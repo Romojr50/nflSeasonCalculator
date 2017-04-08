@@ -41,5 +41,9 @@ public class Conference {
 		Division newDivision = new Division(name);
 		divisions.add(newDivision);
 	}
+
+	public void addDivision(Division newDivision) {
+		divisions.add(newDivision);
+	}
 	
 }

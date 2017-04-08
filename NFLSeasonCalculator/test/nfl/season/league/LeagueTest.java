@@ -2,8 +2,13 @@ package nfl.season.league;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.util.Arrays;
+import java.util.List;
+
 import nfl.season.league.enums.NFLConferenceEnum;
 import nfl.season.league.enums.NFLDivisionEnum;
+import nfl.season.league.enums.NFLTeamEnum;
 
 import org.junit.Test;
 
@@ -23,6 +28,8 @@ public class LeagueTest {
 		Conference nfc = nfl.getConference(NFLConferenceEnum.NFC.name());
 		assertNotNull(nfc);
 		assertConferenceHasCorrectDivisions(nfc);
+		
+		assertConferencesHaveExpectedTeams(afc, nfc);
 	}
 
 	private void assertConferenceHasCorrectDivisions(Conference conference) {
@@ -34,6 +41,57 @@ public class LeagueTest {
 		assertNotNull(south);
 		Division west = conference.getDivision(NFLDivisionEnum.WEST.name());
 		assertNotNull(west);
+	}
+	
+	private void assertConferencesHaveExpectedTeams(Conference afc,
+			Conference nfc) {
+		assertAFCHasExpectedTeams(afc);
+		
+		assertNFCHasExpectedTeams(nfc);
+	}
+
+	private void assertAFCHasExpectedTeams(Conference afc) {
+		Division afcEast = afc.getDivision(NFLDivisionEnum.EAST.name());
+		List<NFLTeamEnum> teamsExpectedInAFCEast = Arrays.asList(NFLTeamEnum.PATRIOTS, NFLTeamEnum.JETS, NFLTeamEnum.DOLPHINS, NFLTeamEnum.BILLS);
+		assertDivisionHasExpectedTeams(afcEast, teamsExpectedInAFCEast);
+		
+		Division afcNorth = afc.getDivision(NFLDivisionEnum.NORTH.name());
+		List<NFLTeamEnum> teamsExpectedInAFCNorth = Arrays.asList(NFLTeamEnum.STEELERS, NFLTeamEnum.RAVENS, NFLTeamEnum.BENGALS, NFLTeamEnum.BROWNS);
+		assertDivisionHasExpectedTeams(afcNorth, teamsExpectedInAFCNorth);
+		
+		Division afcSouth = afc.getDivision(NFLDivisionEnum.SOUTH.name());
+		List<NFLTeamEnum> teamsExpectedInAFCSouth = Arrays.asList(NFLTeamEnum.TEXANS, NFLTeamEnum.COLTS, NFLTeamEnum.TITANS, NFLTeamEnum.JAGUARS);
+		assertDivisionHasExpectedTeams(afcSouth, teamsExpectedInAFCSouth);
+		
+		Division afcWest = afc.getDivision(NFLDivisionEnum.WEST.name());
+		List<NFLTeamEnum> teamsExpectedInAFCWest = Arrays.asList(NFLTeamEnum.BRONCOS, NFLTeamEnum.RAIDERS, NFLTeamEnum.CHIEFS, NFLTeamEnum.CHARGERS);
+		assertDivisionHasExpectedTeams(afcWest, teamsExpectedInAFCWest);
+	}
+	
+	private void assertNFCHasExpectedTeams(Conference nfc) {
+		Division nfcEast = nfc.getDivision(NFLDivisionEnum.EAST.name());
+		List<NFLTeamEnum> teamsExpectedInNFCEast = Arrays.asList(NFLTeamEnum.GIANTS, NFLTeamEnum.COWBOYS, NFLTeamEnum.EAGLES, NFLTeamEnum.REDSKINS);
+		assertDivisionHasExpectedTeams(nfcEast, teamsExpectedInNFCEast);
+		
+		Division nfcNorth = nfc.getDivision(NFLDivisionEnum.NORTH.name());
+		List<NFLTeamEnum> teamsExpectedInNFCNorth = Arrays.asList(NFLTeamEnum.PACKERS, NFLTeamEnum.VIKINGS, NFLTeamEnum.LIONS, NFLTeamEnum.BEARS);
+		assertDivisionHasExpectedTeams(nfcNorth, teamsExpectedInNFCNorth);
+		
+		Division nfcSouth = nfc.getDivision(NFLDivisionEnum.SOUTH.name());
+		List<NFLTeamEnum> teamsExpectedInNFCSouth = Arrays.asList(NFLTeamEnum.FALCONS, NFLTeamEnum.SAINTS, NFLTeamEnum.PANTHERS, NFLTeamEnum.BUCCANEERS);
+		assertDivisionHasExpectedTeams(nfcSouth, teamsExpectedInNFCSouth);
+		
+		Division nfcWest = nfc.getDivision(NFLDivisionEnum.WEST.name());
+		List<NFLTeamEnum> teamsExpectedInNFCWest = Arrays.asList(NFLTeamEnum.SEAHAWKS, NFLTeamEnum.CARDINALS, NFLTeamEnum.NINERS, NFLTeamEnum.RAMS);
+		assertDivisionHasExpectedTeams(nfcWest, teamsExpectedInNFCWest);
+	}
+	
+	private void assertDivisionHasExpectedTeams(Division division,
+			List<NFLTeamEnum> teamsExpectedInDivision) {
+		for (NFLTeamEnum teamExpected : teamsExpectedInDivision) {
+			Team expectedTeam = division.getTeam(teamExpected.name());
+			assertNotNull(expectedTeam);
+		}
 	}
 	
 }

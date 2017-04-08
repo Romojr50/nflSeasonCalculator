@@ -5,6 +5,7 @@ import java.util.List;
 
 import nfl.season.league.enums.NFLConferenceEnum;
 import nfl.season.league.enums.NFLDivisionEnum;
+import nfl.season.league.enums.NFLTeamEnum;
 
 public class League {
 	
@@ -21,11 +22,22 @@ public class League {
 	public void initializeNFL() {
 		conferences = new ArrayList<Conference>();
 		for (NFLConferenceEnum nflConference : NFLConferenceEnum.values()) {
-			Conference newConference = new Conference(nflConference.name());
+			String conferenceName = nflConference.name();
+			Conference newConference = new Conference(conferenceName);
 			conferences.add(newConference);
 			
 			for (NFLDivisionEnum nflDivision : NFLDivisionEnum.values()) {
-				newConference.createDivision(nflDivision.name());
+				String divisionName = nflDivision.name();
+				Division newDivision = new Division(divisionName);
+				newConference.addDivision(newDivision);
+				
+				for (NFLTeamEnum nflTeam : NFLTeamEnum.values()) {
+					if (nflTeam.getConference().name().equals(conferenceName) 
+							&& nflTeam.getDivision().name().equals(divisionName)) {
+						Team newTeam = new Team(nflTeam.name());
+						newDivision.addTeam(newTeam);
+					}
+				}
 			}
 		}
 	}
