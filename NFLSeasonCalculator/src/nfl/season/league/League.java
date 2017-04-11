@@ -3,10 +3,6 @@ package nfl.season.league;
 import java.util.ArrayList;
 import java.util.List;
 
-import nfl.season.league.enums.NFLConferenceEnum;
-import nfl.season.league.enums.NFLDivisionEnum;
-import nfl.season.league.enums.NFLTeamEnum;
-
 public class League {
 	
 	public static final String NFL = "NFL";

@@ -6,10 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Arrays;
 import java.util.List;
 
-import nfl.season.league.enums.NFLConferenceEnum;
-import nfl.season.league.enums.NFLDivisionEnum;
-import nfl.season.league.enums.NFLTeamEnum;
-
 import org.junit.Test;
 
 public class LeagueTest {
