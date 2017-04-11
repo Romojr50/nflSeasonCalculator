@@ -1,5 +1,6 @@
 package nfl.season.calculator;
 
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Matchers.anyString;
@@ -26,13 +27,12 @@ public class MainMenuTest {
 	
 	@Test
 	public void mainMenuPrintsOutOptionsAndGoesToTeams() {
-		when(input.askForInt(anyString())).thenReturn(1);
+		when(input.askForInt(anyString())).thenReturn(1, 2);
 		String expectedMenuMessage = "1. Edit Team Settings\n2. Exit";
 		
 		mainMenu.launchMainMenu();
 		
-		verify(input).askForInt(expectedMenuMessage);
-		when(input.askForInt(anyString())).thenReturn(1);
+		verify(input, times(2)).askForInt(expectedMenuMessage);
 	}
 	
 }

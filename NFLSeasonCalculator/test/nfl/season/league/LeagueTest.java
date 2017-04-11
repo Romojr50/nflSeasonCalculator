@@ -85,7 +85,7 @@ public class LeagueTest {
 	private void assertDivisionHasExpectedTeams(Division division,
 			List<NFLTeamEnum> teamsExpectedInDivision) {
 		for (NFLTeamEnum teamExpected : teamsExpectedInDivision) {
-			Team expectedTeam = division.getTeam(teamExpected.name());
+			Team expectedTeam = division.getTeam(teamExpected.getTeamName());
 			assertNotNull(expectedTeam);
 		}
 	}

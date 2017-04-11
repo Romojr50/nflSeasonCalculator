@@ -30,7 +30,7 @@ public class League {
 				for (NFLTeamEnum nflTeam : NFLTeamEnum.values()) {
 					if (nflTeam.getConference().name().equals(conferenceName) 
 							&& nflTeam.getDivision().name().equals(divisionName)) {
-						Team newTeam = new Team(nflTeam.name());
+						Team newTeam = new Team(nflTeam.getTeamName());
 						newDivision.addTeam(newTeam);
 					}
 				}
