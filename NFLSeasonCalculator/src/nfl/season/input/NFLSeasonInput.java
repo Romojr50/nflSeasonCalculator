@@ -18,5 +18,10 @@ public class NFLSeasonInput {
 		out.println(message);
 		return scanner.nextInt();
 	}
+
+	public String askForString(String message) {
+		out.println(message);
+		return scanner.nextLine();
+	}
 	
 }

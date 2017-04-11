@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.InputMismatchException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,20 +27,45 @@ public class NFLSeasonInputTest {
 	
 	@Before
 	public void setUp() throws IOException {
-		String input = "12";
-		inputStream = new ByteArrayInputStream(input.getBytes());
-		
-		nflSeasonInput = new NFLSeasonInput(inputStream, printStream);
 	}
 	
 	@Test
 	public void asksForIntAndReturnsInt() {
+		String input = "12";
+		inputStream = new ByteArrayInputStream(input.getBytes());
+		nflSeasonInput = new NFLSeasonInput(inputStream, printStream);
+		
 		String message = "Asking for int";
 		
 		int returnInt = nflSeasonInput.askForInt(message);
 		
 		verify(printStream).println(message);
 		assertEquals(12, returnInt);
+	}
+	
+	@Test
+	public void asksForStringAndReturnsString() {
+		String input = "Dozen 12";
+		inputStream = new ByteArrayInputStream(input.getBytes());
+		nflSeasonInput = new NFLSeasonInput(inputStream, printStream);
+		
+		String message = "Asking for string";
+		
+		String returnString = nflSeasonInput.askForString(message);
+		
+		verify(printStream).println(message);
+		assertEquals(input, returnString);
+	}
+	
+	@Test(expected=InputMismatchException.class)
+	public void asksForIntButGetsNonIntSoErrorIsReturned() {
+		String input = "Not an int";
+		inputStream = new ByteArrayInputStream(input.getBytes());
+		nflSeasonInput = new NFLSeasonInput(inputStream, printStream);
+		
+		int returnInt = nflSeasonInput.askForInt("message");
+		
+		assertEquals(0, returnInt);
 	}
 	
 }
