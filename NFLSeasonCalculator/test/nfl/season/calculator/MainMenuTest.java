@@ -1,9 +1,12 @@
 package nfl.season.calculator;
 
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.anyString;
+
+import java.util.InputMismatchException;
+
 import nfl.season.calculator.MainMenu.MainMenuOptions;
 import nfl.season.input.NFLSeasonInput;
 
@@ -24,21 +27,42 @@ public class MainMenuTest {
 	@Mock
 	private TeamsMenu teamsMenu;
 	
+	String expectedMenuMessage;
+	
 	@Before
 	public void setUp() {
 		mainMenu = new MainMenu(input);
 		mainMenu.setSubMenu(teamsMenu, MainMenuOptions.TEAMS.getOptionNumber());
+		
+		expectedMenuMessage = "Please enter in an integer corresponding to one of the following:\n1. Edit Team Settings\n2. Exit";
 	}
 	
 	@Test
-	public void mainMenuPrintsOutOptionsAndGoesToTeams() {
+	public void mainMenuPrintsOutOptionsAndGoesToTeamMenu() {
 		when(input.askForInt(anyString())).thenReturn(1, 2);
-		String expectedMenuMessage = "Select tab:\n1. Edit Team Settings\n2. Exit";
 		
 		mainMenu.launchMainMenu();
 		
 		verify(input, times(2)).askForInt(expectedMenuMessage);
 		verify(teamsMenu, times(1)).launchSubMenu();
+	}
+	
+	@Test
+	public void mainMenuIgnoresNonIntInput() {
+		when(input.askForInt(anyString())).thenThrow(new InputMismatchException()).thenReturn(2);
+		
+		mainMenu.launchMainMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+	}
+	
+	@Test
+	public void mainMenuIgnoresInputOutsideOfExpectedRange() {
+		when(input.askForInt(anyString())).thenReturn(999, 2);
+		
+		mainMenu.launchMainMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
 	}
 	
 }

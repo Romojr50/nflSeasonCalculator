@@ -1,10 +1,13 @@
 package nfl.season.calculator;
 
+import java.util.InputMismatchException;
+
 import nfl.season.input.NFLSeasonInput;
 
 public class MainMenu {
 
-	private static final String MAIN_MENU_INTRO = "Select tab:\n";
+	private static final String MAIN_MENU_INTRO = 
+			"Please enter in an integer corresponding to one of the following:\n";
 	
 	public enum MainMenuOptions {
 		TEAMS(1, "Edit Team Settings"), EXIT(2, "Exit");
@@ -35,11 +38,15 @@ public class MainMenu {
 		
 		int selectedOption = -1;
 		while (selectedOption != MainMenuOptions.EXIT.optionNumber) {
-			selectedOption = input.askForInt(mainMenuMessage);
-			
-			if (MainMenuOptions.EXIT.optionNumber != selectedOption) {
-				SubMenu selectedSubMenu = subMenus[selectedOption - 1];
-				selectedSubMenu.launchSubMenu();
+			try {
+				selectedOption = input.askForInt(mainMenuMessage);
+				
+				if (MainMenuOptions.EXIT.optionNumber > selectedOption) {
+					SubMenu selectedSubMenu = subMenus[selectedOption - 1];
+					selectedSubMenu.launchSubMenu();
+				}
+			} catch (InputMismatchException ime) {
+				selectedOption = -1;
 			}
 		}
 		
