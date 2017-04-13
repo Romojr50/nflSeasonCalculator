@@ -34,7 +34,7 @@ public class MainMenuTest {
 		mainMenu = new MainMenu(input);
 		mainMenu.setSubMenu(teamsMenu, MainMenuOptions.TEAMS.getOptionNumber());
 		
-		expectedMenuMessage = "Please enter in an integer corresponding to one of the following:\n1. Edit Team Settings\n2. Exit";
+		expectedMenuMessage = MenuOptionsUtil.MENU_INTRO + "1. Edit Team Settings\n2. Exit";
 	}
 	
 	@Test

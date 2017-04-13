@@ -6,10 +6,7 @@ import nfl.season.input.NFLSeasonInput;
 
 public class MainMenu {
 
-	private static final String MAIN_MENU_INTRO = 
-			"Please enter in an integer corresponding to one of the following:\n";
-	
-	public enum MainMenuOptions {
+	public enum MainMenuOptions implements MenuOptions {
 		TEAMS(1, "Edit Team Settings"), EXIT(2, "Exit");
 		private int optionNumber;
 		private String optionDescription;
@@ -19,8 +16,14 @@ public class MainMenu {
 			this.optionDescription = optionDescription;
 		}
 		
+		@Override
 		public int getOptionNumber() {
 			return optionNumber;
+		}
+
+		@Override
+		public String getOptionDescription() {
+			return optionDescription;
 		}
 	}
 	
@@ -34,7 +37,7 @@ public class MainMenu {
 	}
 
 	public void launchMainMenu() {
-		String mainMenuMessage = createMainMenuMessage();
+		String mainMenuMessage = MenuOptionsUtil.createMenuMessage(MainMenuOptions.class);
 		
 		int selectedOption = -1;
 		while (selectedOption != MainMenuOptions.EXIT.optionNumber) {
@@ -60,15 +63,4 @@ public class MainMenu {
 		subMenus[optionNumber - 1] = subMenu;
 	}
 
-	private String createMainMenuMessage() {
-		StringBuilder mainMenuMessage = new StringBuilder();
-		mainMenuMessage.append(MAIN_MENU_INTRO);
-		for (MainMenuOptions option : MainMenuOptions.values()) {
-			mainMenuMessage.append(option.optionNumber + ". " 
-					+ option.optionDescription + "\n");
-		}
-		mainMenuMessage.setLength(mainMenuMessage.length() - 1);
-		return mainMenuMessage.toString();
-	}
-	
 }

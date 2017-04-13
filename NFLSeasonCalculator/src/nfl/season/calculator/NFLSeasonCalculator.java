@@ -16,7 +16,7 @@ public class NFLSeasonCalculator {
 		NFLSeasonInput input = new NFLSeasonInput(System.in, System.out);
 		
 		MainMenu mainMenu = new MainMenu(input);
-		TeamsMenu teamsMenu = new TeamsMenu();
+		TeamsMenu teamsMenu = new TeamsMenu(input);
 		mainMenu.setSubMenu(teamsMenu, MainMenuOptions.TEAMS.getOptionNumber());
 		
 		return mainMenu;
