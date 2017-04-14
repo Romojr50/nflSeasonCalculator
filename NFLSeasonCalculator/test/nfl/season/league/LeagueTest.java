@@ -27,6 +27,17 @@ public class LeagueTest {
 		
 		assertConferencesHaveExpectedTeams(afc, nfc);
 	}
+	
+	@Test
+	public void getTeamInLeagueReturnsTeamAtIndex() {
+		String tenthTeamName = NFLTeamEnum.values()[9].getTeamName();
+
+		League nfl = new League(League.NFL);
+		nfl.initializeNFL();
+		
+		Team tenthTeam = nfl.getTeam(10);
+		assertEquals(tenthTeamName, tenthTeam.getName());
+	}
 
 	private void assertConferenceHasCorrectDivisions(Conference conference) {
 		Division east = conference.getDivision(NFLDivisionEnum.EAST.name());

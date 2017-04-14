@@ -60,4 +60,28 @@ public class League {
 		return returnConference;
 	}
 
+	public Team getTeam(int teamIndex) {
+		Team returnTeam = null;
+		int maxIndex = NFLTeamEnum.values().length;
+		
+		if (teamIndex > 0 && teamIndex <= maxIndex) {
+			String teamName = NFLTeamEnum.values()[teamIndex - 1].getTeamName();
+			
+			for (Conference conference : conferences) {
+				List<Division> divisions = conference.getDivisions();
+				for (Division division : divisions) {
+					List<Team> teams = division.getTeams();
+					for (Team team : teams) {
+						if (teamName.equals(team.getName())) {
+							returnTeam = team;
+							break;
+						}
+					}
+				}
+			}
+		}
+		
+		return returnTeam;
+	}
+
 }

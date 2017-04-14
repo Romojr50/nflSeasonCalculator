@@ -32,6 +32,10 @@ public class Division {
 		
 		return returnTeam;
 	}
+	
+	public List<Team> getTeams() {
+		return teams;
+	}
 
 	public void addTeam(Team newTeam) {
 		teams.add(newTeam);
