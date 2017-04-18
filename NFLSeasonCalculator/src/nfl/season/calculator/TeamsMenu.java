@@ -9,6 +9,8 @@ import nfl.season.league.Team;
 
 public class TeamsMenu extends SubMenu {
 	
+	private static final int EXIT_FROM_TEAM_SELECT = NFLTeamEnum.values().length + 1;
+
 	public enum TeamsMenuOptions implements MenuOptions {
 		SELECT_TEAM(1, "Select Team"), 
 		SET_ALL_RANKINGS(2, "Set all Team Power Rankings"), 
@@ -55,20 +57,7 @@ public class TeamsMenu extends SubMenu {
 				selectedOption = input.askForInt(teamsMenuMessage);
 				
 				if (TeamsMenuOptions.SELECT_TEAM.optionNumber == selectedOption) {
-					String teamListMessage = createTeamListMessage();
-					int selectedTeamNumber = -1;
-					
-					while (selectedTeamNumber <= NFLTeamEnum.values().length) {
-						selectedTeamNumber = input.askForInt(teamListMessage);
-						
-						Team selectedTeam = nfl.getTeam(selectedTeamNumber);
-						
-						if (selectedTeam != null) {
-							SingleTeamMenu singleTeamMenu = getSingleTeamMenu();
-							singleTeamMenu.setTeam(selectedTeam);
-							singleTeamMenu.launchSubMenu();
-						}
-					}
+					launchTeamSelect();
 				}
 			} catch (InputMismatchException ime) {
 				selectedOption = -1;
@@ -88,6 +77,27 @@ public class TeamsMenu extends SubMenu {
 			singleTeamMenu = (SingleTeamMenu) subMenu;
 		}
 	}
+	
+	private void launchTeamSelect() {
+		String teamListMessage = createTeamListMessage();
+		int selectedTeamNumber = -1;
+		
+		while (selectedTeamNumber != EXIT_FROM_TEAM_SELECT) {
+			try {
+				selectedTeamNumber = input.askForInt(teamListMessage);
+				
+				Team selectedTeam = nfl.getTeam(selectedTeamNumber);
+				
+				if (selectedTeam != null) {
+					SingleTeamMenu singleTeamMenu = getSingleTeamMenu();
+					singleTeamMenu.setTeam(selectedTeam);
+					singleTeamMenu.launchSubMenu();
+				}
+			} catch (InputMismatchException ime) {
+				selectedTeamNumber = -1;
+			}
+		}
+	}
 
 	private String createTeamListMessage() {
 		StringBuilder teamListMessage = new StringBuilder();
@@ -97,8 +107,9 @@ public class TeamsMenu extends SubMenu {
 			teamListMessage.append(teamIndex + ". ");
 			teamListMessage.append(nflTeam.getTeamName());
 			teamListMessage.append("\n");
+			teamIndex++;
 		}
-		teamListMessage.append((NFLTeamEnum.values().length + 1) + ". Back to Team Menu");
+		teamListMessage.append(EXIT_FROM_TEAM_SELECT + ". Back to Team Menu");
 		return teamListMessage.toString();
 	}
 

@@ -5,6 +5,9 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.InputMismatchException;
+
 import nfl.season.calculator.TeamsMenu.TeamsMenuOptions;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
@@ -19,6 +22,12 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TeamsMenuTest {
+
+	private static final int GO_TO_TEAM_SELECT = 1;
+
+	private static final int EXIT_FROM_TEAMS_MENU = 3;
+	
+	private static final int EXIT_FROM_TEAM_SELECT = NFLTeamEnum.values().length + 1;
 
 	private static final int COLTS_INDEX = 10;
 
@@ -49,7 +58,7 @@ public class TeamsMenuTest {
 	
 	@Test
 	public void teamMenuIsLaunchedAndSelectTeamIsSelectedSoTeamsAreListed() {
-		when(input.askForInt(anyString())).thenReturn(1, NFLTeamEnum.values().length + 1, 3);
+		when(input.askForInt(anyString())).thenReturn(1, EXIT_FROM_TEAM_SELECT, EXIT_FROM_TEAMS_MENU);
 		
 		teamsMenu.launchSubMenu();
 		
@@ -61,8 +70,27 @@ public class TeamsMenuTest {
 	}
 	
 	@Test
+	public void teamMenuIgnoresNonIntInput() {
+		when(input.askForInt(anyString())).thenThrow(new InputMismatchException()).thenReturn(3);
+		
+		teamsMenu.launchSubMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+	}
+	
+	@Test
+	public void teamMenuIgnoresInputOutsideOfExpectedRange() {
+		when(input.askForInt(anyString())).thenReturn(-2, EXIT_FROM_TEAMS_MENU);
+		
+		teamsMenu.launchSubMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+	}
+	
+	@Test
 	public void teamIsSelectedAndPowerRankingIsSet() {
-		when(input.askForInt(anyString())).thenReturn(1, COLTS_INDEX, NFLTeamEnum.values().length + 1, 3);
+		when(input.askForInt(anyString())).thenReturn(1, COLTS_INDEX, 
+				EXIT_FROM_TEAM_SELECT, EXIT_FROM_TEAMS_MENU);
 		when(nfl.getTeam(COLTS_INDEX)).thenReturn(colts);
 		
 		teamsMenu.launchSubMenu();
@@ -72,6 +100,31 @@ public class TeamsMenuTest {
 		verify(input, times(2)).askForInt(teamListMessage);
 		verify(singleTeamMenu).setTeam(colts);
 		verify(singleTeamMenu, times(1)).launchSubMenu();
+	}
+	
+	@Test
+	public void nonIntIsInputAtTeamSelectAndInputIsIgnored() {
+		when(input.askForInt(anyString())).thenReturn(GO_TO_TEAM_SELECT).thenThrow(
+				new InputMismatchException()).thenReturn(EXIT_FROM_TEAM_SELECT, 
+						EXIT_FROM_TEAMS_MENU);
+		
+		teamsMenu.launchSubMenu();
+		
+		String teamListMessage = buildTeamListMessage();
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, times(2)).askForInt(teamListMessage);
+	}
+	
+	@Test
+	public void intOutsideExpectedInputIsPutInTeamSelectAndInputIsIgnored() {
+		when(input.askForInt(anyString())).thenReturn(GO_TO_TEAM_SELECT, 999, 
+				EXIT_FROM_TEAM_SELECT, EXIT_FROM_TEAMS_MENU);
+		
+		teamsMenu.launchSubMenu();
+		
+		String teamListMessage = buildTeamListMessage();
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, times(2)).askForInt(teamListMessage);
 	}
 	
 	@Test
@@ -91,8 +144,9 @@ public class TeamsMenuTest {
 			teamListMessage.append(teamIndex + ". ");
 			teamListMessage.append(nflTeam.getTeamName());
 			teamListMessage.append("\n");
+			teamIndex++;
 		}
-		teamListMessage.append((NFLTeamEnum.values().length + 1) + ". Back to Team Menu");
+		teamListMessage.append(EXIT_FROM_TEAM_SELECT + ". Back to Team Menu");
 		return teamListMessage.toString();
 	}
 	
