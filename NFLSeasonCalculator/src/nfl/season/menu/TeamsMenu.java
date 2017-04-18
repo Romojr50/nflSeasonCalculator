@@ -1,7 +1,5 @@
 package nfl.season.menu;
 
-import java.util.InputMismatchException;
-
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
 import nfl.season.league.NFLTeamEnum;
@@ -53,14 +51,10 @@ public class TeamsMenu extends SubMenu {
 		
 		int selectedOption = -1;
 		while (selectedOption != TeamsMenuOptions.EXIT.optionNumber) {
-			try {
-				selectedOption = input.askForInt(teamsMenuMessage);
+			selectedOption = input.askForInt(teamsMenuMessage);
 				
-				if (TeamsMenuOptions.SELECT_TEAM.optionNumber == selectedOption) {
-					launchTeamSelect();
-				}
-			} catch (InputMismatchException ime) {
-				selectedOption = -1;
+			if (TeamsMenuOptions.SELECT_TEAM.optionNumber == selectedOption) {
+				launchTeamSelect();
 			}
 		}
 	}
@@ -83,18 +77,14 @@ public class TeamsMenu extends SubMenu {
 		int selectedTeamNumber = -1;
 		
 		while (selectedTeamNumber != EXIT_FROM_TEAM_SELECT) {
-			try {
-				selectedTeamNumber = input.askForInt(teamListMessage);
+			selectedTeamNumber = input.askForInt(teamListMessage);
 				
-				Team selectedTeam = nfl.getTeam(selectedTeamNumber);
+			Team selectedTeam = nfl.getTeam(selectedTeamNumber);
 				
-				if (selectedTeam != null) {
-					SingleTeamMenu singleTeamMenu = getSingleTeamMenu();
-					singleTeamMenu.setTeam(selectedTeam);
-					singleTeamMenu.launchSubMenu();
-				}
-			} catch (InputMismatchException ime) {
-				selectedTeamNumber = -1;
+			if (selectedTeam != null) {
+				SingleTeamMenu singleTeamMenu = getSingleTeamMenu();
+				singleTeamMenu.setTeam(selectedTeam);
+				singleTeamMenu.launchSubMenu();
 			}
 		}
 	}

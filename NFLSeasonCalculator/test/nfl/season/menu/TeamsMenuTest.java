@@ -5,17 +5,10 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.InputMismatchException;
-
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
 import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
-import nfl.season.menu.MenuOptionsUtil;
-import nfl.season.menu.SingleTeamMenu;
-import nfl.season.menu.SubMenu;
-import nfl.season.menu.TeamsMenu;
 import nfl.season.menu.TeamsMenu.TeamsMenuOptions;
 
 import org.junit.Before;
@@ -74,15 +67,6 @@ public class TeamsMenuTest {
 	}
 	
 	@Test
-	public void teamMenuIgnoresNonIntInput() {
-		when(input.askForInt(anyString())).thenThrow(new InputMismatchException()).thenReturn(3);
-		
-		teamsMenu.launchSubMenu();
-		
-		verify(input, times(2)).askForInt(expectedMenuMessage);
-	}
-	
-	@Test
 	public void teamMenuIgnoresInputOutsideOfExpectedRange() {
 		when(input.askForInt(anyString())).thenReturn(-2, EXIT_FROM_TEAMS_MENU);
 		
@@ -104,19 +88,6 @@ public class TeamsMenuTest {
 		verify(input, times(2)).askForInt(teamListMessage);
 		verify(singleTeamMenu).setTeam(colts);
 		verify(singleTeamMenu, times(1)).launchSubMenu();
-	}
-	
-	@Test
-	public void nonIntIsInputAtTeamSelectAndInputIsIgnored() {
-		when(input.askForInt(anyString())).thenReturn(GO_TO_TEAM_SELECT).thenThrow(
-				new InputMismatchException()).thenReturn(EXIT_FROM_TEAM_SELECT, 
-						EXIT_FROM_TEAMS_MENU);
-		
-		teamsMenu.launchSubMenu();
-		
-		String teamListMessage = buildTeamListMessage();
-		verify(input, times(2)).askForInt(expectedMenuMessage);
-		verify(input, times(2)).askForInt(teamListMessage);
 	}
 	
 	@Test

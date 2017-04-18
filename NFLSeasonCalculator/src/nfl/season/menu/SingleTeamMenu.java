@@ -1,7 +1,5 @@
 package nfl.season.menu;
 
-import java.util.InputMismatchException;
-
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
@@ -49,23 +47,15 @@ public class SingleTeamMenu extends SubMenu {
 		
 		int selectedOption = -1;
 		while (selectedOption != SingleTeamMenuOptions.EXIT.optionNumber) {
-			try {
-				selectedOption = input.askForInt(singleTeamMenuMessage);
+			selectedOption = input.askForInt(singleTeamMenuMessage);
 				
-				if (SingleTeamMenuOptions.SET_POWER_RANKING.optionNumber == selectedOption) {
-					int newPowerRanking = -1;
-					while (newPowerRanking < 1 || 
-							newPowerRanking > NFLTeamEnum.values().length) {
-						try {
-							newPowerRanking = input.askForInt(POWER_RANKING_MESSAGE);
-							selectedTeam.setPowerRanking(newPowerRanking);
-						} catch (InputMismatchException ime) {
-							newPowerRanking = -1;
-						}
-					}
+			if (SingleTeamMenuOptions.SET_POWER_RANKING.optionNumber == selectedOption) {
+				int newPowerRanking = -1;
+				while (newPowerRanking < 1 || 
+					newPowerRanking > NFLTeamEnum.values().length) {
+					newPowerRanking = input.askForInt(POWER_RANKING_MESSAGE);
+					selectedTeam.setPowerRanking(newPowerRanking);
 				}
-			} catch (InputMismatchException ime) {
-				selectedOption = -1;
 			}
 		}
 	}

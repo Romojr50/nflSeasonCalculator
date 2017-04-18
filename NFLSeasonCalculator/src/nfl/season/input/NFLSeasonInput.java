@@ -16,7 +16,22 @@ public class NFLSeasonInput {
 
 	public int askForInt(String message) {
 		out.println(message);
-		return scanner.nextInt();
+		int returnInt = -1;
+		boolean inputError = true;
+		while (inputError) {
+			if (scanner.hasNextInt()) {
+				returnInt = scanner.nextInt();
+				if (scanner.hasNextLine()) {
+					scanner.nextLine();
+				}
+				inputError = false;
+			} else {
+				out.println(message);
+				scanner.nextLine();
+				continue;
+			}
+		}
+		return returnInt;
 	}
 
 	public String askForString(String message) {

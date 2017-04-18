@@ -4,13 +4,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.InputMismatchException;
-
 import nfl.season.input.NFLSeasonInput;
-import nfl.season.menu.MainMenu;
-import nfl.season.menu.MenuOptionsUtil;
-import nfl.season.menu.TeamsMenu;
 import nfl.season.menu.MainMenu.MainMenuOptions;
 
 import org.junit.Before;
@@ -48,15 +42,6 @@ public class MainMenuTest {
 		
 		verify(input, times(2)).askForInt(expectedMenuMessage);
 		verify(teamsMenu, times(1)).launchSubMenu();
-	}
-	
-	@Test
-	public void mainMenuIgnoresNonIntInput() {
-		when(input.askForInt(anyString())).thenThrow(new InputMismatchException()).thenReturn(2);
-		
-		mainMenu.launchMainMenu();
-		
-		verify(input, times(2)).askForInt(expectedMenuMessage);
 	}
 	
 	@Test

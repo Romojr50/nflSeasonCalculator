@@ -1,7 +1,5 @@
 package nfl.season.menu;
 
-import java.util.InputMismatchException;
-
 import nfl.season.input.NFLSeasonInput;
 
 public class MainMenu {
@@ -41,15 +39,11 @@ public class MainMenu {
 		
 		int selectedOption = -1;
 		while (selectedOption != MainMenuOptions.EXIT.optionNumber) {
-			try {
-				selectedOption = input.askForInt(mainMenuMessage);
-				
-				if (MainMenuOptions.EXIT.optionNumber > selectedOption) {
-					SubMenu selectedSubMenu = subMenus[selectedOption - 1];
-					selectedSubMenu.launchSubMenu();
-				}
-			} catch (InputMismatchException ime) {
-				selectedOption = -1;
+			selectedOption = input.askForInt(mainMenuMessage);
+			
+			if (MainMenuOptions.EXIT.optionNumber > selectedOption) {
+				SubMenu selectedSubMenu = subMenus[selectedOption - 1];
+				selectedSubMenu.launchSubMenu();
 			}
 		}
 		

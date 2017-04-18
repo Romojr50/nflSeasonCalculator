@@ -1,13 +1,13 @@
 package nfl.season.input;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.InputMismatchException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class NFLSeasonInputTest {
 	
 	@Test
 	public void asksForIntAndReturnsInt() {
-		String input = "12";
+		String input = 12 + "\n";
 		inputStream = new ByteArrayInputStream(input.getBytes());
 		nflSeasonInput = new NFLSeasonInput(inputStream, printStream);
 		
@@ -57,15 +57,34 @@ public class NFLSeasonInputTest {
 		assertEquals(input, returnString);
 	}
 	
-	@Test(expected=InputMismatchException.class)
-	public void asksForIntButGetsNonIntSoErrorIsReturned() {
-		String input = "Not an int";
+	@Test
+	public void asksForIntButGetsNonIntSoMessageIsRepeatedUntilIntIsInput() {
+		String message = "message";
+		
+		String input = "Not an int\nAlso not an int\n56";
 		inputStream = new ByteArrayInputStream(input.getBytes());
 		nflSeasonInput = new NFLSeasonInput(inputStream, printStream);
 		
-		int returnInt = nflSeasonInput.askForInt("message");
+		int returnInt = nflSeasonInput.askForInt(message);
 		
-		assertEquals(0, returnInt);
+		verify(printStream, times(3)).println(message);
+		assertEquals(56, returnInt);
+	}
+	
+	@Test
+	public void asksForIntTwiceGetsOneIntThenNonIntThenIntSoEachIntReturned() {
+		String message = "message";
+		
+		String input = "1\n3a\n3\n";
+		inputStream = new ByteArrayInputStream(input.getBytes());
+		nflSeasonInput = new NFLSeasonInput(inputStream, printStream);
+		
+		int returnInt1 = nflSeasonInput.askForInt(message);
+		int returnInt2 = nflSeasonInput.askForInt(message);
+		
+		verify(printStream, times(3)).println(message);
+		assertEquals(1, returnInt1);
+		assertEquals(3, returnInt2);
 	}
 	
 }

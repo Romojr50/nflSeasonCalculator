@@ -4,9 +4,6 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.InputMismatchException;
-
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.Team;
 
@@ -60,34 +57,12 @@ public class SingleTeamMenuTest {
 	}
 	
 	@Test
-	public void nonIntIsInputSoInputIsIgnored() {
-		when(input.askForInt(anyString())).thenThrow(
-				new InputMismatchException()).thenReturn(EXIT_FROM_SINGLE_TEAM_MENU);
-		
-		singleTeamMenu.launchSubMenu();
-		
-		verify(input, times(2)).askForInt(expectedMenuMessage);
-	}
-	
-	@Test
 	public void intOutsideOfExpectedRangeIsInputSoInputIsIgnored() {
 		when(input.askForInt(anyString())).thenReturn(-2, EXIT_FROM_SINGLE_TEAM_MENU);
 		
 		singleTeamMenu.launchSubMenu();
 		
 		verify(input, times(2)).askForInt(expectedMenuMessage);
-	}
-	
-	@Test
-	public void nonIntIsEnteredForPowerRankingSoInputIsIgnored() {
-		when(input.askForInt(anyString())).thenReturn(SET_POWER_RANKING).thenThrow(
-				new InputMismatchException()).thenReturn(10).thenReturn(EXIT_FROM_SINGLE_TEAM_MENU);
-		
-		singleTeamMenu.launchSubMenu();
-		
-		verify(input, times(2)).askForInt(expectedMenuMessage);
-		verify(input, times(2)).askForInt(expectedPowerRankingsMessage);
-		verify(colts, times(1)).setPowerRanking(10);
 	}
 	
 	@Test
