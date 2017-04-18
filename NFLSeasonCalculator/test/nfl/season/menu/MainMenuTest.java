@@ -1,4 +1,4 @@
-package nfl.season.calculator;
+package nfl.season.menu;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
@@ -7,8 +7,11 @@ import static org.mockito.Mockito.when;
 
 import java.util.InputMismatchException;
 
-import nfl.season.calculator.MainMenu.MainMenuOptions;
 import nfl.season.input.NFLSeasonInput;
+import nfl.season.menu.MainMenu;
+import nfl.season.menu.MenuOptionsUtil;
+import nfl.season.menu.TeamsMenu;
+import nfl.season.menu.MainMenu.MainMenuOptions;
 
 import org.junit.Before;
 import org.junit.Test;

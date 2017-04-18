@@ -1,4 +1,4 @@
-package nfl.season.calculator;
+package nfl.season.menu;
 
 import java.util.InputMismatchException;
 

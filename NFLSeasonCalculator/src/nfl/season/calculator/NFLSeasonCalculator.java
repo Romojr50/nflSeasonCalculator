@@ -1,9 +1,12 @@
 package nfl.season.calculator;
 
-import nfl.season.calculator.MainMenu.MainMenuOptions;
-import nfl.season.calculator.TeamsMenu.TeamsMenuOptions;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
+import nfl.season.menu.MainMenu;
+import nfl.season.menu.SingleTeamMenu;
+import nfl.season.menu.TeamsMenu;
+import nfl.season.menu.MainMenu.MainMenuOptions;
+import nfl.season.menu.TeamsMenu.TeamsMenuOptions;
 
 public class NFLSeasonCalculator {
 
@@ -27,7 +30,7 @@ public class NFLSeasonCalculator {
 
 	public static TeamsMenu createTeamsMenu(NFLSeasonInput input, League nfl) {
 		TeamsMenu teamsMenu = new TeamsMenu(input, nfl);
-		SingleTeamMenu singleTeamMenu = new SingleTeamMenu();
+		SingleTeamMenu singleTeamMenu = new SingleTeamMenu(input);
 		teamsMenu.setSubMenu(singleTeamMenu, TeamsMenuOptions.SELECT_TEAM.getOptionNumber());
 		return teamsMenu;
 	}

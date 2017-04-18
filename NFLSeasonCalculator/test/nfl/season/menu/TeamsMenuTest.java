@@ -1,4 +1,4 @@
-package nfl.season.calculator;
+package nfl.season.menu;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
@@ -8,11 +8,15 @@ import static org.mockito.Mockito.when;
 
 import java.util.InputMismatchException;
 
-import nfl.season.calculator.TeamsMenu.TeamsMenuOptions;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
 import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
+import nfl.season.menu.MenuOptionsUtil;
+import nfl.season.menu.SingleTeamMenu;
+import nfl.season.menu.SubMenu;
+import nfl.season.menu.TeamsMenu;
+import nfl.season.menu.TeamsMenu.TeamsMenuOptions;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +44,7 @@ public class TeamsMenuTest {
 	private League nfl;
 	
 	@Mock
-	Team colts;
+	private Team colts;
 	
 	@Mock
 	private SingleTeamMenu singleTeamMenu;

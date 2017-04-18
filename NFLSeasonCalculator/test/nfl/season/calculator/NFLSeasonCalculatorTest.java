@@ -2,10 +2,14 @@ package nfl.season.calculator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import nfl.season.calculator.MainMenu.MainMenuOptions;
-import nfl.season.calculator.TeamsMenu.TeamsMenuOptions;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
+import nfl.season.menu.MainMenu;
+import nfl.season.menu.SingleTeamMenu;
+import nfl.season.menu.SubMenu;
+import nfl.season.menu.TeamsMenu;
+import nfl.season.menu.MainMenu.MainMenuOptions;
+import nfl.season.menu.TeamsMenu.TeamsMenuOptions;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
