@@ -10,6 +10,8 @@ import org.junit.Test;
 
 public class LeagueTest {
 
+	String tenthTeamName = NFLTeamEnum.values()[9].getTeamName();
+	
 	@Test
 	public void leagueIsInitializedWithNFLConferencesDivisionsAndTeams() {
 		League nfl = new League(League.NFL);
@@ -30,12 +32,22 @@ public class LeagueTest {
 	
 	@Test
 	public void getTeamInLeagueReturnsTeamAtIndex() {
-		String tenthTeamName = NFLTeamEnum.values()[9].getTeamName();
-
 		League nfl = new League(League.NFL);
 		nfl.initializeNFL();
 		
 		Team tenthTeam = nfl.getTeam(10);
+		assertEquals(tenthTeamName, tenthTeam.getName());
+	}
+	
+	@Test
+	public void getAllTeamsInLeagueReturnsAllTeams() {
+		League nfl = new League(League.NFL);
+		nfl.initializeNFL();
+		
+		List<Team> allTeams = nfl.getTeams();
+		
+		assertEquals(NFLTeamEnum.values().length, allTeams.size());
+		Team tenthTeam = allTeams.get(9);
 		assertEquals(tenthTeamName, tenthTeam.getName());
 	}
 

@@ -2,9 +2,14 @@ package nfl.season.menu;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
 import nfl.season.league.NFLTeamEnum;
@@ -21,6 +26,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class TeamsMenuTest {
 
 	private static final int GO_TO_TEAM_SELECT = 1;
+	
+	private static final int GO_TO_SET_ALL_RANKINGS = 2;
 
 	private static final int EXIT_FROM_TEAMS_MENU = 3;
 	
@@ -40,6 +47,22 @@ public class TeamsMenuTest {
 	private Team colts;
 	
 	@Mock
+	private Team patriots;
+	
+	@Mock
+	private Team falcons;
+	
+	@Mock
+	private Team steelers;
+	
+	@Mock
+	private Team packers;
+	
+	private List<Team> mockTeams;
+	
+	int[] indexesChosenForPowerRankingsInOrder = {2, 2, 1, 1};
+	
+	@Mock
 	private SingleTeamMenu singleTeamMenu;
 	
 	private String expectedMenuMessage;
@@ -51,6 +74,20 @@ public class TeamsMenuTest {
 		
 		expectedMenuMessage = 
 				MenuOptionsUtil.MENU_INTRO + "1. Select Team\n2. Set all Team Power Rankings\n3. Back to Main Menu";
+		
+		when(steelers.getName()).thenReturn("Steelers");
+		when(patriots.getName()).thenReturn("Patriots");
+		when(falcons.getName()).thenReturn("Falcons");
+		when(packers.getName()).thenReturn("Packers");
+		
+		mockTeams = new ArrayList<Team>();
+		mockTeams.add(steelers);
+		mockTeams.add(patriots);
+		mockTeams.add(falcons);
+		mockTeams.add(packers);
+		List<Team> mockTeamsCopy = new ArrayList<Team>();
+		mockTeamsCopy.addAll(mockTeams);
+		when(nfl.getTeams()).thenReturn(mockTeamsCopy);
 	}
 	
 	@Test
@@ -111,6 +148,82 @@ public class TeamsMenuTest {
 		assertEquals(singleTeamMenu, returnedSingleTeamMenu);
 	}
 	
+	@Test
+	public void setAllRankingsIsSelectedAndThenExitedImmediately() {
+		when(input.askForInt(anyString())).thenReturn(GO_TO_SET_ALL_RANKINGS, 
+				EXIT_FROM_TEAM_SELECT, EXIT_FROM_TEAMS_MENU);
+		
+		teamsMenu.launchSubMenu();
+		
+		String teamListMessage = buildTeamListMessage();
+		teamListMessage = "Set #1\n" + teamListMessage;
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verifyTeamListMessagesForSetAllRankings(1, 1);
+	}
+	
+	@Test
+	public void setAllRankingsPutInFourRankingsSoFourRankingsAreSet() {
+		when(input.askForInt(anyString())).thenReturn(GO_TO_SET_ALL_RANKINGS, 
+				indexesChosenForPowerRankingsInOrder[0], 
+				indexesChosenForPowerRankingsInOrder[1], 
+				indexesChosenForPowerRankingsInOrder[2],
+				indexesChosenForPowerRankingsInOrder[3],
+				EXIT_FROM_TEAMS_MENU);
+		
+		teamsMenu.launchSubMenu();
+		
+		verifyTeamListMessagesForSetAllRankings(4, 1);
+		verify(input, never()).askForInt(
+				"Set #5\nPlease enter in an integer corresponding to one of "
+				+ "the following:\n33. Back to Team Menu");
+		
+		verify(patriots).setPowerRanking(1);
+		verify(falcons).setPowerRanking(2);
+		verify(steelers).setPowerRanking(3);
+		verify(packers).setPowerRanking(4);
+	}
+	
+	@Test
+	public void setAllRankingsIsDoneOneIsSetThenOldMaxIsSelectedAndIgnored() {
+		when(input.askForInt(anyString())).thenReturn(GO_TO_SET_ALL_RANKINGS, 
+				indexesChosenForPowerRankingsInOrder[0],
+				mockTeams.size(),
+				EXIT_FROM_TEAM_SELECT, 
+				EXIT_FROM_TEAMS_MENU);
+		
+		teamsMenu.launchSubMenu();
+		
+		verifyTeamListMessagesForSetAllRankings(2, 2);
+	}
+	
+	private void verifyTeamListMessagesForSetAllRankings(int numberOfRankingsToSet, 
+			int numberOfRepeatsOfLastMessage) {
+		List<Team> mockTeamsCopy = new ArrayList<Team>();
+		mockTeamsCopy.addAll(mockTeams);
+		for (int i = 1; i <= numberOfRankingsToSet; i++) {
+			StringBuilder teamListForSetAllRankings = new StringBuilder();
+			teamListForSetAllRankings.append("Set #" + i + "\n");
+			teamListForSetAllRankings.append(MenuOptionsUtil.MENU_INTRO);
+			int teamIndex = 1;
+			for (Team team : mockTeamsCopy) {
+				teamListForSetAllRankings.append(teamIndex + ". ");
+				teamListForSetAllRankings.append(team.getName());
+				teamListForSetAllRankings.append("\n");
+				teamIndex++;
+			}
+			teamListForSetAllRankings.append(EXIT_FROM_TEAM_SELECT + ". Back to Team Menu");
+			
+			if (i == numberOfRankingsToSet) {
+				verify(input, times(numberOfRepeatsOfLastMessage)).askForInt(
+						teamListForSetAllRankings.toString());
+			} else {
+				verify(input, times(1)).askForInt(teamListForSetAllRankings.toString());
+			}
+			
+			mockTeamsCopy.remove((indexesChosenForPowerRankingsInOrder[i - 1]) - 1);
+		}
+	}
+
 	private String buildTeamListMessage() {
 		StringBuilder teamListMessage = new StringBuilder();
 		teamListMessage.append(MenuOptionsUtil.MENU_INTRO);

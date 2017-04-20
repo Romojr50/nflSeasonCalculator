@@ -84,4 +84,17 @@ public class League {
 		return returnTeam;
 	}
 
+	public List<Team> getTeams() {
+		List<Team> returnTeams = new ArrayList<Team>();
+		
+		for (Conference conference : conferences) {
+			List<Division> divisions = conference.getDivisions();
+			for (Division division : divisions) {
+				List<Team> teams = division.getTeams();
+				returnTeams.addAll(teams);
+			}
+		}
+		return returnTeams;
+	}
+
 }

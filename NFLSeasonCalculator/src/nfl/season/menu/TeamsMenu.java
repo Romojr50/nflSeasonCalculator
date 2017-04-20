@@ -1,5 +1,7 @@
 package nfl.season.menu;
 
+import java.util.List;
+
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
 import nfl.season.league.NFLTeamEnum;
@@ -55,6 +57,8 @@ public class TeamsMenu extends SubMenu {
 				
 			if (TeamsMenuOptions.SELECT_TEAM.optionNumber == selectedOption) {
 				launchTeamSelect();
+			} else if (TeamsMenuOptions.SET_ALL_RANKINGS.optionNumber == selectedOption) {
+				launchSetAllRankings();
 			}
 		}
 	}
@@ -88,6 +92,24 @@ public class TeamsMenu extends SubMenu {
 			}
 		}
 	}
+	
+	private void launchSetAllRankings() {
+		int selectedTeamNumber = -1;
+		
+		int currentRanking = 1;
+		List<Team> remainingTeams = nfl.getTeams();
+		while (selectedTeamNumber != EXIT_FROM_TEAM_SELECT && remainingTeams.size() > 0) {
+			String setAllRankingsPrefix = "Set #" + currentRanking + "\n";
+			String teamListMessage = setAllRankingsPrefix + createTeamListMessageFromList(remainingTeams);
+			selectedTeamNumber = input.askForInt(teamListMessage);
+			
+			if (selectedTeamNumber <= remainingTeams.size()) {
+				Team selectedTeam = remainingTeams.remove(selectedTeamNumber - 1);
+				selectedTeam.setPowerRanking(currentRanking);
+				currentRanking++;
+			}
+		}
+	}
 
 	private String createTeamListMessage() {
 		StringBuilder teamListMessage = new StringBuilder();
@@ -96,6 +118,20 @@ public class TeamsMenu extends SubMenu {
 		for (NFLTeamEnum nflTeam : NFLTeamEnum.values()) {
 			teamListMessage.append(teamIndex + ". ");
 			teamListMessage.append(nflTeam.getTeamName());
+			teamListMessage.append("\n");
+			teamIndex++;
+		}
+		teamListMessage.append(EXIT_FROM_TEAM_SELECT + ". Back to Team Menu");
+		return teamListMessage.toString();
+	}
+	
+	private String createTeamListMessageFromList(List<Team> teams) {
+		StringBuilder teamListMessage = new StringBuilder();
+		teamListMessage.append(MenuOptionsUtil.MENU_INTRO);
+		int teamIndex = 1;
+		for (Team team : teams) {
+			teamListMessage.append(teamIndex + ". ");
+			teamListMessage.append(team.getName());
 			teamListMessage.append("\n");
 			teamIndex++;
 		}
