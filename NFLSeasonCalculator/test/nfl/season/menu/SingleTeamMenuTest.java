@@ -46,12 +46,14 @@ public class SingleTeamMenuTest {
 		singleTeamMenu = new SingleTeamMenu(input, nfl);
 		singleTeamMenu.setTeam(colts);
 		
-		expectedMenuMessage = 
-				MenuOptionsUtil.MENU_INTRO + "1. Set Power Ranking\n2. Back to Teams Menu";
-		
-		expectedPowerRankingsMessage = "Please enter in a number between 1-32:";
+		expectedPowerRankingsMessage = "Please enter in a number between 1-32 to " +
+				"set the team to that ranking\nor -1 to clear this team's ranking:";
 		
 		when(colts.getName()).thenReturn("Colts");
+		when(colts.getPowerRanking()).thenReturn(19);
+		
+		setExpectedMenuMessage();
+		
 		when(eagles.getName()).thenReturn("Eagles");
 	}
 	
@@ -66,6 +68,22 @@ public class SingleTeamMenuTest {
 		verify(input, times(1)).askForInt(expectedPowerRankingsMessage);
 		
 		verify(colts, times(1)).setPowerRanking(15);
+	}
+	
+	@Test
+	public void powerRankingNotYetSetSoUnsetIsDisplayedAsPowerRanking() {
+		when(colts.getPowerRanking()).thenReturn(Team.CLEAR_RANKING, Team.CLEAR_RANKING, 
+				15);
+		setExpectedMenuMessage();
+		when(input.askForInt(anyString())).thenReturn(SET_POWER_RANKING, 15, 
+				EXIT_FROM_SINGLE_TEAM_MENU);
+		
+		expectedMenuMessage = expectedMenuMessage.replace("" + Team.CLEAR_RANKING, 
+				Team.UNSET_RANKING_DISPLAY);
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, times(1)).askForInt(expectedMenuMessage);
 	}
 	
 	@Test
@@ -154,6 +172,27 @@ public class SingleTeamMenuTest {
 		verify(input, times(2)).askForString(overwriteMessage);
 		verify(colts, times(1)).setPowerRanking(overwritePowerRanking);
 		verify(eagles, times(1)).setPowerRanking(-1);
+	}
+	
+	@Test
+	public void setClearPowerRankingWhenOtherTeamsAreClearedButNoOverwriteMessageAppears() {
+		when(colts.getPowerRanking()).thenReturn(15);
+		when(eagles.getPowerRanking()).thenReturn(-1);
+		
+		when(input.askForInt(anyString())).thenReturn(SET_POWER_RANKING, Team.CLEAR_RANKING, 
+				EXIT_FROM_SINGLE_TEAM_MENU);
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, never()).askForString(anyString());
+		verify(nfl, never()).getTeamWithPowerRanking(anyInt());
+	}
+	
+	private void setExpectedMenuMessage() {
+		expectedMenuMessage = 
+				colts.getName() + "\nPower Ranking: " + colts.getPowerRanking() + 
+				"\n" + MenuOptionsUtil.MENU_INTRO + 
+				"1. Set Power Ranking\n2. Back to Teams Menu";
 	}
 	
 }

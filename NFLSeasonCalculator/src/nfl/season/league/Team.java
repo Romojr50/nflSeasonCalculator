@@ -3,6 +3,8 @@ package nfl.season.league;
 public class Team {
 
 	public static final int CLEAR_RANKING = -1;
+
+	public static final String UNSET_RANKING_DISPLAY = "Unset";
 	
 	private String name;
 	

@@ -30,8 +30,11 @@ public class SingleTeamMenu extends SubMenu {
 		}
 	}
 	
-	private static final String POWER_RANKING_MESSAGE = 
-			"Please enter in a number between 1-32:";
+	private static final String POWER_RANKING_MESSAGE = "Please enter in a number " +
+			"between 1-32 to set the team to that ranking\nor -1 to clear this " +
+			"team's ranking:";
+	
+	private static final int NON_POWER_RANKING = 0;
 	
 	private Team selectedTeam;
 	
@@ -46,11 +49,17 @@ public class SingleTeamMenu extends SubMenu {
 	
 	@Override
 	public void launchSubMenu() {
-		String singleTeamMenuMessage = MenuOptionsUtil.createMenuMessage(
+		String singleTeamMenuMessageSuffix = MenuOptionsUtil.createMenuMessage(
 				SingleTeamMenuOptions.class);
+		String singleTeamMenuMessage = singleTeamMenuMessageSuffix;
 		
 		int selectedOption = -1;
 		while (selectedOption != SingleTeamMenuOptions.EXIT.optionNumber) {
+			singleTeamMenuMessage = selectedTeam.getName() + "\nPower Ranking: " + 
+					selectedTeam.getPowerRanking() + "\n" + singleTeamMenuMessageSuffix;
+			singleTeamMenuMessage = singleTeamMenuMessage.replace("" + Team.CLEAR_RANKING, 
+					Team.UNSET_RANKING_DISPLAY); 
+			
 			selectedOption = input.askForInt(singleTeamMenuMessage);
 				
 			if (SingleTeamMenuOptions.SET_POWER_RANKING.optionNumber == selectedOption) {
@@ -64,12 +73,16 @@ public class SingleTeamMenu extends SubMenu {
 	}
 
 	private void launchSetPowerRankingMenu() {
-		int newPowerRanking = Team.CLEAR_RANKING;
-		while (newPowerRanking < 1 || 
-			newPowerRanking > NFLTeamEnum.values().length) {
+		int newPowerRanking = NON_POWER_RANKING;
+		while ((newPowerRanking < 1 || 
+				newPowerRanking > NFLTeamEnum.values().length) && 
+				newPowerRanking != Team.CLEAR_RANKING) {
 			newPowerRanking = input.askForInt(POWER_RANKING_MESSAGE);
 			
-			Team teamWithThatRanking = league.getTeamWithPowerRanking(newPowerRanking);
+			Team teamWithThatRanking = null;
+			if (newPowerRanking != Team.CLEAR_RANKING) {
+				teamWithThatRanking = league.getTeamWithPowerRanking(newPowerRanking);
+			}
 			
 			if (teamWithThatRanking == null) {
 				selectedTeam.setPowerRanking(newPowerRanking);
@@ -97,7 +110,7 @@ public class SingleTeamMenu extends SubMenu {
 				selectedTeam.setPowerRanking(newPowerRanking);
 				teamWithThatRanking.setPowerRanking(Team.CLEAR_RANKING);
 			} else if ("N".equalsIgnoreCase(overwriteAnswer)){
-				newPowerRanking = Team.CLEAR_RANKING;
+				newPowerRanking = NON_POWER_RANKING;
 			}
 		}
 		
