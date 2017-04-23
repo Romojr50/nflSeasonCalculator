@@ -50,6 +50,19 @@ public class LeagueTest {
 		Team tenthTeam = allTeams.get(9);
 		assertEquals(tenthTeamName, tenthTeam.getName());
 	}
+	
+	@Test
+	public void getTeamWithPowerRankingSoTeamWithThatPowerRankingIsReturned() {
+		League nfl = new League(League.NFL);
+		nfl.initializeNFL();
+		
+		List<Team> allTeams = nfl.getTeams();
+		Team teamAtRankingTen = allTeams.get(17);
+		teamAtRankingTen.setPowerRanking(10);
+		
+		Team returnTeam = nfl.getTeamWithPowerRanking(10);
+		assertEquals(teamAtRankingTen, returnTeam);
+	}
 
 	private void assertConferenceHasCorrectDivisions(Conference conference) {
 		Division east = conference.getDivision(NFLDivisionEnum.EAST.name());

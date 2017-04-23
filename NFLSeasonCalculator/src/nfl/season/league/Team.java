@@ -10,12 +10,16 @@ public class Team {
 		this.name = name;
 	}
 
-	public Object getName() {
+	public String getName() {
 		return name;
 	}
 
 	public void setPowerRanking(int powerRanking) {
 		this.powerRanking = powerRanking;
+	}
+
+	public int getPowerRanking() {
+		return this.powerRanking;
 	}
 	
 }

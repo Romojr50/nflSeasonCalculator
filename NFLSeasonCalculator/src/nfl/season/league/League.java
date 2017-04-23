@@ -11,8 +11,11 @@ public class League {
 	
 	private List<Conference> conferences;
 	
+	private List<Team> allTeams;
+	
 	public League(String name) {
 		this.name = name;
+		allTeams = new ArrayList<Team>();
 	}
 
 	public void initializeNFL() {
@@ -32,6 +35,7 @@ public class League {
 							&& nflTeam.getDivision().name().equals(divisionName)) {
 						Team newTeam = new Team(nflTeam.getTeamName());
 						newDivision.addTeam(newTeam);
+						allTeams.add(newTeam);
 					}
 				}
 			}
@@ -85,16 +89,19 @@ public class League {
 	}
 
 	public List<Team> getTeams() {
-		List<Team> returnTeams = new ArrayList<Team>();
-		
-		for (Conference conference : conferences) {
-			List<Division> divisions = conference.getDivisions();
-			for (Division division : divisions) {
-				List<Team> teams = division.getTeams();
-				returnTeams.addAll(teams);
+		return allTeams;
+	}
+
+	public Team getTeamWithPowerRanking(int powerRanking) {
+		Team returnTeam = null;
+		for (Team team : allTeams) {
+			int teamPowerRanking = team.getPowerRanking();
+			if (powerRanking == teamPowerRanking) {
+				returnTeam = team;
+				break;
 			}
 		}
-		return returnTeams;
+		return returnTeam;
 	}
 
 }
