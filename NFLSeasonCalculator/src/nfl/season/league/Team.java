@@ -9,6 +9,8 @@ public class Team {
 	private String name;
 	
 	private int powerRanking = CLEAR_RANKING;
+	
+	private int teamLevel = 1;
 
 	public Team(String name) {
 		this.name = name;
@@ -17,13 +19,21 @@ public class Team {
 	public String getName() {
 		return name;
 	}
+	
+	public int getPowerRanking() {
+		return this.powerRanking;
+	}
 
 	public void setPowerRanking(int powerRanking) {
 		this.powerRanking = powerRanking;
 	}
 
-	public int getPowerRanking() {
-		return this.powerRanking;
+	public int getTeamLevel() {
+		return teamLevel;
+	}
+
+	public void setTeamLevel(int newTeamLevel) {
+		this.teamLevel = newTeamLevel;
 	}
 	
 }

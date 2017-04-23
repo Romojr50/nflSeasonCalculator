@@ -20,12 +20,16 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class SingleTeamMenuTest {
 	
 	private static final int SET_POWER_RANKING = 1;
+	
+	private static final int SET_TEAM_LEVEL = 2;
 
-	private static final int EXIT_FROM_SINGLE_TEAM_MENU = 2;
+	private static final int EXIT_FROM_SINGLE_TEAM_MENU = 3;
 	
 	private String expectedMenuMessage;
 	
 	private String expectedPowerRankingsMessage;
+	
+	private String expectedTeamLevelMessage;
 	
 	@Mock
 	private NFLSeasonInput input;
@@ -46,17 +50,18 @@ public class SingleTeamMenuTest {
 		singleTeamMenu = new SingleTeamMenu(input, nfl);
 		singleTeamMenu.setTeam(colts);
 		
-		expectedPowerRankingsMessage = "Please enter in a number between 1-32 to " +
-				"set the team to that ranking\nor -1 to clear this team's ranking:";
 		
 		when(colts.getName()).thenReturn("Colts");
 		when(colts.getPowerRanking()).thenReturn(19);
+		when(colts.getTeamLevel()).thenReturn(48);
 		
 		setExpectedMenuMessage();
+		setExpectedPowerRankingsMessage();
+		setExpectedTeamLevelMessage();
 		
 		when(eagles.getName()).thenReturn("Eagles");
 	}
-	
+
 	@Test
 	public void teamPowerRankingIsSet() {
 		when(input.askForInt(anyString())).thenReturn(SET_POWER_RANKING, 15, 
@@ -188,11 +193,53 @@ public class SingleTeamMenuTest {
 		verify(nfl, never()).getTeamWithPowerRanking(anyInt());
 	}
 	
+	@Test
+	public void teamLevelIsSet() {
+		int newTeamLevel = 17;
+		
+		when(input.askForInt(anyString())).thenReturn(SET_TEAM_LEVEL, newTeamLevel, 
+				EXIT_FROM_SINGLE_TEAM_MENU);
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, times(1)).askForInt(expectedTeamLevelMessage);
+		
+		verify(colts, times(1)).setTeamLevel(newTeamLevel);
+	}
+	
+	@Test
+	public void teamLevelInputIsInvalidSoInvalidInputIsIgnored() {
+		int newTeamLevel = 17;
+		
+		when(input.askForInt(anyString())).thenReturn(SET_TEAM_LEVEL, 0, newTeamLevel, 
+				EXIT_FROM_SINGLE_TEAM_MENU);
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, times(2)).askForInt(expectedTeamLevelMessage);
+		
+		verify(colts, times(1)).setTeamLevel(newTeamLevel);
+	}
+	
 	private void setExpectedMenuMessage() {
 		expectedMenuMessage = 
 				colts.getName() + "\nPower Ranking: " + colts.getPowerRanking() + 
-				"\n" + MenuOptionsUtil.MENU_INTRO + 
-				"1. Set Power Ranking\n2. Back to Teams Menu";
+				"\nTeam Level: " + colts.getTeamLevel() + "\n" + MenuOptionsUtil.MENU_INTRO + 
+				"1. Set Power Ranking\n2. Set Team Level\n3. Back to Teams Menu";
+	}
+	
+
+	private void setExpectedPowerRankingsMessage() {
+		expectedPowerRankingsMessage = "Currently #" + colts.getPowerRanking() + 
+				"\nPlease enter in a number between 1-32 to set the team to that " +
+				"ranking\nor -1 to clear this team's ranking:";
+	}
+	
+	private void setExpectedTeamLevelMessage() {
+		expectedTeamLevelMessage = "Current Team Level: " + colts.getTeamLevel() + 
+				"\nPlease enter in an integer above 0";
 	}
 	
 }

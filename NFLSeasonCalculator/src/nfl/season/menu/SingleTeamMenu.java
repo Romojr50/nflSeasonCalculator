@@ -9,7 +9,8 @@ public class SingleTeamMenu extends SubMenu {
 
 	public enum SingleTeamMenuOptions implements MenuOptions {
 		SET_POWER_RANKING(1, "Set Power Ranking"), 
-		EXIT(2, "Back to Teams Menu");
+		SET_TEAM_LEVEL(2, "Set Team Level"),
+		EXIT(3, "Back to Teams Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -30,9 +31,9 @@ public class SingleTeamMenu extends SubMenu {
 		}
 	}
 	
-	private static final String POWER_RANKING_MESSAGE = "Please enter in a number " +
-			"between 1-32 to set the team to that ranking\nor -1 to clear this " +
-			"team's ranking:";
+	private static final String POWER_RANKING_MESSAGE_SUFFIX = "\nPlease enter in " +
+			"a number between 1-32 to set the team to that ranking\nor -1 to clear " +
+			"this team's ranking:";
 	
 	private static final int NON_POWER_RANKING = 0;
 	
@@ -56,7 +57,8 @@ public class SingleTeamMenu extends SubMenu {
 		int selectedOption = -1;
 		while (selectedOption != SingleTeamMenuOptions.EXIT.optionNumber) {
 			singleTeamMenuMessage = selectedTeam.getName() + "\nPower Ranking: " + 
-					selectedTeam.getPowerRanking() + "\n" + singleTeamMenuMessageSuffix;
+					selectedTeam.getPowerRanking() + "\nTeam Level: " + 
+					selectedTeam.getTeamLevel() + "\n" + singleTeamMenuMessageSuffix;
 			singleTeamMenuMessage = singleTeamMenuMessage.replace("" + Team.CLEAR_RANKING, 
 					Team.UNSET_RANKING_DISPLAY); 
 			
@@ -64,10 +66,12 @@ public class SingleTeamMenu extends SubMenu {
 				
 			if (SingleTeamMenuOptions.SET_POWER_RANKING.optionNumber == selectedOption) {
 				launchSetPowerRankingMenu();
+			} else if (SingleTeamMenuOptions.SET_TEAM_LEVEL.optionNumber == selectedOption) {
+				launchSetTeamLevelMenu();
 			}
 		}
 	}
-	
+
 	public void setTeam(Team team) {
 		this.selectedTeam = team;
 	}
@@ -77,7 +81,9 @@ public class SingleTeamMenu extends SubMenu {
 		while ((newPowerRanking < 1 || 
 				newPowerRanking > NFLTeamEnum.values().length) && 
 				newPowerRanking != Team.CLEAR_RANKING) {
-			newPowerRanking = input.askForInt(POWER_RANKING_MESSAGE);
+			String powerRankingMessage = "Currently #" + selectedTeam.getPowerRanking() + 
+					POWER_RANKING_MESSAGE_SUFFIX;
+			newPowerRanking = input.askForInt(powerRankingMessage);
 			
 			Team teamWithThatRanking = null;
 			if (newPowerRanking != Team.CLEAR_RANKING) {
@@ -91,6 +97,21 @@ public class SingleTeamMenu extends SubMenu {
 						teamWithThatRanking);
 			}
 		}
+	}
+	
+	private void launchSetTeamLevelMenu() {
+		int newTeamLevel = -1;
+		
+		while (newTeamLevel <= 0) {
+			String teamLevelMessage = "Current Team Level: " + selectedTeam.getTeamLevel() + 
+					"\nPlease enter in an integer above 0";
+			newTeamLevel = input.askForInt(teamLevelMessage);
+			
+			if (newTeamLevel > 0) {
+				selectedTeam.setTeamLevel(newTeamLevel);
+			}
+		}
+		
 	}
 
 	private int launchRankingOverwriteMenu(int newPowerRanking,
