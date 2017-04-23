@@ -89,7 +89,9 @@ public class League {
 	}
 
 	public List<Team> getTeams() {
-		return allTeams;
+		List<Team> returnTeams = new ArrayList<Team>();
+		returnTeams.addAll(allTeams);
+		return returnTeams;
 	}
 
 	public Team getTeamWithPowerRanking(int powerRanking) {

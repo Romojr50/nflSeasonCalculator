@@ -16,4 +16,9 @@ public class SubMenu {
 		subMenus[optionNumber - 1] = subMenu;
 	}
 	
+	protected boolean isNotYesOrNoIndicator(String overwriteAnswer) {
+		return !"Y".equalsIgnoreCase(overwriteAnswer) && 
+				!"N".equalsIgnoreCase(overwriteAnswer);
+	}
+	
 }

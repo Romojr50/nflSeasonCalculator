@@ -2,9 +2,11 @@ package nfl.season.league;
 
 public class Team {
 
+	public static final int CLEAR_RANKING = -1;
+	
 	private String name;
 	
-	private int powerRanking;
+	private int powerRanking = CLEAR_RANKING;
 
 	public Team(String name) {
 		this.name = name;

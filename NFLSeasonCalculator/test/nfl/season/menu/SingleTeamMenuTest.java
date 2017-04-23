@@ -108,7 +108,7 @@ public class SingleTeamMenuTest {
 		verify(input, times(2)).askForInt(expectedPowerRankingsMessage);
 		verify(input, times(2)).askForString(overwriteMessage);
 		verify(colts, times(2)).setPowerRanking(powerRanking);
-		verify(eagles, times(2)).setPowerRanking(-1);
+		verify(eagles, times(2)).setPowerRanking(Team.CLEAR_RANKING);
 	}
 	
 	@Test

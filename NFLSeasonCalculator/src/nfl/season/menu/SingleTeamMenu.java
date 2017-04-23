@@ -7,8 +7,6 @@ import nfl.season.league.Team;
 
 public class SingleTeamMenu extends SubMenu {
 
-	private static final int CLEARED_POWER_RANKING = -1;
-
 	public enum SingleTeamMenuOptions implements MenuOptions {
 		SET_POWER_RANKING(1, "Set Power Ranking"), 
 		EXIT(2, "Back to Teams Menu");
@@ -51,7 +49,7 @@ public class SingleTeamMenu extends SubMenu {
 		String singleTeamMenuMessage = MenuOptionsUtil.createMenuMessage(
 				SingleTeamMenuOptions.class);
 		
-		int selectedOption = CLEARED_POWER_RANKING;
+		int selectedOption = -1;
 		while (selectedOption != SingleTeamMenuOptions.EXIT.optionNumber) {
 			selectedOption = input.askForInt(singleTeamMenuMessage);
 				
@@ -66,7 +64,7 @@ public class SingleTeamMenu extends SubMenu {
 	}
 
 	private void launchSetPowerRankingMenu() {
-		int newPowerRanking = CLEARED_POWER_RANKING;
+		int newPowerRanking = Team.CLEAR_RANKING;
 		while (newPowerRanking < 1 || 
 			newPowerRanking > NFLTeamEnum.values().length) {
 			newPowerRanking = input.askForInt(POWER_RANKING_MESSAGE);
@@ -93,14 +91,13 @@ public class SingleTeamMenu extends SubMenu {
 				newPowerRanking + " to " + selectedTeam.getName() + 
 				"? (Y/N)";
 		
-		while (!"Y".equalsIgnoreCase(overwriteAnswer) && 
-				!"N".equalsIgnoreCase(overwriteAnswer)) {
+		while (isNotYesOrNoIndicator(overwriteAnswer)) {
 			overwriteAnswer = input.askForString(overwriteMessage);
 			if ("Y".equalsIgnoreCase(overwriteAnswer)) {
 				selectedTeam.setPowerRanking(newPowerRanking);
-				teamWithThatRanking.setPowerRanking(CLEARED_POWER_RANKING);
+				teamWithThatRanking.setPowerRanking(Team.CLEAR_RANKING);
 			} else if ("N".equalsIgnoreCase(overwriteAnswer)){
-				newPowerRanking = CLEARED_POWER_RANKING;
+				newPowerRanking = Team.CLEAR_RANKING;
 			}
 		}
 		

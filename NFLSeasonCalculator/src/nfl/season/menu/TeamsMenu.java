@@ -94,21 +94,38 @@ public class TeamsMenu extends SubMenu {
 	}
 	
 	private void launchSetAllRankings() {
-		int selectedTeamNumber = -1;
+		String confirmationMessage = "All rankings will be cleared. Proceed? (Y/N)";
 		
-		int currentRanking = 1;
-		List<Team> remainingTeams = nfl.getTeams();
-		while (selectedTeamNumber != EXIT_FROM_TEAM_SELECT && remainingTeams.size() > 0) {
-			String setAllRankingsPrefix = "Set #" + currentRanking + "\n";
-			String teamListMessage = setAllRankingsPrefix + createTeamListMessageFromList(remainingTeams);
-			selectedTeamNumber = input.askForInt(teamListMessage);
+		String confirmationAnswer = "";
+		
+		while (isNotYesOrNoIndicator(confirmationAnswer)) {
+			confirmationAnswer = input.askForString(confirmationMessage);
+		}
+		
+		if ("Y".equalsIgnoreCase(confirmationAnswer)) {
+			int selectedTeamNumber = -1;
 			
-			if (selectedTeamNumber <= remainingTeams.size()) {
-				Team selectedTeam = remainingTeams.remove(selectedTeamNumber - 1);
-				selectedTeam.setPowerRanking(currentRanking);
-				currentRanking++;
+			int currentRanking = 1;
+			List<Team> remainingTeams = nfl.getTeams();
+			
+			while (selectedTeamNumber != EXIT_FROM_TEAM_SELECT && remainingTeams.size() > 0) {
+				String setAllRankingsPrefix = "Set #" + currentRanking + "\n";
+				String teamListMessage = setAllRankingsPrefix + createTeamListMessageFromList(remainingTeams);
+				selectedTeamNumber = input.askForInt(teamListMessage);
+				
+				if (selectedTeamNumber <= remainingTeams.size()) {
+					if (currentRanking == 1) {
+						for (Team team : remainingTeams) {
+							team.setPowerRanking(Team.CLEAR_RANKING);
+						}
+					}
+					Team selectedTeam = remainingTeams.remove(selectedTeamNumber - 1);
+					selectedTeam.setPowerRanking(currentRanking);
+					currentRanking++;
+				}
 			}
 		}
+		
 	}
 
 	private String createTeamListMessage() {

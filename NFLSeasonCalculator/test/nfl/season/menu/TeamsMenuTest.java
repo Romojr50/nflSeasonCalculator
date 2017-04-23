@@ -1,6 +1,7 @@
 package nfl.season.menu;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -67,6 +68,8 @@ public class TeamsMenuTest {
 	
 	private String expectedMenuMessage;
 	
+	String confirmationMessage;
+	
 	@Before
 	public void setUp() {
 		teamsMenu = new TeamsMenu(input, nfl);
@@ -74,6 +77,8 @@ public class TeamsMenuTest {
 		
 		expectedMenuMessage = 
 				MenuOptionsUtil.MENU_INTRO + "1. Select Team\n2. Set all Team Power Rankings\n3. Back to Main Menu";
+		
+		confirmationMessage = "All rankings will be cleared. Proceed? (Y/N)";
 		
 		when(steelers.getName()).thenReturn("Steelers");
 		when(patriots.getName()).thenReturn("Patriots");
@@ -152,6 +157,7 @@ public class TeamsMenuTest {
 	public void setAllRankingsIsSelectedAndThenExitedImmediately() {
 		when(input.askForInt(anyString())).thenReturn(GO_TO_SET_ALL_RANKINGS, 
 				EXIT_FROM_TEAM_SELECT, EXIT_FROM_TEAMS_MENU);
+		when(input.askForString(confirmationMessage)).thenReturn("Y");
 		
 		teamsMenu.launchSubMenu();
 		
@@ -159,8 +165,10 @@ public class TeamsMenuTest {
 		teamListMessage = "Set #1\n" + teamListMessage;
 		verify(input, times(2)).askForInt(expectedMenuMessage);
 		verifyTeamListMessagesForSetAllRankings(1, 1);
+		
+		verifyNoPowerRankingsWereSet();
 	}
-	
+
 	@Test
 	public void setAllRankingsPutInFourRankingsSoFourRankingsAreSet() {
 		when(input.askForInt(anyString())).thenReturn(GO_TO_SET_ALL_RANKINGS, 
@@ -169,18 +177,49 @@ public class TeamsMenuTest {
 				indexesChosenForPowerRankingsInOrder[2],
 				indexesChosenForPowerRankingsInOrder[3],
 				EXIT_FROM_TEAMS_MENU);
+		when(input.askForString(confirmationMessage)).thenReturn("Y");
 		
 		teamsMenu.launchSubMenu();
 		
 		verifyTeamListMessagesForSetAllRankings(4, 1);
+		verify(input, times(1)).askForString(confirmationMessage);
 		verify(input, never()).askForInt(
 				"Set #5\nPlease enter in an integer corresponding to one of "
 				+ "the following:\n33. Back to Team Menu");
+		
+		verify(patriots).setPowerRanking(Team.CLEAR_RANKING);
+		verify(falcons).setPowerRanking(Team.CLEAR_RANKING);
+		verify(steelers).setPowerRanking(Team.CLEAR_RANKING);
+		verify(packers).setPowerRanking(Team.CLEAR_RANKING);
 		
 		verify(patriots).setPowerRanking(1);
 		verify(falcons).setPowerRanking(2);
 		verify(steelers).setPowerRanking(3);
 		verify(packers).setPowerRanking(4);
+	}
+	
+	@Test
+	public void setAllRankingsButBackOutOfConfirmationMessageSoNoRankingIsAskedFor() {
+		when(input.askForInt(anyString())).thenReturn(GO_TO_SET_ALL_RANKINGS, EXIT_FROM_TEAMS_MENU);
+		when(input.askForString(confirmationMessage)).thenReturn("N");
+		
+		teamsMenu.launchSubMenu();
+		
+		verifyNoPowerRankingsWereSet();
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, times(1)).askForString(confirmationMessage);
+	}
+	
+	@Test
+	public void setAllRankingsButInvalidInputIsPutIntoConfirmationMessageAndIgnored() {
+		when(input.askForInt(anyString())).thenReturn(GO_TO_SET_ALL_RANKINGS, EXIT_FROM_TEAMS_MENU);
+		when(input.askForString(confirmationMessage)).thenReturn("ab", "N");
+		
+		teamsMenu.launchSubMenu();
+		
+		verifyNoPowerRankingsWereSet();
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, times(2)).askForString(confirmationMessage);
 	}
 	
 	@Test
@@ -190,10 +229,25 @@ public class TeamsMenuTest {
 				mockTeams.size(),
 				EXIT_FROM_TEAM_SELECT, 
 				EXIT_FROM_TEAMS_MENU);
+		when(input.askForString(confirmationMessage)).thenReturn("Y");
 		
 		teamsMenu.launchSubMenu();
 		
 		verifyTeamListMessagesForSetAllRankings(2, 2);
+	}
+
+	private String buildTeamListMessage() {
+		StringBuilder teamListMessage = new StringBuilder();
+		teamListMessage.append(MenuOptionsUtil.MENU_INTRO);
+		int teamIndex = 1;
+		for (NFLTeamEnum nflTeam : NFLTeamEnum.values()) {
+			teamListMessage.append(teamIndex + ". ");
+			teamListMessage.append(nflTeam.getTeamName());
+			teamListMessage.append("\n");
+			teamIndex++;
+		}
+		teamListMessage.append(EXIT_FROM_TEAM_SELECT + ". Back to Team Menu");
+		return teamListMessage.toString();
 	}
 	
 	private void verifyTeamListMessagesForSetAllRankings(int numberOfRankingsToSet, 
@@ -223,19 +277,12 @@ public class TeamsMenuTest {
 			mockTeamsCopy.remove((indexesChosenForPowerRankingsInOrder[i - 1]) - 1);
 		}
 	}
-
-	private String buildTeamListMessage() {
-		StringBuilder teamListMessage = new StringBuilder();
-		teamListMessage.append(MenuOptionsUtil.MENU_INTRO);
-		int teamIndex = 1;
-		for (NFLTeamEnum nflTeam : NFLTeamEnum.values()) {
-			teamListMessage.append(teamIndex + ". ");
-			teamListMessage.append(nflTeam.getTeamName());
-			teamListMessage.append("\n");
-			teamIndex++;
-		}
-		teamListMessage.append(EXIT_FROM_TEAM_SELECT + ". Back to Team Menu");
-		return teamListMessage.toString();
+	
+	private void verifyNoPowerRankingsWereSet() {
+		verify(patriots, never()).setPowerRanking(anyInt());
+		verify(falcons, never()).setPowerRanking(anyInt());
+		verify(steelers, never()).setPowerRanking(anyInt());
+		verify(packers, never()).setPowerRanking(anyInt());
 	}
 	
 }
