@@ -2,7 +2,9 @@ package nfl.season.league;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -123,6 +125,20 @@ public class LeagueTest {
 		for (NFLTeamEnum teamExpected : teamsExpectedInDivision) {
 			Team expectedTeam = division.getTeam(teamExpected.getTeamName());
 			assertNotNull(expectedTeam);
+			
+			String expectedTeamName = expectedTeam.getName();
+			List<Matchup> teamMatchups = expectedTeam.getMatchups();
+			assertEquals(NFLTeamEnum.values().length - 1, teamMatchups.size());
+			List<String> matchupTeamNames = new ArrayList<String>();
+			for (Matchup matchup : teamMatchups) {
+				matchupTeamNames.add(matchup.getOpponentName(expectedTeamName));
+			}
+			for (NFLTeamEnum nflTeam : NFLTeamEnum.values()) {
+				String nflTeamName = nflTeam.getTeamName();
+				if (!nflTeamName.equalsIgnoreCase(expectedTeamName)) {
+					assertTrue(matchupTeamNames.contains(nflTeam.getTeamName()));
+				}
+			}
 		}
 	}
 	

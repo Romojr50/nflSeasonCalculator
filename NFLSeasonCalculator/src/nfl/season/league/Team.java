@@ -1,5 +1,8 @@
 package nfl.season.league;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Team {
 
 	public static final int CLEAR_RANKING = -1;
@@ -11,9 +14,12 @@ public class Team {
 	private int powerRanking = CLEAR_RANKING;
 	
 	private int teamLevel = 1;
+	
+	private List<Matchup> matchups;
 
 	public Team(String name) {
 		this.name = name;
+		this.matchups = new ArrayList<Matchup>();
 	}
 
 	public String getName() {
@@ -34,6 +40,14 @@ public class Team {
 
 	public void setTeamLevel(int newTeamLevel) {
 		this.teamLevel = newTeamLevel;
+	}
+
+	public List<Matchup> getMatchups() {
+		return matchups;
+	}
+
+	public void addMatchup(Matchup matchup) {
+		matchups.add(matchup);
 	}
 	
 }

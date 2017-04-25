@@ -33,9 +33,7 @@ public class League {
 				for (NFLTeamEnum nflTeam : NFLTeamEnum.values()) {
 					if (nflTeam.getConference().name().equals(conferenceName) 
 							&& nflTeam.getDivision().name().equals(divisionName)) {
-						Team newTeam = new Team(nflTeam.getTeamName());
-						newDivision.addTeam(newTeam);
-						allTeams.add(newTeam);
+						initializeTeam(newDivision, nflTeam);
 					}
 				}
 			}
@@ -104,6 +102,22 @@ public class League {
 			}
 		}
 		return returnTeam;
+	}
+	
+
+	private void initializeTeam(Division newDivision, NFLTeamEnum nflTeam) {
+		String newTeamName = nflTeam.getTeamName();
+		Team newTeam = new Team(newTeamName);
+		newDivision.addTeam(newTeam);
+		allTeams.add(newTeam);
+		
+		for (NFLTeamEnum opponent : NFLTeamEnum.values()) {
+			String opponentName = opponent.getTeamName();
+			if (!newTeamName.equalsIgnoreCase(opponentName)) {
+				Matchup matchup = new Matchup(newTeamName, opponentName);
+				newTeam.addMatchup(matchup);
+			}
+		}
 	}
 
 }
