@@ -30,6 +30,28 @@ public class LeagueTest {
 		assertConferenceHasCorrectDivisions(nfc);
 		
 		assertConferencesHaveExpectedTeams(afc, nfc);
+		
+		List<Team> allTeams = nfl.getTeams();
+		for (Team team : allTeams) {
+			String teamName = team.getName();
+			List<Matchup> teamMatchups = team.getMatchups();
+			assertEquals(NFLTeamEnum.values().length - 1, teamMatchups.size());
+			List<String> matchupTeamNames = new ArrayList<String>();
+			for (Matchup matchup : teamMatchups) {
+				matchupTeamNames.add(matchup.getOpponentName(teamName));
+			}
+			for (Team opponent : allTeams) {
+				String opponentName = opponent.getName();
+				if (!opponentName.equalsIgnoreCase(teamName)) {
+					assertTrue(matchupTeamNames.contains(opponent.getName()));
+				}
+				Matchup teamMatchup = team.getMatchup(opponentName);
+				Matchup opponentMatchup = opponent.getMatchup(teamName);
+				assertEquals(teamMatchup, opponentMatchup);
+			}
+			
+		}
+		
 	}
 	
 	@Test
@@ -125,20 +147,6 @@ public class LeagueTest {
 		for (NFLTeamEnum teamExpected : teamsExpectedInDivision) {
 			Team expectedTeam = division.getTeam(teamExpected.getTeamName());
 			assertNotNull(expectedTeam);
-			
-			String expectedTeamName = expectedTeam.getName();
-			List<Matchup> teamMatchups = expectedTeam.getMatchups();
-			assertEquals(NFLTeamEnum.values().length - 1, teamMatchups.size());
-			List<String> matchupTeamNames = new ArrayList<String>();
-			for (Matchup matchup : teamMatchups) {
-				matchupTeamNames.add(matchup.getOpponentName(expectedTeamName));
-			}
-			for (NFLTeamEnum nflTeam : NFLTeamEnum.values()) {
-				String nflTeamName = nflTeam.getTeamName();
-				if (!nflTeamName.equalsIgnoreCase(expectedTeamName)) {
-					assertTrue(matchupTeamNames.contains(nflTeam.getTeamName()));
-				}
-			}
 		}
 	}
 	

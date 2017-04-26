@@ -45,6 +45,22 @@ public class Team {
 	public List<Matchup> getMatchups() {
 		return matchups;
 	}
+	
+	public Matchup getMatchup(String opponentName) {
+		Matchup returnMatchup = null;
+		
+		if (opponentName != null) {
+			for (Matchup matchup : matchups) {
+				String matchupOpponentName = matchup.getOpponentName(name);
+				if (opponentName.equalsIgnoreCase(matchupOpponentName)) {
+					returnMatchup = matchup;
+					break;
+				}
+			}
+		}
+		
+		return returnMatchup;
+	}
 
 	public void addMatchup(Matchup matchup) {
 		matchups.add(matchup);

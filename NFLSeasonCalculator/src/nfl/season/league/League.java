@@ -37,9 +37,11 @@ public class League {
 					}
 				}
 			}
+			
+			initializeMatchups();
 		}
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -110,12 +112,21 @@ public class League {
 		Team newTeam = new Team(newTeamName);
 		newDivision.addTeam(newTeam);
 		allTeams.add(newTeam);
-		
-		for (NFLTeamEnum opponent : NFLTeamEnum.values()) {
-			String opponentName = opponent.getTeamName();
-			if (!newTeamName.equalsIgnoreCase(opponentName)) {
-				Matchup matchup = new Matchup(newTeamName, opponentName);
-				newTeam.addMatchup(matchup);
+	}
+	
+	private void initializeMatchups() {
+		for (Team team : allTeams) {
+			String teamName = team.getName();
+			for (Team opponent : allTeams) {
+				String opponentName = opponent.getName();
+				if (!teamName.equalsIgnoreCase(opponentName)) {
+					Matchup matchup = team.getMatchup(opponentName);
+					if (matchup == null) {
+						Matchup newMatchup = new Matchup(team, opponent);
+						team.addMatchup(newMatchup);
+						opponent.addMatchup(newMatchup);
+					}
+				}
 			}
 		}
 	}
