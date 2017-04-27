@@ -3,6 +3,7 @@ package nfl.season.calculator;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
 import nfl.season.menu.MainMenu;
+import nfl.season.menu.MatchupMenu;
 import nfl.season.menu.SingleTeamMenu;
 import nfl.season.menu.TeamsMenu;
 import nfl.season.menu.MainMenu.MainMenuOptions;
@@ -30,7 +31,11 @@ public class NFLSeasonCalculator {
 
 	public static TeamsMenu createTeamsMenu(NFLSeasonInput input, League nfl) {
 		TeamsMenu teamsMenu = new TeamsMenu(input, nfl);
+		
 		SingleTeamMenu singleTeamMenu = new SingleTeamMenu(input, nfl);
+		MatchupMenu matchupMenu = new MatchupMenu();
+		singleTeamMenu.setSubMenu(matchupMenu, 1);
+		
 		teamsMenu.setSubMenu(singleTeamMenu, TeamsMenuOptions.SELECT_TEAM.getOptionNumber());
 		return teamsMenu;
 	}

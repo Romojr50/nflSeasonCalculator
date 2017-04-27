@@ -82,6 +82,15 @@ public class SingleTeamMenu extends SubMenu {
 	public void setTeam(Team team) {
 		this.selectedTeam = team;
 	}
+	
+	public MatchupMenu getMatchupMenu() {
+		SubMenu subMenu = subMenus[0];
+		MatchupMenu matchupMenu = null;
+		if (subMenu != null && subMenu instanceof MatchupMenu) {
+			matchupMenu = (MatchupMenu) subMenu;
+		}
+		return matchupMenu;
+	}
 
 	private void launchSetPowerRankingMenu() {
 		int newPowerRanking = NON_POWER_RANKING;
@@ -125,11 +134,11 @@ public class SingleTeamMenu extends SubMenu {
 		String matchupMenuMessage = getMatchupMenuMessage();
 		
 		List<Matchup> teamMatchups = selectedTeam.getMatchups();
-		int exitMatchup = teamMatchups.size();
+		int exitMatchup = teamMatchups.size() + 1;
 		int matchupSelection = -1;
 		while (matchupSelection != exitMatchup) {
 			matchupSelection = input.askForInt(matchupMenuMessage);
-			if (matchupSelection < exitMatchup) {
+			if (matchupSelection < exitMatchup && matchupSelection > 0) {
 				Matchup selectedMatchup = teamMatchups.get(matchupSelection - 1);
 				MatchupMenu matchupMenu = getMatchupMenu();
 				matchupMenu.setMatchup(selectedMatchup);
@@ -181,13 +190,4 @@ public class SingleTeamMenu extends SubMenu {
 		return matchupMenuMessage;
 	}
 	
-	private MatchupMenu getMatchupMenu() {
-		SubMenu subMenu = subMenus[0];
-		MatchupMenu matchupMenu = null;
-		if (subMenu != null && subMenu instanceof MatchupMenu) {
-			matchupMenu = (MatchupMenu) subMenu;
-		}
-		return matchupMenu;
-	}
-
 }

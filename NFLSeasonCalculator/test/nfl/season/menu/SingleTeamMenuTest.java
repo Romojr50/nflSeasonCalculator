@@ -1,5 +1,6 @@
 package nfl.season.menu;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
@@ -249,6 +250,15 @@ public class SingleTeamMenuTest {
 	}
 	
 	@Test
+	public void setSubMenuWithSingleTeamsMenuSoSingleTeamsMenuIsSet() {
+		singleTeamMenu.setSubMenu(matchupMenu, 1);
+		
+		SubMenu returnedMatchupMenu = singleTeamMenu.getMatchupMenu();
+		
+		assertEquals(matchupMenu, returnedMatchupMenu);
+	}
+	
+	@Test
 	public void teamMatchupIsSelectedSoMatchupMenuIsOpened() {
 		int matchupIndex = 2;
 		Matchup expectedMatchup = matchups.get(matchupIndex - 1);
@@ -262,6 +272,18 @@ public class SingleTeamMenuTest {
 		
 		verify(matchupMenu).setMatchup(expectedMatchup);
 		verify(matchupMenu).launchSubMenu();
+	}
+	
+	@Test
+	public void inputOutsideOfExpectedRangeEnteredWhenSelectingMatchupSoInputIsIgnored() {
+		when(input.askForInt(anyString())).thenReturn(CHOOSE_MATCHUP, 67, -2, 2, 
+				matchups.size() + 1, EXIT_FROM_SINGLE_TEAM_MENU);
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, times(4)).askForInt(expectedMatchupMessage);
+		verify(matchupMenu, times(1)).launchSubMenu();
 	}
 	
 	private void setExpectedMenuMessage() {
