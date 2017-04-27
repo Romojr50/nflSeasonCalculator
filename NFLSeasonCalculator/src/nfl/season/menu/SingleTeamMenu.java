@@ -1,7 +1,10 @@
 package nfl.season.menu;
 
+import java.util.List;
+
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
+import nfl.season.league.Matchup;
 import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
 
@@ -10,7 +13,8 @@ public class SingleTeamMenu extends SubMenu {
 	public enum SingleTeamMenuOptions implements MenuOptions {
 		SET_POWER_RANKING(1, "Set Power Ranking"), 
 		SET_TEAM_LEVEL(2, "Set Team Level"),
-		EXIT(3, "Back to Teams Menu");
+		CHOOSE_MATCHUP(3, "Edit Matchup Settings"),
+		EXIT(4, "Back to Teams Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -46,6 +50,7 @@ public class SingleTeamMenu extends SubMenu {
 	public SingleTeamMenu(NFLSeasonInput input, League league) {
 		this.input = input;
 		this.league = league;
+		subMenus = new SubMenu[1];
 	}
 	
 	@Override
@@ -68,6 +73,8 @@ public class SingleTeamMenu extends SubMenu {
 				launchSetPowerRankingMenu();
 			} else if (SingleTeamMenuOptions.SET_TEAM_LEVEL.optionNumber == selectedOption) {
 				launchSetTeamLevelMenu();
+			} else if (SingleTeamMenuOptions.CHOOSE_MATCHUP.optionNumber == selectedOption) {
+				launchSelectMatchupMenu();
 			}
 		}
 	}
@@ -113,6 +120,23 @@ public class SingleTeamMenu extends SubMenu {
 		}
 		
 	}
+	
+	private void launchSelectMatchupMenu() {
+		String matchupMenuMessage = getMatchupMenuMessage();
+		
+		List<Matchup> teamMatchups = selectedTeam.getMatchups();
+		int exitMatchup = teamMatchups.size();
+		int matchupSelection = -1;
+		while (matchupSelection != exitMatchup) {
+			matchupSelection = input.askForInt(matchupMenuMessage);
+			if (matchupSelection < exitMatchup) {
+				Matchup selectedMatchup = teamMatchups.get(matchupSelection - 1);
+				MatchupMenu matchupMenu = getMatchupMenu();
+				matchupMenu.setMatchup(selectedMatchup);
+				matchupMenu.launchSubMenu();
+			}
+		}
+	}
 
 	private int launchRankingOverwriteMenu(int newPowerRanking,
 			Team teamWithThatRanking) {
@@ -136,6 +160,34 @@ public class SingleTeamMenu extends SubMenu {
 		}
 		
 		return newPowerRanking;
+	}
+	
+	private String getMatchupMenuMessage() {
+		StringBuilder matchupMenuMessageBuilder = new StringBuilder();
+		matchupMenuMessageBuilder.append(MenuOptionsUtil.MENU_INTRO);
+		int matchupIndex = 1;
+		List<Matchup> teamMatchups = selectedTeam.getMatchups();
+		for (Matchup matchup : teamMatchups) {
+			matchupMenuMessageBuilder.append(matchupIndex + ". ");
+			String opponentName = matchup.getOpponentName(selectedTeam.getName());
+			matchupMenuMessageBuilder.append(opponentName + "\n");
+			
+			matchupIndex++;
+		}
+		int exitMatchup = matchupIndex;
+		matchupMenuMessageBuilder.append(exitMatchup + ". Back to Team Menu");
+		
+		String matchupMenuMessage = matchupMenuMessageBuilder.toString();
+		return matchupMenuMessage;
+	}
+	
+	private MatchupMenu getMatchupMenu() {
+		SubMenu subMenu = subMenus[0];
+		MatchupMenu matchupMenu = null;
+		if (subMenu != null && subMenu instanceof MatchupMenu) {
+			matchupMenu = (MatchupMenu) subMenu;
+		}
+		return matchupMenu;
 	}
 
 }

@@ -6,8 +6,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
+import nfl.season.league.Matchup;
 import nfl.season.league.Team;
 
 import org.junit.Before;
@@ -23,13 +28,17 @@ public class SingleTeamMenuTest {
 	
 	private static final int SET_TEAM_LEVEL = 2;
 
-	private static final int EXIT_FROM_SINGLE_TEAM_MENU = 3;
+	private static final int CHOOSE_MATCHUP = 3;
+	
+	private static final int EXIT_FROM_SINGLE_TEAM_MENU = 4;
 	
 	private String expectedMenuMessage;
 	
 	private String expectedPowerRankingsMessage;
 	
 	private String expectedTeamLevelMessage;
+	
+	private String expectedMatchupMessage;
 	
 	@Mock
 	private NFLSeasonInput input;
@@ -38,10 +47,24 @@ public class SingleTeamMenuTest {
 	private League nfl;
 	
 	@Mock
+	private MatchupMenu matchupMenu;
+	
+	@Mock
 	private Team colts;
 	
 	@Mock
 	private Team eagles;
+	
+	@Mock
+	private Matchup texansMatchup;
+	
+	@Mock
+	private Matchup titansMatchup;
+	
+	@Mock
+	private Matchup jaguarsMatchup;
+	
+	private List<Matchup> matchups;
 	
 	private SingleTeamMenu singleTeamMenu;
 	
@@ -49,7 +72,7 @@ public class SingleTeamMenuTest {
 	public void setUp() {
 		singleTeamMenu = new SingleTeamMenu(input, nfl);
 		singleTeamMenu.setTeam(colts);
-		
+		singleTeamMenu.setSubMenu(matchupMenu, 1);
 		
 		when(colts.getName()).thenReturn("Colts");
 		when(colts.getPowerRanking()).thenReturn(19);
@@ -60,6 +83,8 @@ public class SingleTeamMenuTest {
 		setExpectedTeamLevelMessage();
 		
 		when(eagles.getName()).thenReturn("Eagles");
+		
+		setupMatchups();
 	}
 
 	@Test
@@ -223,11 +248,28 @@ public class SingleTeamMenuTest {
 		verify(colts, times(1)).setTeamLevel(newTeamLevel);
 	}
 	
+	@Test
+	public void teamMatchupIsSelectedSoMatchupMenuIsOpened() {
+		int matchupIndex = 2;
+		Matchup expectedMatchup = matchups.get(matchupIndex - 1);
+		
+		when(input.askForInt(anyString())).thenReturn(CHOOSE_MATCHUP, matchupIndex, 
+				matchups.size() + 1, EXIT_FROM_SINGLE_TEAM_MENU);
+		
+		singleTeamMenu.launchSubMenu();
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, times(2)).askForInt(expectedMatchupMessage);
+		
+		verify(matchupMenu).setMatchup(expectedMatchup);
+		verify(matchupMenu).launchSubMenu();
+	}
+	
 	private void setExpectedMenuMessage() {
 		expectedMenuMessage = 
 				colts.getName() + "\nPower Ranking: " + colts.getPowerRanking() + 
 				"\nTeam Level: " + colts.getTeamLevel() + "\n" + MenuOptionsUtil.MENU_INTRO + 
-				"1. Set Power Ranking\n2. Set Team Level\n3. Back to Teams Menu";
+				"1. Set Power Ranking\n2. Set Team Level\n3. Edit Matchup Settings\n" +
+				"4. Back to Teams Menu";
 	}
 	
 
@@ -240,6 +282,33 @@ public class SingleTeamMenuTest {
 	private void setExpectedTeamLevelMessage() {
 		expectedTeamLevelMessage = "Current Team Level: " + colts.getTeamLevel() + 
 				"\nPlease enter in an integer above 0";
+	}
+	
+
+	private void setupMatchups() {
+		matchups = new ArrayList<Matchup>();
+		matchups.add(jaguarsMatchup);
+		matchups.add(titansMatchup);
+		matchups.add(texansMatchup);
+		
+		String coltsName = colts.getName();
+		when(jaguarsMatchup.getOpponentName(coltsName)).thenReturn("Jaguars");
+		when(titansMatchup.getOpponentName(coltsName)).thenReturn("Titans");
+		when(texansMatchup.getOpponentName(coltsName)).thenReturn("Texans");
+		
+		StringBuilder expectedMatchupMessageBuilder = new StringBuilder();
+		expectedMatchupMessageBuilder.append(MenuOptionsUtil.MENU_INTRO);
+		int matchupIndex = 1;
+		for (Matchup matchup : matchups) {
+			expectedMatchupMessageBuilder.append(matchupIndex + ". ");
+			String opponentName = matchup.getOpponentName(colts.getName());
+			expectedMatchupMessageBuilder.append(opponentName + "\n");
+			matchupIndex++;
+		}
+		expectedMatchupMessageBuilder.append(matchupIndex + ". Back to Team Menu");
+		expectedMatchupMessage = expectedMatchupMessageBuilder.toString();
+		
+		when(colts.getMatchups()).thenReturn(matchups);
 	}
 	
 }
