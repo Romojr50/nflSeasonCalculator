@@ -30,12 +30,15 @@ public class MatchupMenuTest {
 	
 	private String eaglesName = "Eagles";
 	
+	private int coltsWinChance = 55;
+	
+	private int eaglesWinChance = 45;
+	
 	private String[] teamNames;
 	
 	private String expectedMenuMessage;
 	
-	private String expectedSetWinChanceMessage = 
-			"Please enter in a number between 1 and 99";
+	private String expectedSetWinChanceMessage;
 	
 	@Mock
 	private NFLSeasonInput input;
@@ -54,6 +57,8 @@ public class MatchupMenuTest {
 		
 		when(matchup.getTeamNames()).thenReturn(teamNames);
 		when(matchup.getOpponentName(coltsName)).thenReturn(eaglesName);
+		when(matchup.getTeamWinChance(coltsName)).thenReturn(coltsWinChance);
+		when(matchup.getTeamWinChance(eaglesName)).thenReturn(eaglesWinChance);
 		
 		setExpectedMenuMessage();
 	}
@@ -63,15 +68,31 @@ public class MatchupMenuTest {
 		int expectedTeam1WinChance = 15;
 		int expectedTeam2WinChance = 48;
 		
+		when(matchup.getTeamWinChance(coltsName)).thenReturn(50, 50, expectedTeam1WinChance, 
+				(100 - expectedTeam2WinChance), 50, expectedTeam1WinChance, 
+				(100 - expectedTeam2WinChance), 50);
+		when(matchup.getTeamWinChance(eaglesName)).thenReturn(50, (100 - expectedTeam1WinChance), 
+				(100 - expectedTeam1WinChance), expectedTeam2WinChance, 50, 
+				(100 - expectedTeam1WinChance), expectedTeam2WinChance, 
+				(100 - expectedTeam1WinChance));
+		
 		when(input.askForInt(anyString())).thenReturn(SET_FIRST_TEAM_WIN_CHANCE, 
 				expectedTeam1WinChance, SET_SECOND_TEAM_WIN_CHANCE, expectedTeam2WinChance,
 				EXIT_OPTION);
 		
 		matchupMenu.launchSubMenu();
 		
-		verify(input, times(3)).askForInt(expectedMenuMessage);
+		setExpectedMenuMessage();
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+		setExpectedMenuMessage();
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+		setExpectedMenuMessage();
+		verify(input, times(1)).askForInt(expectedMenuMessage);
 		
-		verify(input, times(2)).askForInt(expectedSetWinChanceMessage);
+		setExpectedSetWinChanceMessage(coltsName);
+		verify(input, times(1)).askForInt(expectedSetWinChanceMessage);
+		setExpectedSetWinChanceMessage(eaglesName);
+		verify(input, times(1)).askForInt(expectedSetWinChanceMessage);
 		
 		verify(matchup).setTeamWinChance(coltsName, expectedTeam1WinChance);
 		verify(matchup).setTeamWinChance(eaglesName, expectedTeam2WinChance);
@@ -93,7 +114,7 @@ public class MatchupMenuTest {
 		matchupMenu.launchSubMenu();
 		
 		verify(input, times(2)).askForInt(expectedMenuMessage);
-		
+		setExpectedSetWinChanceMessage(coltsName);
 		verify(input, times(4)).askForInt(expectedSetWinChanceMessage);
 		
 		verify(matchup).setTeamWinChance(coltsName, 45);
@@ -106,9 +127,18 @@ public class MatchupMenuTest {
 		String selectedTeamName = matchupMenu.getSelectedTeamName();
 		String afterOneTeamMessage = " win chance\n";
 		expectedMenuMessage = "Matchup: " + teamNames[0] + " vs. " + teamNames[1] + 
-				"\n" + MenuOptionsUtil.MENU_INTRO + "1. Set " + teamNames[0] + 
+				"\n" + "Current win chances:\n" + teamNames[0] + ": " + 
+				matchup.getTeamWinChance(teamNames[0]) + "\n" + teamNames[1] + 
+				": " + matchup.getTeamWinChance(teamNames[1]) + "\n" + 
+				MenuOptionsUtil.MENU_INTRO + "1. Set " + teamNames[0] + 
 				afterOneTeamMessage + "2. Set " + teamNames[1] + 
 				afterOneTeamMessage + "3. Back to " + selectedTeamName + " Menu";
+	}
+	
+	private void setExpectedSetWinChanceMessage(String teamName) {
+		expectedSetWinChanceMessage = "Current " + teamName + " win chance: " + 
+				matchup.getTeamWinChance(teamName) + 
+				"\nPlease enter in a number between 1 and 99";
 	}
 	
 }

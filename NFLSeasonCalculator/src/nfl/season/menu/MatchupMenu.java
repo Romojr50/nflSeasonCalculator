@@ -2,8 +2,6 @@ package nfl.season.menu;
 
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.Matchup;
-import nfl.season.league.Team;
-import nfl.season.menu.SingleTeamMenu.SingleTeamMenuOptions;
 
 public class MatchupMenu extends SubMenu {
 
@@ -57,14 +55,11 @@ public class MatchupMenu extends SubMenu {
 		String team1Name = selectedTeamName;
 		String team2Name = matchup.getOpponentName(team1Name);
 		
-		String matchupMenuMessage = "Matchup: " + team1Name + " vs. " + team2Name + "\n";
-		matchupMenuMessage = matchupMenuMessage + MenuOptionsUtil.createMenuMessage
-				(MatchupMenuOptions.class);
-		matchupMenuMessage = matchupMenuMessage.replace("<Team1>", team1Name);
-		matchupMenuMessage = matchupMenuMessage.replace("<Team2>", team2Name);
 		
 		int selectedOption = -1;
 		while (selectedOption != MatchupMenuOptions.BACK_TO_SINGLE_TEAM_MENU.optionNumber) {
+			String matchupMenuMessage = buildMatchupMenuMessage(team1Name,
+					team2Name);
 			selectedOption = input.askForInt(matchupMenuMessage);
 			
 			if (selectedOption == MatchupMenuOptions.SET_TEAM_1_WIN_CHANCE.optionNumber) {
@@ -75,8 +70,28 @@ public class MatchupMenu extends SubMenu {
 		}
 	}
 
+	private String buildMatchupMenuMessage(String team1Name, String team2Name) {
+		StringBuilder matchupMenuMessageBuilder = new StringBuilder();
+		matchupMenuMessageBuilder.append("Matchup: " + team1Name + " vs. " + 
+				team2Name + "\n");
+		matchupMenuMessageBuilder.append("Current win chances:\n");
+		matchupMenuMessageBuilder.append(team1Name + ": " + 
+				matchup.getTeamWinChance(team1Name) + "\n");
+		matchupMenuMessageBuilder.append(team2Name + ": " + 
+				matchup.getTeamWinChance(team2Name) + "\n");
+		matchupMenuMessageBuilder.append(MenuOptionsUtil.createMenuMessage
+				(MatchupMenuOptions.class));
+		
+		String matchupMenuMessage = matchupMenuMessageBuilder.toString();
+		matchupMenuMessage = matchupMenuMessage.replace("<Team1>", team1Name);
+		matchupMenuMessage = matchupMenuMessage.replace("<Team2>", team2Name);
+		return matchupMenuMessage;
+	}
+
 	private void launchSetTeamWinChanceMenu(String teamName) {
-		String setTeamWinChanceMessage = "Please enter in a number between 1 and 99";
+		String setTeamWinChanceMessage = "Current " + teamName + " win chance: " + 
+				matchup.getTeamWinChance(teamName) + 
+				"\nPlease enter in a number between 1 and 99";
 		int newTeamWinChance = -1;
 		while (newTeamWinChance < 1 || newTeamWinChance > 99) {
 			newTeamWinChance = input.askForInt(setTeamWinChanceMessage);
