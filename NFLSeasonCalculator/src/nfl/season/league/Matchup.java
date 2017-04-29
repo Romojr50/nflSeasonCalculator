@@ -6,6 +6,10 @@ public class Matchup {
 	
 	private Team team2;
 	
+	private int team1WinChance;
+	
+	private int team2WinChance;
+	
 	public Matchup(Team team1, Team team2) {
 		this.team1 = team1;
 		this.team2 = team2;
@@ -25,6 +29,41 @@ public class Matchup {
 		}
 		
 		return opponentName;
+	}
+
+	public String[] getTeamNames() {
+		String[] teamNames = new String[2];
+		
+		teamNames[0] = team1.getName();
+		teamNames[1] = team2.getName();
+		
+		return teamNames;
+	}
+	
+	public int getTeamWinChance(String teamName) {
+		int returnWinChance = -1;
+		
+		if (teamName != null) {
+			if (teamName.equalsIgnoreCase(team1.getName())) {
+				returnWinChance = team1WinChance;
+			} else if (teamName.equalsIgnoreCase(team2.getName())) {
+				returnWinChance = team2WinChance;
+			}
+		}
+		
+		return returnWinChance;
+	}
+
+	public void setTeamWinChance(String teamName, int teamWinChance) {
+		if (teamName != null) {
+			if (teamName.equalsIgnoreCase(team1.getName())) {
+				team1WinChance = teamWinChance;
+				team2WinChance = 100 - teamWinChance;
+			} else if (teamName.equalsIgnoreCase(team2.getName())) {
+				team2WinChance = teamWinChance;
+				team1WinChance = 100 - teamWinChance;
+			}
+		}
 	}
 
 }

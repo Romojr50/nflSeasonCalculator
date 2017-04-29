@@ -40,4 +40,34 @@ public class MatchupTest {
 		assertEquals(team1Name, team2Opponent);
 	}
 	
+	@Test
+	public void getTeamNamesReturnsBothTeamNames() {
+		String[] teamNames = matchup.getTeamNames();
+		assertEquals(2, teamNames.length);
+		assertEquals(team1Name, teamNames[0]);
+		assertEquals(team2Name, teamNames[1]);
+	}
+	
+	@Test
+	public void setTeamWinChanceSoBothTeamsHaveWinChanceAltered() {
+		int expectedTeam1WinChance = 18;
+		int expectedTeam2WinChance = 74;
+		
+		matchup.setTeamWinChance(team1Name, expectedTeam1WinChance);
+		
+		int team1WinChance = matchup.getTeamWinChance(team1Name);
+		int team2WinChance = matchup.getTeamWinChance(team2Name);
+		
+		assertEquals(expectedTeam1WinChance, team1WinChance);
+		assertEquals((100 - expectedTeam1WinChance), team2WinChance);
+		
+		matchup.setTeamWinChance(team2Name, expectedTeam2WinChance);
+		
+		team1WinChance = matchup.getTeamWinChance(team1Name);
+		team2WinChance = matchup.getTeamWinChance(team2Name);
+		
+		assertEquals((100 - expectedTeam2WinChance), team1WinChance);
+		assertEquals(expectedTeam2WinChance, team2WinChance);
+	}
+	
 }

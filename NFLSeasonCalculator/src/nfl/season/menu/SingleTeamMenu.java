@@ -88,6 +88,7 @@ public class SingleTeamMenu extends SubMenu {
 		MatchupMenu matchupMenu = null;
 		if (subMenu != null && subMenu instanceof MatchupMenu) {
 			matchupMenu = (MatchupMenu) subMenu;
+			matchupMenu.setSelectedTeamName(selectedTeam.getName());
 		}
 		return matchupMenu;
 	}

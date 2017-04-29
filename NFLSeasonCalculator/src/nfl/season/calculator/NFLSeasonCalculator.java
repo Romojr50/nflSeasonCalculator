@@ -33,7 +33,7 @@ public class NFLSeasonCalculator {
 		TeamsMenu teamsMenu = new TeamsMenu(input, nfl);
 		
 		SingleTeamMenu singleTeamMenu = new SingleTeamMenu(input, nfl);
-		MatchupMenu matchupMenu = new MatchupMenu();
+		MatchupMenu matchupMenu = new MatchupMenu(input);
 		singleTeamMenu.setSubMenu(matchupMenu, 1);
 		
 		teamsMenu.setSubMenu(singleTeamMenu, TeamsMenuOptions.SELECT_TEAM.getOptionNumber());

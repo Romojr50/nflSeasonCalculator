@@ -256,6 +256,7 @@ public class SingleTeamMenuTest {
 		SubMenu returnedMatchupMenu = singleTeamMenu.getMatchupMenu();
 		
 		assertEquals(matchupMenu, returnedMatchupMenu);
+		verify(matchupMenu).setSelectedTeamName(colts.getName());
 	}
 	
 	@Test
