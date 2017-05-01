@@ -74,27 +74,24 @@ public class MatchupTest {
 	
 	@Test
 	public void calculateTeamWinChancesFromPowerRankingsUsesRankingsToCalculateWinChances() {
-		int betterTeamWinChanceWhenBetterBy24Spots = 90;
-		double winChancePerRankingSpot = 1.523; 
-		
-		when(team1.getPowerRanking()).thenReturn(1);
-		when(team1.getPowerRanking()).thenReturn(25);
+		testWinChanceCalculation(90, 1, 25);
+		testWinChanceCalculation(10, 25, 1);
+		testWinChanceCalculation(55, 1, 2);
+		testWinChanceCalculation(82, 8, 27);
+		testWinChanceCalculation(18, 24, 5);
+		testWinChanceCalculation(37, 18, 12);
+	}
+
+	private void testWinChanceCalculation(
+			int expectedTeam1WinChance, int team1Ranking, int team2Ranking) {
+		when(team1.getPowerRanking()).thenReturn(team1Ranking);
+		when(team2.getPowerRanking()).thenReturn(team2Ranking);
 		
 		matchup.calculateTeamWinChancesFromPowerRankings();
 		
 		assertEquals(Matchup.WinChanceModeEnum.POWER_RANKINGS, matchup.getWinChanceMode());
-		assertEquals(matchup.getTeamWinChance(team1Name), betterTeamWinChanceWhenBetterBy24Spots);
-		assertEquals(matchup.getTeamWinChance(team2Name), (100 - betterTeamWinChanceWhenBetterBy24Spots));
-		
-		when(team1.getPowerRanking()).thenReturn(1);
-		when(team1.getPowerRanking()).thenReturn(2);
-		
-		matchup.calculateTeamWinChancesFromPowerRankings();
-		
-		int expectedTeam1WinChance = Math.round(
-				betterTeamWinChanceWhenBetterBy24Spots - (winChancePerRankingSpot * 23));
-		assertEquals(Matchup.WinChanceModeEnum.POWER_RANKINGS, matchup.getWinChanceMode());
-		assertEquals(matchup.getTeamWinChance(team1Name), expectedTeam1WinChance);
+		assertEquals(expectedTeam1WinChance, matchup.getTeamWinChance(team1Name));
+		assertEquals((100 - expectedTeam1WinChance), matchup.getTeamWinChance(team2Name));
 	}
 	
 }

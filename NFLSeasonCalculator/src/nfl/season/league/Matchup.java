@@ -7,6 +7,8 @@ public class Matchup {
 	}
 	
 	private static final int BETTER_TEAM_WIN_CHANCE_WHEN_BETTER_BY_24_SPOTS = 90;
+
+	private static final double WIN_CHANCE_DIFFERENCE_BY_SPOT = 1.523;
 	
 	private Team team1;
 	
@@ -78,14 +80,30 @@ public class Matchup {
 
 	public void calculateTeamWinChancesFromPowerRankings() {
 		winChanceMode = WinChanceModeEnum.POWER_RANKINGS;
+		int team1Ranking = team1.getPowerRanking();
+		int team2Ranking = team2.getPowerRanking();
+		
+		boolean team1IsRankedHigher = true;
+		if (team2Ranking < team1Ranking) {
+			team1IsRankedHigher = false;
+		}
+		
+		int rankingDifference = Math.abs(team1Ranking - team2Ranking);
+		int rankingDifferenceComparedTo24Difference = rankingDifference - 24;
+		
+		int betterWinChance = (int) Math.round(BETTER_TEAM_WIN_CHANCE_WHEN_BETTER_BY_24_SPOTS + 
+				(rankingDifferenceComparedTo24Difference * WIN_CHANCE_DIFFERENCE_BY_SPOT));
+		
+		if (team1IsRankedHigher) {
+			team1WinChance = betterWinChance;
+			team2WinChance = 100 - betterWinChance;
+		} else {
+			team2WinChance = betterWinChance;
+			team1WinChance = 100 - betterWinChance;
+		}
 	}
 
 	public WinChanceModeEnum getWinChanceMode() {
-		int team1Ranking = team1.getPowerRanking();
-		int team2Ranking = team2.getPowerRanking();
-		int rankingDifference = team1Ranking - team2Ranking;
-		int rankingDifferenceComparedTo24Difference = rankingDifference - 24;
-		
 		return winChanceMode;
 	}
 
