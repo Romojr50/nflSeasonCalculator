@@ -24,7 +24,9 @@ public class MatchupMenuTest {
 	
 	private static final int SET_SECOND_TEAM_WIN_CHANCE = 2;
 	
-	private static final int EXIT_OPTION = 3;
+	private static final int CALCULATE_BASED_OFF_POWER_RANKINGS = 3;
+	
+	private static final int EXIT_OPTION = 4;
 	
 	private String coltsName = "Colts";
 	
@@ -59,6 +61,7 @@ public class MatchupMenuTest {
 		when(matchup.getOpponentName(coltsName)).thenReturn(eaglesName);
 		when(matchup.getTeamWinChance(coltsName)).thenReturn(coltsWinChance);
 		when(matchup.getTeamWinChance(eaglesName)).thenReturn(eaglesWinChance);
+		when(matchup.getWinChanceMode()).thenReturn(Matchup.WinChanceModeEnum.CUSTOM_SETTING);
 		
 		setExpectedMenuMessage();
 	}
@@ -123,6 +126,30 @@ public class MatchupMenuTest {
 		verify(matchup, never()).setTeamWinChance(coltsName, -2);
 	}
 	
+	@Test
+	public void calculateWinChanceBasedOnPowerRankingsSoCalculationIsCalledFor() {
+		when(input.askForInt(anyString())).thenReturn(CALCULATE_BASED_OFF_POWER_RANKINGS, 
+				EXIT_OPTION);
+		when(matchup.getTeamWinChance(coltsName)).thenReturn(55, 58);
+		when(matchup.getTeamWinChance(eaglesName)).thenReturn(45, 42);
+		when(matchup.getWinChanceMode()).thenReturn(Matchup.WinChanceModeEnum.CUSTOM_SETTING,
+				Matchup.WinChanceModeEnum.POWER_RANKINGS);
+		
+		matchupMenu.launchSubMenu();
+		
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+		
+		when(matchup.getTeamWinChance(coltsName)).thenReturn(58);
+		when(matchup.getTeamWinChance(eaglesName)).thenReturn(42);
+		when(matchup.getWinChanceMode()).thenReturn(Matchup.WinChanceModeEnum.POWER_RANKINGS);
+		
+		setExpectedMenuMessage();
+		
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+		
+		verify(matchup).calculateTeamWinChancesFromPowerRankings();
+	}
+	
 	private void setExpectedMenuMessage() {
 		String selectedTeamName = matchupMenu.getSelectedTeamName();
 		String afterOneTeamMessage = " win chance\n";
@@ -130,9 +157,12 @@ public class MatchupMenuTest {
 				"\n" + "Current win chances:\n" + teamNames[0] + ": " + 
 				matchup.getTeamWinChance(teamNames[0]) + "\n" + teamNames[1] + 
 				": " + matchup.getTeamWinChance(teamNames[1]) + "\n" + 
+				"Current win chance determiner: " + 
+				matchup.getWinChanceMode().winChanceModeDescription + "\n" +
 				MenuOptionsUtil.MENU_INTRO + "1. Set " + teamNames[0] + 
 				afterOneTeamMessage + "2. Set " + teamNames[1] + 
-				afterOneTeamMessage + "3. Back to " + selectedTeamName + " Menu";
+				afterOneTeamMessage + "3. Calculate and set win chances based " +
+				"off teams' Power Rankings\n4. Back to " + selectedTeamName + " Menu";
 	}
 	
 	private void setExpectedSetWinChanceMessage(String teamName) {

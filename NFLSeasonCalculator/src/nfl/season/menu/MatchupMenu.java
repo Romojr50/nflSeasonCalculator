@@ -8,7 +8,9 @@ public class MatchupMenu extends SubMenu {
 	public enum MatchupMenuOptions implements MenuOptions {
 		SET_TEAM_1_WIN_CHANCE(1, "Set <Team1> win chance"), 
 		SET_TEAM_2_WIN_CHANCE(2, "Set <Team2> win chance"),
-		BACK_TO_SINGLE_TEAM_MENU(3, "Back to <Team1> Menu");
+		CALCULATE_BASED_OFF_POWER_RANKINGS(3, "Calculate and set win chances based " +
+				"off teams' Power Rankings"),
+		BACK_TO_SINGLE_TEAM_MENU(4, "Back to <Team1> Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -66,6 +68,9 @@ public class MatchupMenu extends SubMenu {
 				launchSetTeamWinChanceMenu(team1Name);
 			} else if (selectedOption == MatchupMenuOptions.SET_TEAM_2_WIN_CHANCE.optionNumber) {
 				launchSetTeamWinChanceMenu(team2Name);
+			} else if (selectedOption == 
+					MatchupMenuOptions.CALCULATE_BASED_OFF_POWER_RANKINGS.optionNumber) {
+				matchup.calculateTeamWinChancesFromPowerRankings();
 			}
 		}
 	}
@@ -79,6 +84,11 @@ public class MatchupMenu extends SubMenu {
 				matchup.getTeamWinChance(team1Name) + "\n");
 		matchupMenuMessageBuilder.append(team2Name + ": " + 
 				matchup.getTeamWinChance(team2Name) + "\n");
+		
+		matchupMenuMessageBuilder.append("Current win chance determiner: ");
+		matchupMenuMessageBuilder.append(matchup.getWinChanceMode().winChanceModeDescription);
+		matchupMenuMessageBuilder.append("\n");
+		
 		matchupMenuMessageBuilder.append(MenuOptionsUtil.createMenuMessage
 				(MatchupMenuOptions.class));
 		

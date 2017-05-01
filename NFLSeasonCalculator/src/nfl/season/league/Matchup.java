@@ -3,7 +3,12 @@ package nfl.season.league;
 public class Matchup {
 
 	public enum WinChanceModeEnum {
-		CUSTOM_SETTING, POWER_RANKINGS
+		CUSTOM_SETTING("Custom Setting"), POWER_RANKINGS("Power Rankings");
+		public String winChanceModeDescription;
+		
+		private WinChanceModeEnum(String winChanceModeDescription) {
+			this.winChanceModeDescription = winChanceModeDescription;
+		}
 	}
 	
 	private static final int BETTER_TEAM_WIN_CHANCE_WHEN_BETTER_BY_24_SPOTS = 90;
@@ -23,6 +28,9 @@ public class Matchup {
 	public Matchup(Team team1, Team team2) {
 		this.team1 = team1;
 		this.team2 = team2;
+		team1WinChance = 50;
+		team2WinChance = (100 - team1WinChance);
+		winChanceMode = WinChanceModeEnum.CUSTOM_SETTING;
 	}
 	
 	public String getOpponentName(String teamName) {

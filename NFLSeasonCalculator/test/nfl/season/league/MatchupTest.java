@@ -33,6 +33,13 @@ public class MatchupTest {
 	}
 	
 	@Test
+	public void matchupIsInitializedWith50sAndCustomSetting() {
+		assertEquals(50, matchup.getTeamWinChance(team1Name));
+		assertEquals(50, matchup.getTeamWinChance(team2Name));
+		assertEquals(Matchup.WinChanceModeEnum.CUSTOM_SETTING, matchup.getWinChanceMode());
+	}
+	
+	@Test
 	public void opponentNameIsLookedForSoOtherTeamNameIsReturned() {
 		String team1Opponent = matchup.getOpponentName(team1Name);
 		String team2Opponent = matchup.getOpponentName(team2Name);
