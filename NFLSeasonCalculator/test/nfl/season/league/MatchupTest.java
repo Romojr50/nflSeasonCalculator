@@ -1,6 +1,8 @@
 package nfl.season.league;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -56,6 +58,20 @@ public class MatchupTest {
 	}
 	
 	@Test
+	public void getTeamPowerRankingReturnsTeamPowerRankings() {
+		int team1Ranking = 7;
+		int team2Ranking = 26;
+		when(team1.getPowerRanking()).thenReturn(team1Ranking);
+		when(team2.getPowerRanking()).thenReturn(team2Ranking);
+		
+		int team1ReturnedRanking = matchup.getTeamPowerRanking(team1Name);
+		int team2ReturnedRanking = matchup.getTeamPowerRanking(team2Name);
+		
+		assertEquals(team1Ranking, team1ReturnedRanking);
+		assertEquals(team2Ranking, team2ReturnedRanking);
+	}
+	
+	@Test
 	public void setTeamWinChanceSoBothTeamsHaveWinChanceAltered() {
 		int expectedTeam1WinChance = 18;
 		int expectedTeam2WinChance = 74;
@@ -88,14 +104,41 @@ public class MatchupTest {
 		testWinChanceCalculation(18, 24, 5);
 		testWinChanceCalculation(37, 18, 12);
 	}
+	
+	@Test
+	public void calculateTeamWinChancesFromPowerRankingsButRankingsAreClearedSoNoCalculationIsDone() {
+		int initialTeam1WinChance = 49;
+		matchup.setTeamWinChance(team1Name, initialTeam1WinChance);
+		
+		when(team1.getPowerRanking()).thenReturn(Team.CLEAR_RANKING);
+		when(team2.getPowerRanking()).thenReturn(5);
+		
+		boolean calculationSuccessful = matchup.calculateTeamWinChancesFromPowerRankings();
+		
+		assertFalse(calculationSuccessful);
+		assertEquals(Matchup.WinChanceModeEnum.CUSTOM_SETTING, matchup.getWinChanceMode());
+		assertEquals(initialTeam1WinChance, matchup.getTeamWinChance(team1Name));
+		assertEquals((100 - initialTeam1WinChance), matchup.getTeamWinChance(team2Name));
+		
+		when(team1.getPowerRanking()).thenReturn(7);
+		when(team2.getPowerRanking()).thenReturn(Team.CLEAR_RANKING);
+		
+		calculationSuccessful = matchup.calculateTeamWinChancesFromPowerRankings();
+		
+		assertFalse(calculationSuccessful);
+		assertEquals(Matchup.WinChanceModeEnum.CUSTOM_SETTING, matchup.getWinChanceMode());
+		assertEquals(initialTeam1WinChance, matchup.getTeamWinChance(team1Name));
+		assertEquals((100 - initialTeam1WinChance), matchup.getTeamWinChance(team2Name));
+	}
 
 	private void testWinChanceCalculation(
 			int expectedTeam1WinChance, int team1Ranking, int team2Ranking) {
 		when(team1.getPowerRanking()).thenReturn(team1Ranking);
 		when(team2.getPowerRanking()).thenReturn(team2Ranking);
 		
-		matchup.calculateTeamWinChancesFromPowerRankings();
+		boolean calculationSuccessful = matchup.calculateTeamWinChancesFromPowerRankings();
 		
+		assertTrue(calculationSuccessful);
 		assertEquals(Matchup.WinChanceModeEnum.POWER_RANKINGS, matchup.getWinChanceMode());
 		assertEquals(expectedTeam1WinChance, matchup.getTeamWinChance(team1Name));
 		assertEquals((100 - expectedTeam1WinChance), matchup.getTeamWinChance(team2Name));

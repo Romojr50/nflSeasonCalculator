@@ -85,34 +85,58 @@ public class Matchup {
 			}
 		}
 	}
+	
+	public int getTeamPowerRanking(String teamName) {
+		int returnRanking = Team.CLEAR_RANKING;
+		if (teamName != null) {
+			if (teamName.equalsIgnoreCase(team1.getName())) {
+				returnRanking = team1.getPowerRanking();
+			} else if (teamName.equalsIgnoreCase(team2.getName())) {
+				returnRanking = team2.getPowerRanking();
+			}
+		}
+		return returnRanking;
+	}
 
-	public void calculateTeamWinChancesFromPowerRankings() {
-		winChanceMode = WinChanceModeEnum.POWER_RANKINGS;
+	public boolean calculateTeamWinChancesFromPowerRankings() {
+		boolean success = false;
 		int team1Ranking = team1.getPowerRanking();
 		int team2Ranking = team2.getPowerRanking();
-		
-		boolean team1IsRankedHigher = true;
-		if (team2Ranking < team1Ranking) {
-			team1IsRankedHigher = false;
+
+		if (Team.CLEAR_RANKING != team1Ranking && Team.CLEAR_RANKING != team2Ranking) {
+			winChanceMode = WinChanceModeEnum.POWER_RANKINGS;
+			boolean team1IsRankedHigher = true;
+			if (team2Ranking < team1Ranking) {
+				team1IsRankedHigher = false;
+			}
+			
+			int betterWinChance = calculateBetterWinChance(team1Ranking,
+					team2Ranking);
+			
+			if (team1IsRankedHigher) {
+				team1WinChance = betterWinChance;
+				team2WinChance = 100 - betterWinChance;
+			} else {
+				team2WinChance = betterWinChance;
+				team1WinChance = 100 - betterWinChance;
+			}
+			success = true;
 		}
 		
+		return success;
+	}
+
+	public WinChanceModeEnum getWinChanceMode() {
+		return winChanceMode;
+	}
+	
+	private int calculateBetterWinChance(int team1Ranking, int team2Ranking) {
 		int rankingDifference = Math.abs(team1Ranking - team2Ranking);
 		int rankingDifferenceComparedTo24Difference = rankingDifference - 24;
 		
 		int betterWinChance = (int) Math.round(BETTER_TEAM_WIN_CHANCE_WHEN_BETTER_BY_24_SPOTS + 
 				(rankingDifferenceComparedTo24Difference * WIN_CHANCE_DIFFERENCE_BY_SPOT));
-		
-		if (team1IsRankedHigher) {
-			team1WinChance = betterWinChance;
-			team2WinChance = 100 - betterWinChance;
-		} else {
-			team2WinChance = betterWinChance;
-			team1WinChance = 100 - betterWinChance;
-		}
-	}
-
-	public WinChanceModeEnum getWinChanceMode() {
-		return winChanceMode;
+		return betterWinChance;
 	}
 
 }

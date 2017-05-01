@@ -61,7 +61,10 @@ public class MatchupMenuTest {
 		when(matchup.getOpponentName(coltsName)).thenReturn(eaglesName);
 		when(matchup.getTeamWinChance(coltsName)).thenReturn(coltsWinChance);
 		when(matchup.getTeamWinChance(eaglesName)).thenReturn(eaglesWinChance);
+		when(matchup.getTeamPowerRanking(coltsName)).thenReturn(15);
+		when(matchup.getTeamPowerRanking(eaglesName)).thenReturn(2);
 		when(matchup.getWinChanceMode()).thenReturn(Matchup.WinChanceModeEnum.CUSTOM_SETTING);
+		when(matchup.calculateTeamWinChancesFromPowerRankings()).thenReturn(true);
 		
 		setExpectedMenuMessage();
 	}
@@ -150,6 +153,19 @@ public class MatchupMenuTest {
 		verify(matchup).calculateTeamWinChancesFromPowerRankings();
 	}
 	
+	@Test
+	public void calculateWinChanceFailsSoTellUserToSetPowerRankings() {
+		when(matchup.calculateTeamWinChancesFromPowerRankings()).thenReturn(false);
+		when(input.askForInt(anyString())).thenReturn(CALCULATE_BASED_OFF_POWER_RANKINGS, 
+				EXIT_OPTION);
+		
+		matchupMenu.launchSubMenu();
+		
+		expectedMenuMessage = "Could not calculate; set Power Rankings on both " +
+				"teams.\n" + expectedMenuMessage;
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+	}
+	
 	private void setExpectedMenuMessage() {
 		String selectedTeamName = matchupMenu.getSelectedTeamName();
 		String afterOneTeamMessage = " win chance\n";
@@ -162,7 +178,9 @@ public class MatchupMenuTest {
 				MenuOptionsUtil.MENU_INTRO + "1. Set " + teamNames[0] + 
 				afterOneTeamMessage + "2. Set " + teamNames[1] + 
 				afterOneTeamMessage + "3. Calculate and set win chances based " +
-				"off teams' Power Rankings\n4. Back to " + selectedTeamName + " Menu";
+				"off teams' Power Rankings: #" + matchup.getTeamPowerRanking(teamNames[0]) + 
+				" vs. #" + matchup.getTeamPowerRanking(teamNames[1]) + 
+				"\n4. Back to " + selectedTeamName + " Matchup List";
 	}
 	
 	private void setExpectedSetWinChanceMessage(String teamName) {
