@@ -13,7 +13,7 @@ public class Team {
 	
 	private int powerRanking = CLEAR_RANKING;
 	
-	private int teamLevel = 1;
+	private int eloRating = 1;
 	
 	private List<Matchup> matchups;
 
@@ -34,12 +34,12 @@ public class Team {
 		this.powerRanking = powerRanking;
 	}
 
-	public int getTeamLevel() {
-		return teamLevel;
+	public int getELORating() {
+		return eloRating;
 	}
 
-	public void setTeamLevel(int newTeamLevel) {
-		this.teamLevel = newTeamLevel;
+	public void setELORating(int newELORating) {
+		this.eloRating = newELORating;
 	}
 
 	public List<Matchup> getMatchups() {

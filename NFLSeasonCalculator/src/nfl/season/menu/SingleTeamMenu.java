@@ -12,7 +12,7 @@ public class SingleTeamMenu extends SubMenu {
 
 	public enum SingleTeamMenuOptions implements MenuOptions {
 		SET_POWER_RANKING(1, "Set Power Ranking"), 
-		SET_TEAM_LEVEL(2, "Set Team Level"),
+		SET_ELO_RATING(2, "Set ELO Rating"),
 		CHOOSE_MATCHUP(3, "Edit Matchup Settings"),
 		EXIT(4, "Back to Teams Menu");
 		
@@ -62,8 +62,8 @@ public class SingleTeamMenu extends SubMenu {
 		int selectedOption = -1;
 		while (selectedOption != SingleTeamMenuOptions.EXIT.optionNumber) {
 			singleTeamMenuMessage = selectedTeam.getName() + "\nPower Ranking: " + 
-					selectedTeam.getPowerRanking() + "\nTeam Level: " + 
-					selectedTeam.getTeamLevel() + "\n" + singleTeamMenuMessageSuffix;
+					selectedTeam.getPowerRanking() + "\nELO Rating: " + 
+					selectedTeam.getELORating() + "\n" + singleTeamMenuMessageSuffix;
 			singleTeamMenuMessage = singleTeamMenuMessage.replace("" + Team.CLEAR_RANKING, 
 					Team.UNSET_RANKING_DISPLAY); 
 			
@@ -71,8 +71,8 @@ public class SingleTeamMenu extends SubMenu {
 				
 			if (SingleTeamMenuOptions.SET_POWER_RANKING.optionNumber == selectedOption) {
 				launchSetPowerRankingMenu();
-			} else if (SingleTeamMenuOptions.SET_TEAM_LEVEL.optionNumber == selectedOption) {
-				launchSetTeamLevelMenu();
+			} else if (SingleTeamMenuOptions.SET_ELO_RATING.optionNumber == selectedOption) {
+				launchSetELORatingMenu();
 			} else if (SingleTeamMenuOptions.CHOOSE_MATCHUP.optionNumber == selectedOption) {
 				launchSelectMatchupMenu();
 			}
@@ -116,16 +116,16 @@ public class SingleTeamMenu extends SubMenu {
 		}
 	}
 	
-	private void launchSetTeamLevelMenu() {
-		int newTeamLevel = -1;
+	private void launchSetELORatingMenu() {
+		int newELORating = -1;
 		
-		while (newTeamLevel <= 0) {
-			String teamLevelMessage = "Current Team Level: " + selectedTeam.getTeamLevel() + 
+		while (newELORating <= 0) {
+			String eloRatingMessage = "Current ELO Rating: " + selectedTeam.getELORating() + 
 					"\nPlease enter in an integer above 0";
-			newTeamLevel = input.askForInt(teamLevelMessage);
+			newELORating = input.askForInt(eloRatingMessage);
 			
-			if (newTeamLevel > 0) {
-				selectedTeam.setTeamLevel(newTeamLevel);
+			if (newELORating > 0) {
+				selectedTeam.setELORating(newELORating);
 			}
 		}
 		

@@ -27,7 +27,7 @@ public class SingleTeamMenuTest {
 	
 	private static final int SET_POWER_RANKING = 1;
 	
-	private static final int SET_TEAM_LEVEL = 2;
+	private static final int SET_ELO_RATING = 2;
 
 	private static final int CHOOSE_MATCHUP = 3;
 	
@@ -37,7 +37,7 @@ public class SingleTeamMenuTest {
 	
 	private String expectedPowerRankingsMessage;
 	
-	private String expectedTeamLevelMessage;
+	private String expectedELORatingMessage;
 	
 	private String expectedMatchupMessage;
 	
@@ -77,11 +77,11 @@ public class SingleTeamMenuTest {
 		
 		when(colts.getName()).thenReturn("Colts");
 		when(colts.getPowerRanking()).thenReturn(19);
-		when(colts.getTeamLevel()).thenReturn(48);
+		when(colts.getELORating()).thenReturn(48);
 		
 		setExpectedMenuMessage();
 		setExpectedPowerRankingsMessage();
-		setExpectedTeamLevelMessage();
+		setExpectedELORatingMessage();
 		
 		when(eagles.getName()).thenReturn("Eagles");
 		
@@ -220,33 +220,33 @@ public class SingleTeamMenuTest {
 	}
 	
 	@Test
-	public void teamLevelIsSet() {
-		int newTeamLevel = 17;
+	public void eloRatingIsSet() {
+		int newELORating = 17;
 		
-		when(input.askForInt(anyString())).thenReturn(SET_TEAM_LEVEL, newTeamLevel, 
+		when(input.askForInt(anyString())).thenReturn(SET_ELO_RATING, newELORating, 
 				EXIT_FROM_SINGLE_TEAM_MENU);
 		
 		singleTeamMenu.launchSubMenu();
 		
 		verify(input, times(2)).askForInt(expectedMenuMessage);
-		verify(input, times(1)).askForInt(expectedTeamLevelMessage);
+		verify(input, times(1)).askForInt(expectedELORatingMessage);
 		
-		verify(colts, times(1)).setTeamLevel(newTeamLevel);
+		verify(colts, times(1)).setELORating(newELORating);
 	}
 	
 	@Test
-	public void teamLevelInputIsInvalidSoInvalidInputIsIgnored() {
-		int newTeamLevel = 17;
+	public void eloRatingInputIsInvalidSoInvalidInputIsIgnored() {
+		int newELORating = 17;
 		
-		when(input.askForInt(anyString())).thenReturn(SET_TEAM_LEVEL, 0, newTeamLevel, 
+		when(input.askForInt(anyString())).thenReturn(SET_ELO_RATING, 0, newELORating, 
 				EXIT_FROM_SINGLE_TEAM_MENU);
 		
 		singleTeamMenu.launchSubMenu();
 		
 		verify(input, times(2)).askForInt(expectedMenuMessage);
-		verify(input, times(2)).askForInt(expectedTeamLevelMessage);
+		verify(input, times(2)).askForInt(expectedELORatingMessage);
 		
-		verify(colts, times(1)).setTeamLevel(newTeamLevel);
+		verify(colts, times(1)).setELORating(newELORating);
 	}
 	
 	@Test
@@ -290,8 +290,8 @@ public class SingleTeamMenuTest {
 	private void setExpectedMenuMessage() {
 		expectedMenuMessage = 
 				colts.getName() + "\nPower Ranking: " + colts.getPowerRanking() + 
-				"\nTeam Level: " + colts.getTeamLevel() + "\n" + MenuOptionsUtil.MENU_INTRO + 
-				"1. Set Power Ranking\n2. Set Team Level\n3. Edit Matchup Settings\n" +
+				"\nELO Rating: " + colts.getELORating() + "\n" + MenuOptionsUtil.MENU_INTRO + 
+				"1. Set Power Ranking\n2. Set ELO Rating\n3. Edit Matchup Settings\n" +
 				"4. Back to Teams Menu";
 	}
 	
@@ -302,8 +302,8 @@ public class SingleTeamMenuTest {
 				"ranking\nor -1 to clear this team's ranking:";
 	}
 	
-	private void setExpectedTeamLevelMessage() {
-		expectedTeamLevelMessage = "Current Team Level: " + colts.getTeamLevel() + 
+	private void setExpectedELORatingMessage() {
+		expectedELORatingMessage = "Current ELO Rating: " + colts.getELORating() + 
 				"\nPlease enter in an integer above 0";
 	}
 	
