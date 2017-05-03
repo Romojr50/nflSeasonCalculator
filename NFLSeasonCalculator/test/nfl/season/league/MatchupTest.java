@@ -97,12 +97,12 @@ public class MatchupTest {
 	
 	@Test
 	public void calculateTeamWinChancesFromPowerRankingsUsesRankingsToCalculateWinChances() {
-		testWinChanceCalculation(90, 1, 25);
-		testWinChanceCalculation(10, 25, 1);
-		testWinChanceCalculation(55, 1, 2);
-		testWinChanceCalculation(82, 8, 27);
-		testWinChanceCalculation(18, 24, 5);
-		testWinChanceCalculation(37, 18, 12);
+		testRankingCalculation(90, 1, 25);
+		testRankingCalculation(10, 25, 1);
+		testRankingCalculation(55, 1, 2);
+		testRankingCalculation(82, 8, 27);
+		testRankingCalculation(18, 24, 5);
+		testRankingCalculation(37, 18, 12);
 	}
 	
 	@Test
@@ -130,8 +130,18 @@ public class MatchupTest {
 		assertEquals(initialTeam1WinChance, matchup.getTeamWinChance(team1Name));
 		assertEquals((100 - initialTeam1WinChance), matchup.getTeamWinChance(team2Name));
 	}
+	
+	@Test
+	public void calculateTeamWinChanceFromEloRatingUsesEloRatingsToDetermineWinChance() {
+		// 1 / (1 + 10 ^ ((ratingA - ratingB) / 400))
+		testEloCalculation(36, 1450, 1550);
+		testEloCalculation(50, 1500, 1500);
+		testEloCalculation(98, 1800, 1100);
+		testEloCalculation(75, 1578, 1391);
+		testEloCalculation(46, 1490, 1515);
+	}
 
-	private void testWinChanceCalculation(
+	private void testRankingCalculation(
 			int expectedTeam1WinChance, int team1Ranking, int team2Ranking) {
 		when(team1.getPowerRanking()).thenReturn(team1Ranking);
 		when(team2.getPowerRanking()).thenReturn(team2Ranking);
@@ -140,6 +150,19 @@ public class MatchupTest {
 		
 		assertTrue(calculationSuccessful);
 		assertEquals(Matchup.WinChanceModeEnum.POWER_RANKINGS, matchup.getWinChanceMode());
+		assertEquals(expectedTeam1WinChance, matchup.getTeamWinChance(team1Name));
+		assertEquals((100 - expectedTeam1WinChance), matchup.getTeamWinChance(team2Name));
+	}
+	
+	private void testEloCalculation(int expectedTeam1WinChance, int team1Rating,
+			int team2Rating) {
+		when(team1.getEloRating()).thenReturn(team1Rating);
+		when(team2.getEloRating()).thenReturn(team2Rating);
+		
+		boolean calculationSuccessful = matchup.calculateTeamWinChancesFromEloRatings();
+		
+		assertTrue(calculationSuccessful);
+		assertEquals(Matchup.WinChanceModeEnum.ELO_RATINGS, matchup.getWinChanceMode());
 		assertEquals(expectedTeam1WinChance, matchup.getTeamWinChance(team1Name));
 		assertEquals((100 - expectedTeam1WinChance), matchup.getTeamWinChance(team2Name));
 	}

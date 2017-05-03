@@ -3,7 +3,8 @@ package nfl.season.league;
 public class Matchup {
 
 	public enum WinChanceModeEnum {
-		CUSTOM_SETTING("Custom Setting"), POWER_RANKINGS("Power Rankings");
+		CUSTOM_SETTING("Custom Setting"), POWER_RANKINGS("Power Rankings"), 
+		ELO_RATINGS("Elo Ratings");
 		public String winChanceModeDescription;
 		
 		private WinChanceModeEnum(String winChanceModeDescription) {
@@ -124,6 +125,24 @@ public class Matchup {
 		}
 		
 		return success;
+	}
+	
+	public boolean calculateTeamWinChancesFromEloRatings() {
+		// 1 / (1 + 10 ^ ((ratingA - ratingB) / 400))
+		winChanceMode = WinChanceModeEnum.ELO_RATINGS;
+		
+		int team1Rating = team1.getEloRating();
+		int team2Rating = team2.getEloRating();
+		
+		int ratingDifference = team2Rating - team1Rating;
+		double powerFor10 = ratingDifference / 400.0;
+		double tenToThePower = Math.pow(10, powerFor10);
+		double dividend = 1 + tenToThePower;
+		double winChanceAsDecimal = 1 / dividend;
+		team1WinChance = (int) Math.round(winChanceAsDecimal * 100);
+		team2WinChance = 100 - team1WinChance;
+		
+		return true;
 	}
 
 	public WinChanceModeEnum getWinChanceMode() {

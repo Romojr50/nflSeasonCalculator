@@ -12,7 +12,7 @@ public class SingleTeamMenu extends SubMenu {
 
 	public enum SingleTeamMenuOptions implements MenuOptions {
 		SET_POWER_RANKING(1, "Set Power Ranking"), 
-		SET_ELO_RATING(2, "Set ELO Rating"),
+		SET_ELO_RATING(2, "Set Elo Rating"),
 		CHOOSE_MATCHUP(3, "Edit Matchup Settings"),
 		EXIT(4, "Back to Teams Menu");
 		
@@ -62,8 +62,8 @@ public class SingleTeamMenu extends SubMenu {
 		int selectedOption = -1;
 		while (selectedOption != SingleTeamMenuOptions.EXIT.optionNumber) {
 			singleTeamMenuMessage = selectedTeam.getName() + "\nPower Ranking: " + 
-					selectedTeam.getPowerRanking() + "\nELO Rating: " + 
-					selectedTeam.getELORating() + "\n" + singleTeamMenuMessageSuffix;
+					selectedTeam.getPowerRanking() + "\nElo Rating: " + 
+					selectedTeam.getEloRating() + "\n" + singleTeamMenuMessageSuffix;
 			singleTeamMenuMessage = singleTeamMenuMessage.replace("" + Team.CLEAR_RANKING, 
 					Team.UNSET_RANKING_DISPLAY); 
 			
@@ -72,7 +72,7 @@ public class SingleTeamMenu extends SubMenu {
 			if (SingleTeamMenuOptions.SET_POWER_RANKING.optionNumber == selectedOption) {
 				launchSetPowerRankingMenu();
 			} else if (SingleTeamMenuOptions.SET_ELO_RATING.optionNumber == selectedOption) {
-				launchSetELORatingMenu();
+				launchSetEloRatingMenu();
 			} else if (SingleTeamMenuOptions.CHOOSE_MATCHUP.optionNumber == selectedOption) {
 				launchSelectMatchupMenu();
 			}
@@ -116,16 +116,16 @@ public class SingleTeamMenu extends SubMenu {
 		}
 	}
 	
-	private void launchSetELORatingMenu() {
-		int newELORating = -1;
+	private void launchSetEloRatingMenu() {
+		int newEloRating = -1;
 		
-		while (newELORating <= 0) {
-			String eloRatingMessage = "Current ELO Rating: " + selectedTeam.getELORating() + 
+		while (newEloRating <= 0) {
+			String eloRatingMessage = "Current Elo Rating: " + selectedTeam.getEloRating() + 
 					"\nPlease enter in an integer above 0";
-			newELORating = input.askForInt(eloRatingMessage);
+			newEloRating = input.askForInt(eloRatingMessage);
 			
-			if (newELORating > 0) {
-				selectedTeam.setELORating(newELORating);
+			if (newEloRating > 0) {
+				selectedTeam.setEloRating(newEloRating);
 			}
 		}
 		

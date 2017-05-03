@@ -34,12 +34,12 @@ public class Team {
 		this.powerRanking = powerRanking;
 	}
 
-	public int getELORating() {
+	public int getEloRating() {
 		return eloRating;
 	}
 
-	public void setELORating(int newELORating) {
-		this.eloRating = newELORating;
+	public void setEloRating(int newEloRating) {
+		this.eloRating = newEloRating;
 	}
 
 	public List<Matchup> getMatchups() {

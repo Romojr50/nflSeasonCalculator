@@ -37,7 +37,7 @@ public class SingleTeamMenuTest {
 	
 	private String expectedPowerRankingsMessage;
 	
-	private String expectedELORatingMessage;
+	private String expectedEloRatingMessage;
 	
 	private String expectedMatchupMessage;
 	
@@ -77,11 +77,11 @@ public class SingleTeamMenuTest {
 		
 		when(colts.getName()).thenReturn("Colts");
 		when(colts.getPowerRanking()).thenReturn(19);
-		when(colts.getELORating()).thenReturn(48);
+		when(colts.getEloRating()).thenReturn(48);
 		
 		setExpectedMenuMessage();
 		setExpectedPowerRankingsMessage();
-		setExpectedELORatingMessage();
+		setExpectedEloRatingMessage();
 		
 		when(eagles.getName()).thenReturn("Eagles");
 		
@@ -221,32 +221,32 @@ public class SingleTeamMenuTest {
 	
 	@Test
 	public void eloRatingIsSet() {
-		int newELORating = 17;
+		int newEloRating = 17;
 		
-		when(input.askForInt(anyString())).thenReturn(SET_ELO_RATING, newELORating, 
+		when(input.askForInt(anyString())).thenReturn(SET_ELO_RATING, newEloRating, 
 				EXIT_FROM_SINGLE_TEAM_MENU);
 		
 		singleTeamMenu.launchSubMenu();
 		
 		verify(input, times(2)).askForInt(expectedMenuMessage);
-		verify(input, times(1)).askForInt(expectedELORatingMessage);
+		verify(input, times(1)).askForInt(expectedEloRatingMessage);
 		
-		verify(colts, times(1)).setELORating(newELORating);
+		verify(colts, times(1)).setEloRating(newEloRating);
 	}
 	
 	@Test
 	public void eloRatingInputIsInvalidSoInvalidInputIsIgnored() {
-		int newELORating = 17;
+		int newEloRating = 17;
 		
-		when(input.askForInt(anyString())).thenReturn(SET_ELO_RATING, 0, newELORating, 
+		when(input.askForInt(anyString())).thenReturn(SET_ELO_RATING, 0, newEloRating, 
 				EXIT_FROM_SINGLE_TEAM_MENU);
 		
 		singleTeamMenu.launchSubMenu();
 		
 		verify(input, times(2)).askForInt(expectedMenuMessage);
-		verify(input, times(2)).askForInt(expectedELORatingMessage);
+		verify(input, times(2)).askForInt(expectedEloRatingMessage);
 		
-		verify(colts, times(1)).setELORating(newELORating);
+		verify(colts, times(1)).setEloRating(newEloRating);
 	}
 	
 	@Test
@@ -290,8 +290,8 @@ public class SingleTeamMenuTest {
 	private void setExpectedMenuMessage() {
 		expectedMenuMessage = 
 				colts.getName() + "\nPower Ranking: " + colts.getPowerRanking() + 
-				"\nELO Rating: " + colts.getELORating() + "\n" + MenuOptionsUtil.MENU_INTRO + 
-				"1. Set Power Ranking\n2. Set ELO Rating\n3. Edit Matchup Settings\n" +
+				"\nElo Rating: " + colts.getEloRating() + "\n" + MenuOptionsUtil.MENU_INTRO + 
+				"1. Set Power Ranking\n2. Set Elo Rating\n3. Edit Matchup Settings\n" +
 				"4. Back to Teams Menu";
 	}
 	
@@ -302,8 +302,8 @@ public class SingleTeamMenuTest {
 				"ranking\nor -1 to clear this team's ranking:";
 	}
 	
-	private void setExpectedELORatingMessage() {
-		expectedELORatingMessage = "Current ELO Rating: " + colts.getELORating() + 
+	private void setExpectedEloRatingMessage() {
+		expectedEloRatingMessage = "Current Elo Rating: " + colts.getEloRating() + 
 				"\nPlease enter in an integer above 0";
 	}
 	
