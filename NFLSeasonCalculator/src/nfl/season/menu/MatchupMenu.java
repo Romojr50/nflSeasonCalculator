@@ -59,11 +59,12 @@ public class MatchupMenu extends SubMenu {
 		String team1Name = selectedTeamName;
 		String team2Name = matchup.getOpponentName(team1Name);
 		boolean calculationSuccess = true;
+		int lastCalculationDone = -1;
 		
 		int selectedOption = -1;
 		while (selectedOption != MatchupMenuOptions.BACK_TO_SINGLE_TEAM_MENU.optionNumber) {
 			String matchupMenuMessage = buildMatchupMenuMessage(team1Name,
-					team2Name, calculationSuccess);
+					team2Name, calculationSuccess, lastCalculationDone);
 			selectedOption = input.askForInt(matchupMenuMessage);
 			
 			if (selectedOption == MatchupMenuOptions.SET_TEAM_1_WIN_CHANCE.optionNumber) {
@@ -73,17 +74,29 @@ public class MatchupMenu extends SubMenu {
 			} else if (selectedOption == 
 					MatchupMenuOptions.CALCULATE_BASED_OFF_POWER_RANKINGS.optionNumber) {
 				calculationSuccess = matchup.calculateTeamWinChancesFromPowerRankings();
+				lastCalculationDone = selectedOption;
+			} else if (selectedOption == 
+					MatchupMenuOptions.CALCULATE_BASED_OFF_ELO_RATINGS.optionNumber) {
+				calculationSuccess = matchup.calculateTeamWinChancesFromEloRatings();
+				lastCalculationDone = selectedOption;
 			}
 		}
 	}
 
 	private String buildMatchupMenuMessage(String team1Name, String team2Name,
-			boolean calculationSuccess) {
+			boolean calculationSuccess, int lastCalculationDone) {
 		StringBuilder matchupMenuMessageBuilder = new StringBuilder();
 		
 		if (!calculationSuccess) {
-			matchupMenuMessageBuilder.append("Could not calculate; set Power " +
-				"Rankings on both teams.\n");
+			if (lastCalculationDone == 
+					MatchupMenuOptions.CALCULATE_BASED_OFF_POWER_RANKINGS.optionNumber) {
+				matchupMenuMessageBuilder.append("Could not calculate; set Power " +
+						"Rankings on both teams.\n");
+			} else if (lastCalculationDone == 
+					MatchupMenuOptions.CALCULATE_BASED_OFF_ELO_RATINGS.optionNumber) {
+				matchupMenuMessageBuilder.append("Could not calculate; set Elo " +
+						"Ratings on both teams to be above 0.\n");
+			}
 		}
 		
 		matchupMenuMessageBuilder.append("Matchup: " + team1Name + " vs. " + 
