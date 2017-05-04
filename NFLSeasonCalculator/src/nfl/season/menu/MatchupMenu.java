@@ -67,6 +67,7 @@ public class MatchupMenu extends SubMenu {
 					team2Name, calculationSuccess, lastCalculationDone);
 			selectedOption = input.askForInt(matchupMenuMessage);
 			
+			calculationSuccess = true;
 			if (selectedOption == MatchupMenuOptions.SET_TEAM_1_WIN_CHANCE.optionNumber) {
 				launchSetTeamWinChanceMenu(team1Name);
 			} else if (selectedOption == MatchupMenuOptions.SET_TEAM_2_WIN_CHANCE.optionNumber) {

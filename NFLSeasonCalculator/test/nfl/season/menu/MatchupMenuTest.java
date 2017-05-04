@@ -155,6 +155,19 @@ public class MatchupMenuTest {
 	}
 	
 	@Test
+	public void calculateWinChanceFailsThenOtherOptionSelectedSoErrorMessageOnlyShownOnce() {
+		when(matchup.calculateTeamWinChancesFromPowerRankings()).thenReturn(false);
+		when(input.askForInt(anyString())).thenReturn(CALCULATE_BASED_OFF_POWER_RANKINGS, 
+				SET_FIRST_TEAM_WIN_CHANCE, 56, EXIT_OPTION);
+		
+		matchupMenu.launchSubMenu();
+		
+		expectedMenuMessage = "Could not calculate; set Power Rankings on both " +
+				"teams.\n" + expectedMenuMessage;
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+	}
+	
+	@Test
 	public void calculateWinChanceBasedOnEloRatingsSoCalculationIsCalledFor() {
 		verifySuccessfulCalculationDone(CALCULATE_BASED_OFF_ELO_RATINGS, 
 				Matchup.WinChanceModeEnum.ELO_RATINGS);
