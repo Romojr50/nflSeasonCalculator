@@ -72,6 +72,20 @@ public class MatchupTest {
 	}
 	
 	@Test
+	public void getTeamEloRatingReturnsTeamEloRatings() {
+		int team1EloRating = 1425;
+		int team2EloRating = 1530;
+		when(team1.getEloRating()).thenReturn(team1EloRating);
+		when(team2.getEloRating()).thenReturn(team2EloRating);
+		
+		int team1ReturnedRating = matchup.getTeamEloRating(team1Name);
+		int team2ReturnedRating = matchup.getTeamEloRating(team2Name);
+		
+		assertEquals(team1EloRating, team1ReturnedRating);
+		assertEquals(team2EloRating, team2ReturnedRating);
+	}
+	
+	@Test
 	public void setTeamWinChanceSoBothTeamsHaveWinChanceAltered() {
 		int expectedTeam1WinChance = 18;
 		int expectedTeam2WinChance = 74;
@@ -115,20 +129,16 @@ public class MatchupTest {
 		
 		boolean calculationSuccessful = matchup.calculateTeamWinChancesFromPowerRankings();
 		
-		assertFalse(calculationSuccessful);
-		assertEquals(Matchup.WinChanceModeEnum.CUSTOM_SETTING, matchup.getWinChanceMode());
-		assertEquals(initialTeam1WinChance, matchup.getTeamWinChance(team1Name));
-		assertEquals((100 - initialTeam1WinChance), matchup.getTeamWinChance(team2Name));
+		assertNoCalculationsOrWinChanceSet(initialTeam1WinChance,
+				calculationSuccessful);
 		
 		when(team1.getPowerRanking()).thenReturn(7);
 		when(team2.getPowerRanking()).thenReturn(Team.CLEAR_RANKING);
 		
 		calculationSuccessful = matchup.calculateTeamWinChancesFromPowerRankings();
 		
-		assertFalse(calculationSuccessful);
-		assertEquals(Matchup.WinChanceModeEnum.CUSTOM_SETTING, matchup.getWinChanceMode());
-		assertEquals(initialTeam1WinChance, matchup.getTeamWinChance(team1Name));
-		assertEquals((100 - initialTeam1WinChance), matchup.getTeamWinChance(team2Name));
+		assertNoCalculationsOrWinChanceSet(initialTeam1WinChance,
+				calculationSuccessful);
 	}
 	
 	@Test
@@ -139,6 +149,27 @@ public class MatchupTest {
 		testEloCalculation(98, 1800, 1100);
 		testEloCalculation(75, 1578, 1391);
 		testEloCalculation(46, 1490, 1515);
+	}
+	
+	@Test
+	public void calculateTeamWinChanceFroEloRatingButEloRatingsAreNegativeSoNoCalculationDone() {
+		int initialTeam1WinChance = 49;
+		matchup.setTeamWinChance(team1Name, initialTeam1WinChance);
+		
+		when(team1.getEloRating()).thenReturn(1500);
+		when(team2.getEloRating()).thenReturn(-1);
+		
+		boolean calculationSuccessful = matchup.calculateTeamWinChancesFromEloRatings();
+		
+		assertNoCalculationsOrWinChanceSet(initialTeam1WinChance,
+				calculationSuccessful);
+		
+		when(team1.getEloRating()).thenReturn(-86);
+		when(team2.getEloRating()).thenReturn(1800);
+		
+		calculationSuccessful = matchup.calculateTeamWinChancesFromEloRatings();
+		
+		assertNoCalculationsOrWinChanceSet(initialTeam1WinChance, calculationSuccessful);
 	}
 
 	private void testRankingCalculation(
@@ -152,6 +183,14 @@ public class MatchupTest {
 		assertEquals(Matchup.WinChanceModeEnum.POWER_RANKINGS, matchup.getWinChanceMode());
 		assertEquals(expectedTeam1WinChance, matchup.getTeamWinChance(team1Name));
 		assertEquals((100 - expectedTeam1WinChance), matchup.getTeamWinChance(team2Name));
+	}
+	
+	private void assertNoCalculationsOrWinChanceSet(int initialTeam1WinChance,
+			boolean calculationSuccessful) {
+		assertFalse(calculationSuccessful);
+		assertEquals(Matchup.WinChanceModeEnum.CUSTOM_SETTING, matchup.getWinChanceMode());
+		assertEquals(initialTeam1WinChance, matchup.getTeamWinChance(team1Name));
+		assertEquals((100 - initialTeam1WinChance), matchup.getTeamWinChance(team2Name));
 	}
 	
 	private void testEloCalculation(int expectedTeam1WinChance, int team1Rating,

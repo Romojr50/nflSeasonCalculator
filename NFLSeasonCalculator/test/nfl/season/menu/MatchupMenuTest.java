@@ -26,7 +26,9 @@ public class MatchupMenuTest {
 	
 	private static final int CALCULATE_BASED_OFF_POWER_RANKINGS = 3;
 	
-	private static final int EXIT_OPTION = 4;
+	private static final int CALCULATE_BASED_OFF_ELO_RATINGS = 4;
+	
+	private static final int EXIT_OPTION = 5;
 	
 	private String coltsName = "Colts";
 	
@@ -63,6 +65,8 @@ public class MatchupMenuTest {
 		when(matchup.getTeamWinChance(eaglesName)).thenReturn(eaglesWinChance);
 		when(matchup.getTeamPowerRanking(coltsName)).thenReturn(15);
 		when(matchup.getTeamPowerRanking(eaglesName)).thenReturn(2);
+		when(matchup.getTeamEloRating(coltsName)).thenReturn(1450);
+		when(matchup.getTeamEloRating(eaglesName)).thenReturn(1550);
 		when(matchup.getWinChanceMode()).thenReturn(Matchup.WinChanceModeEnum.CUSTOM_SETTING);
 		when(matchup.calculateTeamWinChancesFromPowerRankings()).thenReturn(true);
 		
@@ -180,7 +184,10 @@ public class MatchupMenuTest {
 				afterOneTeamMessage + "3. Calculate and set win chances based " +
 				"off teams' Power Rankings: #" + matchup.getTeamPowerRanking(teamNames[0]) + 
 				" vs. #" + matchup.getTeamPowerRanking(teamNames[1]) + 
-				"\n4. Back to " + selectedTeamName + " Matchup List";
+				"\n4. Calculate and set win chances based off teams' Elo Ratings: " + 
+				matchup.getTeamEloRating(teamNames[0]) + " vs. " + 
+				matchup.getTeamEloRating(teamNames[1]) +
+				"\n5. Back to " + selectedTeamName + " Matchup List";
 	}
 	
 	private void setExpectedSetWinChanceMessage(String teamName) {

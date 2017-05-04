@@ -10,7 +10,9 @@ public class MatchupMenu extends SubMenu {
 		SET_TEAM_2_WIN_CHANCE(2, "Set <Team2> win chance"),
 		CALCULATE_BASED_OFF_POWER_RANKINGS(3, "Calculate and set win chances based " +
 				"off teams' Power Rankings: #<Team1Rank> vs. #<Team2Rank>"),
-		BACK_TO_SINGLE_TEAM_MENU(4, "Back to <Team1> Matchup List");
+		CALCULATE_BASED_OFF_ELO_RATINGS(4, "Calculate and set win chances based " + 
+				"off teams' Elo Ratings: <Team1Rating> vs. <Team2Rating>"),
+		BACK_TO_SINGLE_TEAM_MENU(5, "Back to <Team1> Matchup List");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -128,6 +130,10 @@ public class MatchupMenu extends SubMenu {
 				matchup.getTeamPowerRanking(team1Name));
 		matchupMenuMessage = matchupMenuMessage.replace("<Team2Rank>", "" + 
 				matchup.getTeamPowerRanking(team2Name));
+		
+		matchupMenuMessage = matchupMenuMessage.replace("<Team1Rating>", "" + matchup.getTeamEloRating(team1Name));
+		matchupMenuMessage = matchupMenuMessage.replace("<Team2Rating>", "" + matchup.getTeamEloRating(team2Name));
+		
 		return matchupMenuMessage;
 	}
 

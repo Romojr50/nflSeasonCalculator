@@ -98,6 +98,18 @@ public class Matchup {
 		}
 		return returnRanking;
 	}
+	
+	public int getTeamEloRating(String teamName) {
+		int returnRating = -1;
+		if (teamName != null) {
+			if (teamName.equalsIgnoreCase(team1.getName())) {
+				returnRating = team1.getEloRating();
+			} else if (teamName.equalsIgnoreCase(team2.getName())) {
+				returnRating = team2.getEloRating();
+			}
+		}
+		return returnRating;
+	}
 
 	public boolean calculateTeamWinChancesFromPowerRankings() {
 		boolean success = false;
@@ -129,20 +141,27 @@ public class Matchup {
 	
 	public boolean calculateTeamWinChancesFromEloRatings() {
 		// 1 / (1 + 10 ^ ((ratingA - ratingB) / 400))
-		winChanceMode = WinChanceModeEnum.ELO_RATINGS;
+		boolean success = false;
+		
 		
 		int team1Rating = team1.getEloRating();
 		int team2Rating = team2.getEloRating();
 		
-		int ratingDifference = team2Rating - team1Rating;
-		double powerFor10 = ratingDifference / 400.0;
-		double tenToThePower = Math.pow(10, powerFor10);
-		double dividend = 1 + tenToThePower;
-		double winChanceAsDecimal = 1 / dividend;
-		team1WinChance = (int) Math.round(winChanceAsDecimal * 100);
-		team2WinChance = 100 - team1WinChance;
+		if (team1Rating > 0 && team2Rating > 0) {
+			winChanceMode = WinChanceModeEnum.ELO_RATINGS;
+			
+			int ratingDifference = team2Rating - team1Rating;
+			double powerFor10 = ratingDifference / 400.0;
+			double tenToThePower = Math.pow(10, powerFor10);
+			double dividend = 1 + tenToThePower;
+			double winChanceAsDecimal = 1 / dividend;
+			
+			team1WinChance = (int) Math.round(winChanceAsDecimal * 100);
+			team2WinChance = 100 - team1WinChance;
+			success = true;
+		}
 		
-		return true;
+		return success;
 	}
 
 	public WinChanceModeEnum getWinChanceMode() {
