@@ -36,8 +36,8 @@ public class MatchupTest {
 	
 	@Test
 	public void matchupIsInitializedWith50sAndCustomSetting() {
-		assertEquals(50, matchup.getTeamWinChance(team1Name));
-		assertEquals(50, matchup.getTeamWinChance(team2Name));
+		assertEquals(50, matchup.getTeamNeutralWinChance(team1Name));
+		assertEquals(50, matchup.getTeamNeutralWinChance(team2Name));
 		assertEquals(Matchup.WinChanceModeEnum.CUSTOM_SETTING, matchup.getWinChanceMode());
 	}
 	
@@ -86,23 +86,23 @@ public class MatchupTest {
 	}
 	
 	@Test
-	public void setTeamWinChanceSoBothTeamsHaveWinChanceAltered() {
+	public void setTeamNeutralWinChanceSoBothTeamsHaveNeutralWinChanceAltered() {
 		int expectedTeam1WinChance = 18;
 		int expectedTeam2WinChance = 74;
 		
-		matchup.setTeamWinChance(team1Name, expectedTeam1WinChance);
+		matchup.setTeamNeutralWinChance(team1Name, expectedTeam1WinChance);
 		
-		int team1WinChance = matchup.getTeamWinChance(team1Name);
-		int team2WinChance = matchup.getTeamWinChance(team2Name);
+		int team1WinChance = matchup.getTeamNeutralWinChance(team1Name);
+		int team2WinChance = matchup.getTeamNeutralWinChance(team2Name);
 		
 		assertEquals(expectedTeam1WinChance, team1WinChance);
 		assertEquals((100 - expectedTeam1WinChance), team2WinChance);
 		assertEquals(Matchup.WinChanceModeEnum.CUSTOM_SETTING, matchup.getWinChanceMode());
 		
-		matchup.setTeamWinChance(team2Name, expectedTeam2WinChance);
+		matchup.setTeamNeutralWinChance(team2Name, expectedTeam2WinChance);
 		
-		team1WinChance = matchup.getTeamWinChance(team1Name);
-		team2WinChance = matchup.getTeamWinChance(team2Name);
+		team1WinChance = matchup.getTeamNeutralWinChance(team1Name);
+		team2WinChance = matchup.getTeamNeutralWinChance(team2Name);
 		
 		assertEquals((100 - expectedTeam2WinChance), team1WinChance);
 		assertEquals(expectedTeam2WinChance, team2WinChance);
@@ -122,7 +122,7 @@ public class MatchupTest {
 	@Test
 	public void calculateTeamWinChancesFromPowerRankingsButRankingsAreClearedSoNoCalculationIsDone() {
 		int initialTeam1WinChance = 49;
-		matchup.setTeamWinChance(team1Name, initialTeam1WinChance);
+		matchup.setTeamNeutralWinChance(team1Name, initialTeam1WinChance);
 		
 		when(team1.getPowerRanking()).thenReturn(Team.CLEAR_RANKING);
 		when(team2.getPowerRanking()).thenReturn(5);
@@ -154,7 +154,7 @@ public class MatchupTest {
 	@Test
 	public void calculateTeamWinChanceFroEloRatingButEloRatingsAreNegativeSoNoCalculationDone() {
 		int initialTeam1WinChance = 49;
-		matchup.setTeamWinChance(team1Name, initialTeam1WinChance);
+		matchup.setTeamNeutralWinChance(team1Name, initialTeam1WinChance);
 		
 		when(team1.getEloRating()).thenReturn(1500);
 		when(team2.getEloRating()).thenReturn(-1);
@@ -181,16 +181,16 @@ public class MatchupTest {
 		
 		assertTrue(calculationSuccessful);
 		assertEquals(Matchup.WinChanceModeEnum.POWER_RANKINGS, matchup.getWinChanceMode());
-		assertEquals(expectedTeam1WinChance, matchup.getTeamWinChance(team1Name));
-		assertEquals((100 - expectedTeam1WinChance), matchup.getTeamWinChance(team2Name));
+		assertEquals(expectedTeam1WinChance, matchup.getTeamNeutralWinChance(team1Name));
+		assertEquals((100 - expectedTeam1WinChance), matchup.getTeamNeutralWinChance(team2Name));
 	}
 	
 	private void assertNoCalculationsOrWinChanceSet(int initialTeam1WinChance,
 			boolean calculationSuccessful) {
 		assertFalse(calculationSuccessful);
 		assertEquals(Matchup.WinChanceModeEnum.CUSTOM_SETTING, matchup.getWinChanceMode());
-		assertEquals(initialTeam1WinChance, matchup.getTeamWinChance(team1Name));
-		assertEquals((100 - initialTeam1WinChance), matchup.getTeamWinChance(team2Name));
+		assertEquals(initialTeam1WinChance, matchup.getTeamNeutralWinChance(team1Name));
+		assertEquals((100 - initialTeam1WinChance), matchup.getTeamNeutralWinChance(team2Name));
 	}
 	
 	private void testEloCalculation(int expectedTeam1WinChance, int team1Rating,
@@ -202,8 +202,8 @@ public class MatchupTest {
 		
 		assertTrue(calculationSuccessful);
 		assertEquals(Matchup.WinChanceModeEnum.ELO_RATINGS, matchup.getWinChanceMode());
-		assertEquals(expectedTeam1WinChance, matchup.getTeamWinChance(team1Name));
-		assertEquals((100 - expectedTeam1WinChance), matchup.getTeamWinChance(team2Name));
+		assertEquals(expectedTeam1WinChance, matchup.getTeamNeutralWinChance(team1Name));
+		assertEquals((100 - expectedTeam1WinChance), matchup.getTeamNeutralWinChance(team2Name));
 	}
 	
 }

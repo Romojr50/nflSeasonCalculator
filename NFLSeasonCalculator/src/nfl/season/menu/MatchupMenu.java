@@ -104,9 +104,9 @@ public class MatchupMenu extends SubMenu {
 				team2Name + "\n");
 		matchupMenuMessageBuilder.append("Current win chances:\n");
 		matchupMenuMessageBuilder.append(team1Name + ": " + 
-				matchup.getTeamWinChance(team1Name) + "\n");
+				matchup.getTeamNeutralWinChance(team1Name) + "\n");
 		matchupMenuMessageBuilder.append(team2Name + ": " + 
-				matchup.getTeamWinChance(team2Name) + "\n");
+				matchup.getTeamNeutralWinChance(team2Name) + "\n");
 		
 		matchupMenuMessageBuilder.append("Current win chance determiner: ");
 		matchupMenuMessageBuilder.append(matchup.getWinChanceMode().winChanceModeDescription);
@@ -124,13 +124,13 @@ public class MatchupMenu extends SubMenu {
 
 	private void launchSetTeamWinChanceMenu(String teamName) {
 		String setTeamWinChanceMessage = "Current " + teamName + " win chance: " + 
-				matchup.getTeamWinChance(teamName) + 
+				matchup.getTeamNeutralWinChance(teamName) + 
 				"\nPlease enter in a number between 1 and 99";
 		int newTeamWinChance = -1;
 		while (newTeamWinChance < 1 || newTeamWinChance > 99) {
 			newTeamWinChance = input.askForInt(setTeamWinChanceMessage);
 			if (newTeamWinChance >= 1 && newTeamWinChance <= 99) {
-				matchup.setTeamWinChance(teamName, newTeamWinChance);
+				matchup.setTeamNeutralWinChance(teamName, newTeamWinChance);
 			}
 		}
 	}

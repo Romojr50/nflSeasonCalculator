@@ -61,8 +61,8 @@ public class MatchupMenuTest {
 		
 		when(matchup.getTeamNames()).thenReturn(teamNames);
 		when(matchup.getOpponentName(coltsName)).thenReturn(eaglesName);
-		when(matchup.getTeamWinChance(coltsName)).thenReturn(coltsWinChance);
-		when(matchup.getTeamWinChance(eaglesName)).thenReturn(eaglesWinChance);
+		when(matchup.getTeamNeutralWinChance(coltsName)).thenReturn(coltsWinChance);
+		when(matchup.getTeamNeutralWinChance(eaglesName)).thenReturn(eaglesWinChance);
 		when(matchup.getTeamPowerRanking(coltsName)).thenReturn(15);
 		when(matchup.getTeamPowerRanking(eaglesName)).thenReturn(2);
 		when(matchup.getTeamEloRating(coltsName)).thenReturn(1450);
@@ -79,10 +79,10 @@ public class MatchupMenuTest {
 		int expectedTeam1WinChance = 15;
 		int expectedTeam2WinChance = 48;
 		
-		when(matchup.getTeamWinChance(coltsName)).thenReturn(50, 50, expectedTeam1WinChance, 
+		when(matchup.getTeamNeutralWinChance(coltsName)).thenReturn(50, 50, expectedTeam1WinChance, 
 				(100 - expectedTeam2WinChance), 50, expectedTeam1WinChance, 
 				(100 - expectedTeam2WinChance), 50);
-		when(matchup.getTeamWinChance(eaglesName)).thenReturn(50, (100 - expectedTeam1WinChance), 
+		when(matchup.getTeamNeutralWinChance(eaglesName)).thenReturn(50, (100 - expectedTeam1WinChance), 
 				(100 - expectedTeam1WinChance), expectedTeam2WinChance, 50, 
 				(100 - expectedTeam1WinChance), expectedTeam2WinChance, 
 				(100 - expectedTeam1WinChance));
@@ -105,8 +105,8 @@ public class MatchupMenuTest {
 		setExpectedSetWinChanceMessage(eaglesName);
 		verify(input, times(1)).askForInt(expectedSetWinChanceMessage);
 		
-		verify(matchup).setTeamWinChance(coltsName, expectedTeam1WinChance);
-		verify(matchup).setTeamWinChance(eaglesName, expectedTeam2WinChance);
+		verify(matchup).setTeamNeutralWinChance(coltsName, expectedTeam1WinChance);
+		verify(matchup).setTeamNeutralWinChance(eaglesName, expectedTeam2WinChance);
 	}
 	
 	@Test
@@ -128,10 +128,10 @@ public class MatchupMenuTest {
 		setExpectedSetWinChanceMessage(coltsName);
 		verify(input, times(4)).askForInt(expectedSetWinChanceMessage);
 		
-		verify(matchup).setTeamWinChance(coltsName, 45);
-		verify(matchup, never()).setTeamWinChance(coltsName, 100);
-		verify(matchup, never()).setTeamWinChance(coltsName, 0);
-		verify(matchup, never()).setTeamWinChance(coltsName, -2);
+		verify(matchup).setTeamNeutralWinChance(coltsName, 45);
+		verify(matchup, never()).setTeamNeutralWinChance(coltsName, 100);
+		verify(matchup, never()).setTeamNeutralWinChance(coltsName, 0);
+		verify(matchup, never()).setTeamNeutralWinChance(coltsName, -2);
 	}
 	
 	@Test
@@ -192,8 +192,8 @@ public class MatchupMenuTest {
 		String afterOneTeamMessage = " win chance\n";
 		expectedMenuMessage = "Matchup: " + teamNames[0] + " vs. " + teamNames[1] + 
 				"\n" + "Current win chances:\n" + teamNames[0] + ": " + 
-				matchup.getTeamWinChance(teamNames[0]) + "\n" + teamNames[1] + 
-				": " + matchup.getTeamWinChance(teamNames[1]) + "\n" + 
+				matchup.getTeamNeutralWinChance(teamNames[0]) + "\n" + teamNames[1] + 
+				": " + matchup.getTeamNeutralWinChance(teamNames[1]) + "\n" + 
 				"Current win chance determiner: " + 
 				matchup.getWinChanceMode().winChanceModeDescription + "\n" +
 				MenuOptionsUtil.MENU_INTRO + "1. Set " + teamNames[0] + 
@@ -209,7 +209,7 @@ public class MatchupMenuTest {
 	
 	private void setExpectedSetWinChanceMessage(String teamName) {
 		expectedSetWinChanceMessage = "Current " + teamName + " win chance: " + 
-				matchup.getTeamWinChance(teamName) + 
+				matchup.getTeamNeutralWinChance(teamName) + 
 				"\nPlease enter in a number between 1 and 99";
 	}
 	
@@ -217,8 +217,8 @@ public class MatchupMenuTest {
 			Matchup.WinChanceModeEnum winChanceMode) {
 		when(input.askForInt(anyString())).thenReturn(menuOption, 
 				EXIT_OPTION);
-		when(matchup.getTeamWinChance(coltsName)).thenReturn(55, 58);
-		when(matchup.getTeamWinChance(eaglesName)).thenReturn(45, 42);
+		when(matchup.getTeamNeutralWinChance(coltsName)).thenReturn(55, 58);
+		when(matchup.getTeamNeutralWinChance(eaglesName)).thenReturn(45, 42);
 		when(matchup.getWinChanceMode()).thenReturn(Matchup.WinChanceModeEnum.CUSTOM_SETTING,
 				winChanceMode);
 		
@@ -226,8 +226,8 @@ public class MatchupMenuTest {
 		
 		verify(input, times(1)).askForInt(expectedMenuMessage);
 		
-		when(matchup.getTeamWinChance(coltsName)).thenReturn(58);
-		when(matchup.getTeamWinChance(eaglesName)).thenReturn(42);
+		when(matchup.getTeamNeutralWinChance(coltsName)).thenReturn(58);
+		when(matchup.getTeamNeutralWinChance(eaglesName)).thenReturn(42);
 		when(matchup.getWinChanceMode()).thenReturn(winChanceMode);
 		
 		setExpectedMenuMessage();

@@ -20,17 +20,17 @@ public class Matchup {
 	
 	private Team team2;
 	
-	private int team1WinChance;
+	private int team1NeutralWinChance;
 	
-	private int team2WinChance;
+	private int team2NeutralWinChance;
 	
 	private WinChanceModeEnum winChanceMode;
 	
 	public Matchup(Team team1, Team team2) {
 		this.team1 = team1;
 		this.team2 = team2;
-		team1WinChance = 50;
-		team2WinChance = (100 - team1WinChance);
+		team1NeutralWinChance = 50;
+		team2NeutralWinChance = (100 - team1NeutralWinChance);
 		winChanceMode = WinChanceModeEnum.CUSTOM_SETTING;
 	}
 	
@@ -59,29 +59,29 @@ public class Matchup {
 		return teamNames;
 	}
 	
-	public int getTeamWinChance(String teamName) {
+	public int getTeamNeutralWinChance(String teamName) {
 		int returnWinChance = -1;
 		
 		if (teamName != null) {
 			if (teamName.equalsIgnoreCase(team1.getName())) {
-				returnWinChance = team1WinChance;
+				returnWinChance = team1NeutralWinChance;
 			} else if (teamName.equalsIgnoreCase(team2.getName())) {
-				returnWinChance = team2WinChance;
+				returnWinChance = team2NeutralWinChance;
 			}
 		}
 		
 		return returnWinChance;
 	}
 
-	public void setTeamWinChance(String teamName, int teamWinChance) {
+	public void setTeamNeutralWinChance(String teamName, int teamWinChance) {
 		if (teamName != null) {
 			if (teamName.equalsIgnoreCase(team1.getName())) {
-				team1WinChance = teamWinChance;
-				team2WinChance = 100 - teamWinChance;
+				team1NeutralWinChance = teamWinChance;
+				team2NeutralWinChance = 100 - teamWinChance;
 				winChanceMode = WinChanceModeEnum.CUSTOM_SETTING;
 			} else if (teamName.equalsIgnoreCase(team2.getName())) {
-				team2WinChance = teamWinChance;
-				team1WinChance = 100 - teamWinChance;
+				team2NeutralWinChance = teamWinChance;
+				team1NeutralWinChance = 100 - teamWinChance;
 				winChanceMode = WinChanceModeEnum.CUSTOM_SETTING;
 			}
 		}
@@ -127,11 +127,11 @@ public class Matchup {
 					team2Ranking);
 			
 			if (team1IsRankedHigher) {
-				team1WinChance = betterWinChance;
-				team2WinChance = 100 - betterWinChance;
+				team1NeutralWinChance = betterWinChance;
+				team2NeutralWinChance = 100 - betterWinChance;
 			} else {
-				team2WinChance = betterWinChance;
-				team1WinChance = 100 - betterWinChance;
+				team2NeutralWinChance = betterWinChance;
+				team1NeutralWinChance = 100 - betterWinChance;
 			}
 			success = true;
 		}
@@ -156,8 +156,8 @@ public class Matchup {
 			double dividend = 1 + tenToThePower;
 			double winChanceAsDecimal = 1 / dividend;
 			
-			team1WinChance = (int) Math.round(winChanceAsDecimal * 100);
-			team2WinChance = 100 - team1WinChance;
+			team1NeutralWinChance = (int) Math.round(winChanceAsDecimal * 100);
+			team2NeutralWinChance = 100 - team1NeutralWinChance;
 			success = true;
 		}
 		
