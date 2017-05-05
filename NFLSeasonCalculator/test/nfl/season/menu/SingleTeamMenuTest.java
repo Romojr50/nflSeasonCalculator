@@ -28,16 +28,20 @@ public class SingleTeamMenuTest {
 	private static final int SET_POWER_RANKING = 1;
 	
 	private static final int SET_ELO_RATING = 2;
-
-	private static final int CHOOSE_MATCHUP = 3;
 	
-	private static final int EXIT_FROM_SINGLE_TEAM_MENU = 4;
+	private static final int SET_HOME_FIELD_ADVANTAGE = 3;
+
+	private static final int CHOOSE_MATCHUP = 4;
+	
+	private static final int EXIT_FROM_SINGLE_TEAM_MENU = 5;
 	
 	private String expectedMenuMessage;
 	
 	private String expectedPowerRankingsMessage;
 	
 	private String expectedEloRatingMessage;
+	
+	private String expectedHomeFieldMessage;
 	
 	private String expectedMatchupMessage;
 	
@@ -78,10 +82,12 @@ public class SingleTeamMenuTest {
 		when(colts.getName()).thenReturn("Colts");
 		when(colts.getPowerRanking()).thenReturn(19);
 		when(colts.getEloRating()).thenReturn(48);
+		when(colts.getHomeFieldAdvantage()).thenReturn(10);
 		
 		setExpectedMenuMessage();
 		setExpectedPowerRankingsMessage();
 		setExpectedEloRatingMessage();
+		setExpectedHomeFieldAdvantageMessage();
 		
 		when(eagles.getName()).thenReturn("Eagles");
 		
@@ -246,7 +252,39 @@ public class SingleTeamMenuTest {
 		verify(input, times(2)).askForInt(expectedMenuMessage);
 		verify(input, times(2)).askForInt(expectedEloRatingMessage);
 		
+		verify(colts, never()).setEloRating(0);
 		verify(colts, times(1)).setEloRating(newEloRating);
+	}
+	
+	@Test
+	public void homeFieldAdvantageIsSet() {
+		int newHomeFieldAdvantage = 13;
+		
+		when(input.askForInt(anyString())).thenReturn(SET_HOME_FIELD_ADVANTAGE, 
+				newHomeFieldAdvantage, EXIT_FROM_SINGLE_TEAM_MENU);
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, times(1)).askForInt(expectedHomeFieldMessage);
+		
+		verify(colts, times(1)).setHomeFieldAdvantage(newHomeFieldAdvantage);
+	}
+	
+	@Test
+	public void homeFieldInputIsInvalidSoInvalidInputIsIgnored() {
+		int newHomeFieldAdvantage = 9;
+		
+		when(input.askForInt(anyString())).thenReturn(SET_HOME_FIELD_ADVANTAGE, 0, 
+				newHomeFieldAdvantage, EXIT_FROM_SINGLE_TEAM_MENU);
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, times(2)).askForInt(expectedHomeFieldMessage);
+		
+		verify(colts, never()).setHomeFieldAdvantage(0);
+		verify(colts, times(1)).setHomeFieldAdvantage(newHomeFieldAdvantage);
 	}
 	
 	@Test
@@ -290,9 +328,10 @@ public class SingleTeamMenuTest {
 	private void setExpectedMenuMessage() {
 		expectedMenuMessage = 
 				colts.getName() + "\nPower Ranking: " + colts.getPowerRanking() + 
-				"\nElo Rating: " + colts.getEloRating() + "\n" + MenuOptionsUtil.MENU_INTRO + 
-				"1. Set Power Ranking\n2. Set Elo Rating\n3. Edit Matchup Settings\n" +
-				"4. Back to Teams Menu";
+				"\nElo Rating: " + colts.getEloRating() + "\nHome Field Advantage: " + 
+				colts.getHomeFieldAdvantage() + "\n" + MenuOptionsUtil.MENU_INTRO + 
+				"1. Set Power Ranking\n2. Set Elo Rating\n3. Set Home Field Advantage\n" +
+				"4. Edit Matchup Settings\n5. Back to Teams Menu";
 	}
 	
 
@@ -305,6 +344,11 @@ public class SingleTeamMenuTest {
 	private void setExpectedEloRatingMessage() {
 		expectedEloRatingMessage = "Current Elo Rating: " + colts.getEloRating() + 
 				"\nPlease enter in an integer above 0";
+	}
+	
+	private void setExpectedHomeFieldAdvantageMessage() {
+		expectedHomeFieldMessage = "Current Home Field Advantage: " + 
+				colts.getHomeFieldAdvantage() + "\nPlease enter in an integer above 0";
 	}
 	
 
