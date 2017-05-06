@@ -140,15 +140,11 @@ public class SingleTeamMenu extends SubMenu {
 	private void launchSetHomeFieldAdvantageMenu() {
 		int newHomeFieldAdvantage = -1;
 		
-		while (newHomeFieldAdvantage <= 0) {
-			String homeFieldMessage = "Current Home Field Advantage: " + 
-					selectedTeam.getHomeFieldAdvantage() + PLEASE_ENTER_NATURAL_NUMBER;
-			newHomeFieldAdvantage = input.askForInt(homeFieldMessage);
+		String homeFieldMessage = "Current Home Field Advantage: " + 
+				selectedTeam.getHomeFieldAdvantage() + PLEASE_ENTER_NATURAL_NUMBER;
+		newHomeFieldAdvantage = input.askForInt(homeFieldMessage);
 			
-			if (newHomeFieldAdvantage > 0) {
-				selectedTeam.setHomeFieldAdvantage(newHomeFieldAdvantage);
-			}
-		}
+		selectedTeam.setHomeFieldAdvantage(newHomeFieldAdvantage);
 	}
 	
 	private void launchSelectMatchupMenu() {

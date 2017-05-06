@@ -272,19 +272,17 @@ public class SingleTeamMenuTest {
 	}
 	
 	@Test
-	public void homeFieldInputIsInvalidSoInvalidInputIsIgnored() {
-		int newHomeFieldAdvantage = 9;
-		
+	public void homeFieldInputIsZeroOrNegativeSoHomeFieldIsStillSet() {
 		when(input.askForInt(anyString())).thenReturn(SET_HOME_FIELD_ADVANTAGE, 0, 
-				newHomeFieldAdvantage, EXIT_FROM_SINGLE_TEAM_MENU);
+				SET_HOME_FIELD_ADVANTAGE, -2, EXIT_FROM_SINGLE_TEAM_MENU);
 		
 		singleTeamMenu.launchSubMenu();
 		
-		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, times(3)).askForInt(expectedMenuMessage);
 		verify(input, times(2)).askForInt(expectedHomeFieldMessage);
 		
-		verify(colts, never()).setHomeFieldAdvantage(0);
-		verify(colts, times(1)).setHomeFieldAdvantage(newHomeFieldAdvantage);
+		verify(colts, times(1)).setHomeFieldAdvantage(0);
+		verify(colts, times(1)).setHomeFieldAdvantage(-2);
 	}
 	
 	@Test
