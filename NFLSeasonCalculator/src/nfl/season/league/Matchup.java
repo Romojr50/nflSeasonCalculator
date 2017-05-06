@@ -12,6 +12,15 @@ public class Matchup {
 		}
 	}
 	
+	public enum HomeAwayWinChanceModeEnum {
+		CUSTOM_SETTING("Custom Setting"), HOME_FIELD_ADVANTAGE("Home Field Advantage");
+		public String winChanceModeDescription;
+		
+		private HomeAwayWinChanceModeEnum(String winChanceModeDescription) {
+			this.winChanceModeDescription = winChanceModeDescription;
+		}
+	}
+	
 	private static final int BETTER_TEAM_WIN_CHANCE_WHEN_BETTER_BY_24_SPOTS = 90;
 
 	private static final double WIN_CHANCE_DIFFERENCE_BY_SPOT = 1.523;
@@ -24,7 +33,19 @@ public class Matchup {
 	
 	private int team2NeutralWinChance;
 	
+	private int team1HomeWinChance;
+	
+	private int team2HomeWinChance;
+	
+	private int team1AwayWinChance;
+	
+	private int team2AwayWinChance;
+	
 	private WinChanceModeEnum winChanceMode;
+	
+	private HomeAwayWinChanceModeEnum team1HomeWinChanceMode;
+	
+	private HomeAwayWinChanceModeEnum team2HomeWinChanceMode;
 	
 	public Matchup(Team team1, Team team2) {
 		this.team1 = team1;
@@ -85,6 +106,34 @@ public class Matchup {
 				winChanceMode = WinChanceModeEnum.CUSTOM_SETTING;
 			}
 		}
+	}
+	
+	public Object getTeamHomeWinChance(String teamName) {
+		int returnWinChance = -1;
+		
+		if (teamName != null) {
+			if (teamName.equalsIgnoreCase(team1.getName())) {
+				returnWinChance = team1HomeWinChance;
+			} else if (teamName.equalsIgnoreCase(team2.getName())) {
+				returnWinChance = team2HomeWinChance;
+			}
+		}
+		
+		return returnWinChance;	
+	}
+	
+	public Object getTeamAwayWinChance(String teamName) {
+		int returnWinChance = -1;
+		
+		if (teamName != null) {
+			if (teamName.equalsIgnoreCase(team1.getName())) {
+				returnWinChance = team1AwayWinChance;
+			} else if (teamName.equalsIgnoreCase(team2.getName())) {
+				returnWinChance = team2AwayWinChance;
+			}
+		}
+		
+		return returnWinChance;
 	}
 	
 	public int getTeamPowerRanking(String teamName) {
@@ -163,9 +212,45 @@ public class Matchup {
 		
 		return success;
 	}
+	
+	public boolean calculateHomeWinChanceFromHomeFieldAdvantage(String teamName) {
+		boolean success = false;
+		
+		if (teamName != null) {
+			int homeFieldAdvantage = -1;
+			if (teamName.equalsIgnoreCase(team1.getName())) {
+				homeFieldAdvantage = team1.getHomeFieldAdvantage();
+				team1HomeWinChance = team1NeutralWinChance + Math.round(homeFieldAdvantage / 2);
+				team2AwayWinChance = 100 - team1HomeWinChance;
+				team1HomeWinChanceMode = HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE;
+			} else if (teamName.equalsIgnoreCase(team2.getName())) {
+				homeFieldAdvantage = team2.getHomeFieldAdvantage();
+				team2HomeWinChance = team2NeutralWinChance + Math.round(homeFieldAdvantage / 2);
+				team1AwayWinChance = 100 - team2HomeWinChance;
+				team2HomeWinChanceMode = HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE;
+			}
+			success = true;
+			
+		}
+		return success;
+	}
 
 	public WinChanceModeEnum getWinChanceMode() {
 		return winChanceMode;
+	}
+	
+	public HomeAwayWinChanceModeEnum getHomeAwayWinChanceMode(String teamName) {
+		HomeAwayWinChanceModeEnum returnWinChance = HomeAwayWinChanceModeEnum.CUSTOM_SETTING;
+		
+		if (teamName != null) {
+			if (teamName.equalsIgnoreCase(team1.getName())) {
+				returnWinChance = team1HomeWinChanceMode;
+			} else if (teamName.equalsIgnoreCase(team2.getName())) {
+				returnWinChance = team2HomeWinChanceMode;;
+			}
+		}
+		
+		return returnWinChance;
 	}
 	
 	private int calculateBetterWinChance(int team1Ranking, int team2Ranking) {

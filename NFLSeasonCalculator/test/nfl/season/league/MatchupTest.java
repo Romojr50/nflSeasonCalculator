@@ -171,7 +171,14 @@ public class MatchupTest {
 		
 		assertNoCalculationsOrWinChanceSet(initialTeam1WinChance, calculationSuccessful);
 	}
-
+	
+	@Test
+	public void calculateHomeAwayWinChancesFromHomeFieldAdvantageSoHomeAwayWinChancesAreCalculated() {
+		testHomeFieldAdvantageCalculation(10, 15);
+		testHomeFieldAdvantageCalculation(0, 35);
+		testHomeFieldAdvantageCalculation(25, 14);
+	}
+	
 	private void testRankingCalculation(
 			int expectedTeam1WinChance, int team1Ranking, int team2Ranking) {
 		when(team1.getPowerRanking()).thenReturn(team1Ranking);
@@ -204,6 +211,36 @@ public class MatchupTest {
 		assertEquals(Matchup.WinChanceModeEnum.ELO_RATINGS, matchup.getWinChanceMode());
 		assertEquals(expectedTeam1WinChance, matchup.getTeamNeutralWinChance(team1Name));
 		assertEquals((100 - expectedTeam1WinChance), matchup.getTeamNeutralWinChance(team2Name));
+	}
+	
+	private void testHomeFieldAdvantageCalculation(int team1HomeFieldAdvantage,
+			int team2HomeFieldAdvantage) {
+		int team1NeutralWinChance = 55;
+		int team2NeutralWinChance = 100 - team1NeutralWinChance;
+		when(team1.getHomeFieldAdvantage()).thenReturn(team1HomeFieldAdvantage);
+		when(team2.getHomeFieldAdvantage()).thenReturn(team2HomeFieldAdvantage);
+		matchup.setTeamNeutralWinChance(team1Name, team1NeutralWinChance);
+		matchup.setTeamNeutralWinChance(team2Name, team2NeutralWinChance);
+		
+		int expectedTeam1WinChance = team1NeutralWinChance + Math.round(team1HomeFieldAdvantage / 2);
+		int expectedTeam2WinChance = 100 - expectedTeam1WinChance;
+		
+		boolean calculationSuccessful = matchup.calculateHomeWinChanceFromHomeFieldAdvantage(team1Name);
+		
+		assertTrue(calculationSuccessful);
+		assertEquals(Matchup.HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE, matchup.getHomeAwayWinChanceMode(team1Name));
+		assertEquals(expectedTeam1WinChance, matchup.getTeamHomeWinChance(team1Name));
+		assertEquals(expectedTeam2WinChance, matchup.getTeamAwayWinChance(team2Name));
+		
+		expectedTeam2WinChance = team2NeutralWinChance + Math.round(team2HomeFieldAdvantage / 2);
+		expectedTeam1WinChance = 100 - expectedTeam2WinChance;
+		
+		calculationSuccessful = matchup.calculateHomeWinChanceFromHomeFieldAdvantage(team2Name);
+		
+		assertTrue(calculationSuccessful);
+		assertEquals(Matchup.HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE, matchup.getHomeAwayWinChanceMode(team2Name));
+		assertEquals(expectedTeam1WinChance, matchup.getTeamAwayWinChance(team1Name));
+		assertEquals(expectedTeam2WinChance, matchup.getTeamHomeWinChance(team2Name));
 	}
 	
 }
