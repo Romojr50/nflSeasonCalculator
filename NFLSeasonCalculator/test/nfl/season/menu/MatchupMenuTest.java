@@ -28,15 +28,27 @@ public class MatchupMenuTest {
 	
 	private static final int CALCULATE_BASED_OFF_ELO_RATINGS = 4;
 	
-	private static final int EXIT_OPTION = 5;
+	private static final int CALCULATE_FIRST_HOME_AWAY_BASED_OFF_HOME_FIELD_ADVANTAGE = 5;
+	
+	private static final int CALCULATE_SECOND_HOME_AWAY_BASED_OFF_HOME_FIELD_ADVANTAGE = 6;
+	
+	private static final int EXIT_OPTION = 7;
 	
 	private String coltsName = "Colts";
 	
 	private String eaglesName = "Eagles";
 	
-	private int coltsWinChance = 55;
+	private int coltsNeutralWinChance = 55;
 	
-	private int eaglesWinChance = 45;
+	private int coltsHomeWinChance = 66;
+	
+	private int coltsAwayWinChance = 49;
+	
+	private int eaglesNeutralWinChance = 100 - coltsNeutralWinChance;
+	
+	private int eaglesHomeWinChance = 100 - coltsAwayWinChance;
+	
+	private int eaglesAwayWinChance = 100 - coltsHomeWinChance;
 	
 	private String[] teamNames;
 	
@@ -61,8 +73,16 @@ public class MatchupMenuTest {
 		
 		when(matchup.getTeamNames()).thenReturn(teamNames);
 		when(matchup.getOpponentName(coltsName)).thenReturn(eaglesName);
-		when(matchup.getTeamNeutralWinChance(coltsName)).thenReturn(coltsWinChance);
-		when(matchup.getTeamNeutralWinChance(eaglesName)).thenReturn(eaglesWinChance);
+		when(matchup.getTeamNeutralWinChance(coltsName)).thenReturn(coltsNeutralWinChance);
+		when(matchup.getTeamNeutralWinChance(eaglesName)).thenReturn(eaglesNeutralWinChance);
+		when(matchup.getTeamHomeWinChance(coltsName)).thenReturn(coltsHomeWinChance);
+		when(matchup.getTeamAwayWinChance(coltsName)).thenReturn(coltsAwayWinChance);
+		when(matchup.getHomeAwayWinChanceMode(coltsName)).thenReturn(
+				Matchup.HomeAwayWinChanceModeEnum.CUSTOM_SETTING);
+		when(matchup.getTeamHomeWinChance(eaglesName)).thenReturn(eaglesHomeWinChance);
+		when(matchup.getTeamAwayWinChance(eaglesName)).thenReturn(eaglesAwayWinChance);
+		when(matchup.getHomeAwayWinChanceMode(eaglesName)).thenReturn(
+				Matchup.HomeAwayWinChanceModeEnum.CUSTOM_SETTING);
 		when(matchup.getTeamPowerRanking(coltsName)).thenReturn(15);
 		when(matchup.getTeamPowerRanking(eaglesName)).thenReturn(2);
 		when(matchup.getTeamEloRating(coltsName)).thenReturn(1450);
@@ -186,25 +206,77 @@ public class MatchupMenuTest {
 				"teams to be above 0.\n" + expectedMenuMessage;
 		verify(input, times(1)).askForInt(expectedMenuMessage);
 	}
+	
+	@Test
+	public void calculateHomeWinChanceBasedOnHomeFieldAdvantageSoCalculationIsCalledFor() {
+		when(input.askForInt(anyString())).thenReturn(CALCULATE_FIRST_HOME_AWAY_BASED_OFF_HOME_FIELD_ADVANTAGE, 
+				CALCULATE_SECOND_HOME_AWAY_BASED_OFF_HOME_FIELD_ADVANTAGE, EXIT_OPTION);
+		when(matchup.getTeamHomeWinChance(coltsName)).thenReturn(55, 58, 58, 55, 58, 58);
+		when(matchup.getTeamAwayWinChance(eaglesName)).thenReturn(45, 42, 42, 45, 42, 42);
+		when(matchup.getTeamHomeWinChance(eaglesName)).thenReturn(46, 46, 51, 46, 46, 51);
+		when(matchup.getTeamAwayWinChance(coltsName)).thenReturn(54, 54, 49, 54, 54, 49);
+		when(matchup.getHomeAwayWinChanceMode(coltsName)).thenReturn(Matchup.HomeAwayWinChanceModeEnum.CUSTOM_SETTING, 
+				Matchup.HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE, 
+				Matchup.HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE, 
+				Matchup.HomeAwayWinChanceModeEnum.CUSTOM_SETTING, 
+				Matchup.HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE, 
+				Matchup.HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE);
+
+		
+		matchupMenu.launchSubMenu();
+		
+		setExpectedMenuMessage();
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+		
+		setExpectedMenuMessage();
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+		
+		setExpectedMenuMessage();
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+	}
 
 	private void setExpectedMenuMessage() {
 		String selectedTeamName = matchupMenu.getSelectedTeamName();
 		String afterOneTeamMessage = " win chance\n";
-		expectedMenuMessage = "Matchup: " + teamNames[0] + " vs. " + teamNames[1] + 
-				"\n" + "Current win chances:\n" + teamNames[0] + ": " + 
-				matchup.getTeamNeutralWinChance(teamNames[0]) + "\n" + teamNames[1] + 
-				": " + matchup.getTeamNeutralWinChance(teamNames[1]) + "\n" + 
-				"Current win chance determiner: " + 
-				matchup.getWinChanceMode().winChanceModeDescription + "\n" +
-				MenuOptionsUtil.MENU_INTRO + "1. Set " + teamNames[0] + 
-				afterOneTeamMessage + "2. Set " + teamNames[1] + 
-				afterOneTeamMessage + "3. Calculate and set win chances based " +
+		
+		StringBuilder expectedMenuMessageBuilder = new StringBuilder();
+		
+		expectedMenuMessageBuilder.append("Matchup: " + teamNames[0] + " vs. " + 
+				teamNames[1] + "\n");
+		expectedMenuMessageBuilder.append("Current win chances:\n" + teamNames[0] + ": Neutral - " + 
+				matchup.getTeamNeutralWinChance(teamNames[0]) + ", Home - " + 
+				matchup.getTeamHomeWinChance(teamNames[0]) + ", Away - " + 
+				matchup.getTeamAwayWinChance(teamNames[0]) + "\n" + teamNames[1] + 
+				": Neutral - " + matchup.getTeamNeutralWinChance(teamNames[1]) + ", Home - " +
+				matchup.getTeamHomeWinChance(teamNames[1]) + ", Away - " + 
+				matchup.getTeamAwayWinChance(teamNames[1]) + "\n");
+		expectedMenuMessageBuilder.append("Current win chance determiners: Neutral - " + 
+				matchup.getWinChanceMode().winChanceModeDescription + 
+				", " + teamNames[0] + " Home - " + 
+				matchup.getHomeAwayWinChanceMode(teamNames[0]).winChanceModeDescription + 
+				", " + teamNames[1] + " Home - " + 
+				matchup.getHomeAwayWinChanceMode(teamNames[1]).winChanceModeDescription +
+				"\n");
+		expectedMenuMessageBuilder.append(MenuOptionsUtil.MENU_INTRO);
+		expectedMenuMessageBuilder.append("1. Set " + teamNames[0] + afterOneTeamMessage);
+		expectedMenuMessageBuilder.append("2. Set " + teamNames[1] + afterOneTeamMessage);
+		expectedMenuMessageBuilder.append("3. Calculate and set win chances based " +
 				"off teams' Power Rankings: #" + matchup.getTeamPowerRanking(teamNames[0]) + 
 				" vs. #" + matchup.getTeamPowerRanking(teamNames[1]) + 
-				"\n4. Calculate and set win chances based off teams' Elo Ratings: " + 
+				"\n");
+		expectedMenuMessageBuilder.append("4. Calculate and set win chances based off teams' Elo Ratings: " + 
 				matchup.getTeamEloRating(teamNames[0]) + " vs. " + 
 				matchup.getTeamEloRating(teamNames[1]) +
-				"\n5. Back to " + selectedTeamName + " Matchup List";
+				"\n");
+		expectedMenuMessageBuilder.append("5. Calculate " + teamNames[0] + " Home " +
+				"Win Chance by set Home Field Advantage: " + 
+				matchup.getTeamHomeFieldAdvantage(teamNames[0]) + "\n");
+		expectedMenuMessageBuilder.append("6. Calculate " + teamNames[1] + " Home " +
+				"Win Chance by set Home Field Advantage: " + 
+				matchup.getTeamHomeFieldAdvantage(teamNames[1]) + "\n");
+		expectedMenuMessageBuilder.append("7. Back to " + selectedTeamName + " Matchup List");
+		
+		expectedMenuMessage = expectedMenuMessageBuilder.toString();
 	}
 	
 	private void setExpectedSetWinChanceMessage(String teamName) {

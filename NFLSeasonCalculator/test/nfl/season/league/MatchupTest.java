@@ -38,7 +38,13 @@ public class MatchupTest {
 	public void matchupIsInitializedWith50sAndCustomSetting() {
 		assertEquals(50, matchup.getTeamNeutralWinChance(team1Name));
 		assertEquals(50, matchup.getTeamNeutralWinChance(team2Name));
+		assertEquals(50, matchup.getTeamHomeWinChance(team1Name));
+		assertEquals(50, matchup.getTeamHomeWinChance(team2Name));
 		assertEquals(Matchup.WinChanceModeEnum.CUSTOM_SETTING, matchup.getWinChanceMode());
+		assertEquals(Matchup.HomeAwayWinChanceModeEnum.CUSTOM_SETTING, 
+				matchup.getHomeAwayWinChanceMode(team1Name));
+		assertEquals(Matchup.HomeAwayWinChanceModeEnum.CUSTOM_SETTING, 
+				matchup.getHomeAwayWinChanceMode(team2Name));
 	}
 	
 	@Test
@@ -107,6 +113,18 @@ public class MatchupTest {
 		assertEquals((100 - expectedTeam2WinChance), team1WinChance);
 		assertEquals(expectedTeam2WinChance, team2WinChance);
 		assertEquals(Matchup.WinChanceModeEnum.CUSTOM_SETTING, matchup.getWinChanceMode());
+	}
+	
+	@Test
+	public void getTeamHomeFieldAdvantageReturnsAskedForTeamsHomeFieldAdvantage() {
+		int expectedTeam1HomeFieldAdvantage = 12;
+		int expectedTeam2HomeFieldAdvantage = -3;
+		
+		when(team1.getHomeFieldAdvantage()).thenReturn(expectedTeam1HomeFieldAdvantage);
+		when(team2.getHomeFieldAdvantage()).thenReturn(expectedTeam2HomeFieldAdvantage);
+		
+		assertEquals(expectedTeam1HomeFieldAdvantage, matchup.getTeamHomeFieldAdvantage(team1Name));
+		assertEquals(expectedTeam2HomeFieldAdvantage, matchup.getTeamHomeFieldAdvantage(team2Name));
 	}
 	
 	@Test

@@ -12,7 +12,11 @@ public class MatchupMenu extends SubMenu {
 				"off teams' Power Rankings: #<Team1Rank> vs. #<Team2Rank>"),
 		CALCULATE_BASED_OFF_ELO_RATINGS(4, "Calculate and set win chances based " + 
 				"off teams' Elo Ratings: <Team1Rating> vs. <Team2Rating>"),
-		BACK_TO_SINGLE_TEAM_MENU(5, "Back to <Team1> Matchup List");
+		CALCULATE_TEAM_1_HOME_WIN_CHANCE(5, "Calculate <Team1> Home " +
+				"Win Chance by set Home Field Advantage: <Team1Advantage>"),
+		CALCULATE_TEAM_2_HOME_WIN_CHANCE(6, "Calculate <Team2> Home " +
+				"Win Chance by set Home Field Advantage: <Team2Advantage>"),
+		BACK_TO_SINGLE_TEAM_MENU(7, "Back to <Team1> Matchup List");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -80,6 +84,10 @@ public class MatchupMenu extends SubMenu {
 					MatchupMenuOptions.CALCULATE_BASED_OFF_ELO_RATINGS.optionNumber) {
 				calculationSuccess = matchup.calculateTeamWinChancesFromEloRatings();
 				lastCalculationDone = selectedOption;
+			} else if (selectedOption == MatchupMenuOptions.CALCULATE_TEAM_1_HOME_WIN_CHANCE.optionNumber) {
+				matchup.calculateHomeWinChanceFromHomeFieldAdvantage(team1Name);
+			} else if (selectedOption == MatchupMenuOptions.CALCULATE_TEAM_2_HOME_WIN_CHANCE.optionNumber) {
+				matchup.calculateHomeWinChanceFromHomeFieldAdvantage(team2Name);
 			}
 		}
 	}
@@ -88,28 +96,21 @@ public class MatchupMenu extends SubMenu {
 			boolean calculationSuccess, int lastCalculationDone) {
 		StringBuilder matchupMenuMessageBuilder = new StringBuilder();
 		
-		if (!calculationSuccess) {
-			if (lastCalculationDone == 
-					MatchupMenuOptions.CALCULATE_BASED_OFF_POWER_RANKINGS.optionNumber) {
-				matchupMenuMessageBuilder.append("Could not calculate; set Power " +
-						"Rankings on both teams.\n");
-			} else if (lastCalculationDone == 
-					MatchupMenuOptions.CALCULATE_BASED_OFF_ELO_RATINGS.optionNumber) {
-				matchupMenuMessageBuilder.append("Could not calculate; set Elo " +
-						"Ratings on both teams to be above 0.\n");
-			}
-		}
+		addCalculationUnsuccessfulMessage(calculationSuccess,
+				lastCalculationDone, matchupMenuMessageBuilder);
 		
 		matchupMenuMessageBuilder.append("Matchup: " + team1Name + " vs. " + 
 				team2Name + "\n");
 		matchupMenuMessageBuilder.append("Current win chances:\n");
-		matchupMenuMessageBuilder.append(team1Name + ": " + 
-				matchup.getTeamNeutralWinChance(team1Name) + "\n");
-		matchupMenuMessageBuilder.append(team2Name + ": " + 
-				matchup.getTeamNeutralWinChance(team2Name) + "\n");
+		matchupMenuMessageBuilder.append(getTeamWinChancesMessage(team1Name));
+		matchupMenuMessageBuilder.append(getTeamWinChancesMessage(team2Name));
 		
-		matchupMenuMessageBuilder.append("Current win chance determiner: ");
+		matchupMenuMessageBuilder.append("Current win chance determiners: Neutral - ");
 		matchupMenuMessageBuilder.append(matchup.getWinChanceMode().winChanceModeDescription);
+		matchupMenuMessageBuilder.append(", " + team1Name + " Home - " + 
+				matchup.getHomeAwayWinChanceMode(team1Name).winChanceModeDescription);
+		matchupMenuMessageBuilder.append(", " + team2Name + " Home - " + 
+				matchup.getHomeAwayWinChanceMode(team2Name).winChanceModeDescription);
 		matchupMenuMessageBuilder.append("\n");
 		
 		matchupMenuMessageBuilder.append(MenuOptionsUtil.createMenuMessage
@@ -134,6 +135,28 @@ public class MatchupMenu extends SubMenu {
 			}
 		}
 	}
+
+	private void addCalculationUnsuccessfulMessage(boolean calculationSuccess,
+			int lastCalculationDone, StringBuilder matchupMenuMessageBuilder) {
+		if (!calculationSuccess) {
+			if (lastCalculationDone == 
+					MatchupMenuOptions.CALCULATE_BASED_OFF_POWER_RANKINGS.optionNumber) {
+				matchupMenuMessageBuilder.append("Could not calculate; set Power " +
+						"Rankings on both teams.\n");
+			} else if (lastCalculationDone == 
+					MatchupMenuOptions.CALCULATE_BASED_OFF_ELO_RATINGS.optionNumber) {
+				matchupMenuMessageBuilder.append("Could not calculate; set Elo " +
+						"Ratings on both teams to be above 0.\n");
+			}
+		}
+	}
+	
+	private String getTeamWinChancesMessage(String team1Name) {
+		return team1Name + ": Neutral - " + 
+				matchup.getTeamNeutralWinChance(team1Name) + ", Home - " +
+				matchup.getTeamHomeWinChance(team1Name) + ", Away - " +
+				matchup.getTeamAwayWinChance(team1Name) + "\n";
+	}
 	
 	private String replacePlaceholdersInMatchupMenuMessage(String team1Name,
 			String team2Name, String matchupMenuMessage) {
@@ -147,6 +170,11 @@ public class MatchupMenu extends SubMenu {
 		
 		matchupMenuMessage = matchupMenuMessage.replace("<Team1Rating>", "" + matchup.getTeamEloRating(team1Name));
 		matchupMenuMessage = matchupMenuMessage.replace("<Team2Rating>", "" + matchup.getTeamEloRating(team2Name));
+		
+		matchupMenuMessage = matchupMenuMessage.replace("<Team1Advantage>", 
+				"" + matchup.getTeamHomeFieldAdvantage(team1Name));
+		matchupMenuMessage = matchupMenuMessage.replace("<Team2Advantage>", 
+				"" + matchup.getTeamHomeFieldAdvantage(team2Name));
 		
 		return matchupMenuMessage;
 	}

@@ -52,7 +52,13 @@ public class Matchup {
 		this.team2 = team2;
 		team1NeutralWinChance = 50;
 		team2NeutralWinChance = (100 - team1NeutralWinChance);
+		team1HomeWinChance = 50;
+		team2AwayWinChance = (100 - team1HomeWinChance);
+		team2HomeWinChance = 50;
+		team1AwayWinChance = (100 - team2HomeWinChance);
 		winChanceMode = WinChanceModeEnum.CUSTOM_SETTING;
+		team1HomeWinChanceMode = HomeAwayWinChanceModeEnum.CUSTOM_SETTING;
+		team2HomeWinChanceMode = HomeAwayWinChanceModeEnum.CUSTOM_SETTING;
 	}
 	
 	public String getOpponentName(String teamName) {
@@ -158,6 +164,18 @@ public class Matchup {
 			}
 		}
 		return returnRating;
+	}
+	
+	public int getTeamHomeFieldAdvantage(String teamName) {
+		int returnAdvantage = -1;
+		if (teamName != null) {
+			if (teamName.equalsIgnoreCase(team1.getName())) {
+				returnAdvantage = team1.getHomeFieldAdvantage();
+			} else if (teamName.equalsIgnoreCase(team2.getName())) {
+				returnAdvantage = team2.getHomeFieldAdvantage();
+			}
+		}
+		return returnAdvantage;
 	}
 
 	public boolean calculateTeamWinChancesFromPowerRankings() {
