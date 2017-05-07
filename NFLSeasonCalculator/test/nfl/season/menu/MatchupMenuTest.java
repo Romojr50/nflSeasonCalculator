@@ -1,5 +1,6 @@
 package nfl.season.menu;
 
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -28,11 +29,19 @@ public class MatchupMenuTest {
 	
 	private static final int CALCULATE_BASED_OFF_ELO_RATINGS = 4;
 	
-	private static final int CALCULATE_FIRST_HOME_AWAY_BASED_OFF_HOME_FIELD_ADVANTAGE = 5;
+	private static final int SET_FIRST_TEAM_HOME_CHANCE = 5;
 	
-	private static final int CALCULATE_SECOND_HOME_AWAY_BASED_OFF_HOME_FIELD_ADVANTAGE = 6;
+	private static final int SET_FIRST_TEAM_AWAY_CHANCE = 6;
 	
-	private static final int EXIT_OPTION = 7;
+	private static final int SET_SECOND_TEAM_HOME_CHANCE = 7;
+	
+	private static final int SET_SECOND_TEAM_AWAY_CHANCE = 8;
+	
+	private static final int CALCULATE_FIRST_HOME_AWAY_BASED_OFF_HOME_FIELD_ADVANTAGE = 9;
+	
+	private static final int CALCULATE_SECOND_HOME_AWAY_BASED_OFF_HOME_FIELD_ADVANTAGE = 10;
+	
+	private static final int EXIT_OPTION = 11;
 	
 	private String coltsName = "Colts";
 	
@@ -55,6 +64,10 @@ public class MatchupMenuTest {
 	private String expectedMenuMessage;
 	
 	private String expectedSetWinChanceMessage;
+	
+	private String expectedSetHomeWinChanceMessage;
+	
+	private String expectedSetAwayWinChanceMessage;
 	
 	@Mock
 	private NFLSeasonInput input;
@@ -208,6 +221,64 @@ public class MatchupMenuTest {
 	}
 	
 	@Test
+	public void setTeamHomeWinChancesSoCustomHomeWinChancesAreSet() {
+		int team1HomeWinChance = 57;
+		int team2HomeWinChance = 49;
+		when(input.askForInt(anyString())).thenReturn(SET_FIRST_TEAM_HOME_CHANCE, 
+				team1HomeWinChance, SET_SECOND_TEAM_HOME_CHANCE, team2HomeWinChance, 
+				EXIT_OPTION);
+		
+		verify(input, times(3)).askForInt(expectedMenuMessage);
+		
+		setExpectedSetHomeWinChanceMessage(coltsName);
+		verify(input, times(1)).askForInt(expectedSetHomeWinChanceMessage);
+		setExpectedSetHomeWinChanceMessage(eaglesName);
+		verify(input, times(1)).askForInt(expectedSetHomeWinChanceMessage);
+		
+		verify(matchup, times(1)).setTeamHomeWinChance(coltsName, team1HomeWinChance);
+		verify(matchup, times(1)).setTeamHomeWinChance(eaglesName, team2HomeWinChance);
+	}
+	
+	@Test
+	public void setTeamHomeWinChanceWithNonPositiveNumbersSoNonPositivesAreIgnored() {
+		when(input.askForInt(anyString())).thenReturn(SET_FIRST_TEAM_HOME_CHANCE, 
+				-1, SET_SECOND_TEAM_HOME_CHANCE, 0, EXIT_OPTION);
+		
+		verify(input, times(3)).askForInt(expectedMenuMessage);
+		verify(input, times(2)).askForInt(expectedSetHomeWinChanceMessage);
+		verify(matchup, never()).setTeamHomeWinChance(anyString(), anyInt());
+	}
+	
+	@Test
+	public void setTeamAwayWinChancesSoCustomAwayWinChancesAreSet() {
+		int team1AwayWinChance = 57;
+		int team2AwayWinChance = 49;
+		when(input.askForInt(anyString())).thenReturn(SET_FIRST_TEAM_AWAY_CHANCE, 
+				team1AwayWinChance, SET_SECOND_TEAM_AWAY_CHANCE, team2AwayWinChance, 
+				EXIT_OPTION);
+		
+		verify(input, times(3)).askForInt(expectedMenuMessage);
+		
+		setExpectedSetAwayWinChanceMessage(coltsName);
+		verify(input, times(1)).askForInt(expectedSetAwayWinChanceMessage);
+		setExpectedSetAwayWinChanceMessage(eaglesName);
+		verify(input, times(1)).askForInt(expectedSetAwayWinChanceMessage);
+		
+		verify(matchup, times(1)).setTeamAwayWinChance(coltsName, team1AwayWinChance);
+		verify(matchup, times(1)).setTeamAwayWinChance(eaglesName, team2AwayWinChance);
+	}
+	
+	@Test
+	public void setTeamAwayWinChanceWithNonPositiveNumbersSoNonPositivesAreIgnored() {
+		when(input.askForInt(anyString())).thenReturn(SET_FIRST_TEAM_AWAY_CHANCE, 
+				-1, SET_SECOND_TEAM_AWAY_CHANCE, 0, EXIT_OPTION);
+		
+		verify(input, times(3)).askForInt(expectedMenuMessage);
+		verify(input, times(2)).askForInt(expectedSetAwayWinChanceMessage);
+		verify(matchup, never()).setTeamAwayWinChance(anyString(), anyInt());
+	}
+	
+	@Test
 	public void calculateHomeWinChanceBasedOnHomeFieldAdvantageSoCalculationIsCalledFor() {
 		when(input.askForInt(anyString())).thenReturn(CALCULATE_FIRST_HOME_AWAY_BASED_OFF_HOME_FIELD_ADVANTAGE, 
 				CALCULATE_SECOND_HOME_AWAY_BASED_OFF_HOME_FIELD_ADVANTAGE, EXIT_OPTION);
@@ -280,8 +351,20 @@ public class MatchupMenuTest {
 	}
 	
 	private void setExpectedSetWinChanceMessage(String teamName) {
-		expectedSetWinChanceMessage = "Current " + teamName + " win chance: " + 
+		expectedSetWinChanceMessage = "Current " + teamName + " neutral win chance: " + 
 				matchup.getTeamNeutralWinChance(teamName) + 
+				"\nPlease enter in a number between 1 and 99";
+	}
+	
+	private void setExpectedSetHomeWinChanceMessage(String teamName) {
+		expectedSetHomeWinChanceMessage = "Current " + " home win chance: " + 
+				matchup.getTeamHomeWinChance(teamName) + 
+				"\nPlease enter in a number between 1 and 99";
+	}
+	
+	private void setExpectedSetAwayWinChanceMessage(String teamName) {
+		expectedSetHomeWinChanceMessage = "Current " + " away win chance: " + 
+				matchup.getTeamAwayWinChance(teamName) + 
 				"\nPlease enter in a number between 1 and 99";
 	}
 	

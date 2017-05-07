@@ -116,6 +116,54 @@ public class MatchupTest {
 	}
 	
 	@Test
+	public void setTeamHomeWinChanceSoBothTeamsHaveHomeWinChanceAltered() {
+		int expectedTeam1WinChance = 18;
+		int expectedTeam2WinChance = 74;
+		
+		matchup.setTeamHomeWinChance(team1Name, expectedTeam1WinChance);
+		
+		int team1WinChance = matchup.getTeamHomeWinChance(team1Name);
+		int team2WinChance = matchup.getTeamAwayWinChance(team2Name);
+		
+		assertEquals(expectedTeam1WinChance, team1WinChance);
+		assertEquals((100 - expectedTeam1WinChance), team2WinChance);
+		assertEquals(Matchup.HomeAwayWinChanceModeEnum.CUSTOM_SETTING, matchup.getHomeAwayWinChanceMode(team1Name));
+		
+		matchup.setTeamHomeWinChance(team2Name, expectedTeam2WinChance);
+		
+		team1WinChance = matchup.getTeamAwayWinChance(team1Name);
+		team2WinChance = matchup.getTeamHomeWinChance(team2Name);
+		
+		assertEquals((100 - expectedTeam2WinChance), team1WinChance);
+		assertEquals(expectedTeam2WinChance, team2WinChance);
+		assertEquals(Matchup.HomeAwayWinChanceModeEnum.CUSTOM_SETTING, matchup.getHomeAwayWinChanceMode(team2Name));
+	}
+	
+	@Test
+	public void setTeamAwayWinChanceSoBothTeamsHaveAwayWinChanceAltered() {
+		int expectedTeam1WinChance = 18;
+		int expectedTeam2WinChance = 74;
+		
+		matchup.setTeamAwayWinChance(team1Name, expectedTeam1WinChance);
+		
+		int team1WinChance = matchup.getTeamAwayWinChance(team1Name);
+		int team2WinChance = matchup.getTeamHomeWinChance(team2Name);
+		
+		assertEquals(expectedTeam1WinChance, team1WinChance);
+		assertEquals((100 - expectedTeam1WinChance), team2WinChance);
+		assertEquals(Matchup.HomeAwayWinChanceModeEnum.CUSTOM_SETTING, matchup.getHomeAwayWinChanceMode(team2Name));
+		
+		matchup.setTeamAwayWinChance(team2Name, expectedTeam2WinChance);
+		
+		team1WinChance = matchup.getTeamHomeWinChance(team1Name);
+		team2WinChance = matchup.getTeamAwayWinChance(team2Name);
+		
+		assertEquals((100 - expectedTeam2WinChance), team1WinChance);
+		assertEquals(expectedTeam2WinChance, team2WinChance);
+		assertEquals(Matchup.HomeAwayWinChanceModeEnum.CUSTOM_SETTING, matchup.getHomeAwayWinChanceMode(team1Name));
+	}
+	
+	@Test
 	public void getTeamHomeFieldAdvantageReturnsAskedForTeamsHomeFieldAdvantage() {
 		int expectedTeam1HomeFieldAdvantage = 12;
 		int expectedTeam2HomeFieldAdvantage = -3;

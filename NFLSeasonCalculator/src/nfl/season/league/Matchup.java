@@ -114,7 +114,7 @@ public class Matchup {
 		}
 	}
 	
-	public Object getTeamHomeWinChance(String teamName) {
+	public int getTeamHomeWinChance(String teamName) {
 		int returnWinChance = -1;
 		
 		if (teamName != null) {
@@ -128,7 +128,22 @@ public class Matchup {
 		return returnWinChance;	
 	}
 	
-	public Object getTeamAwayWinChance(String teamName) {
+	public void setTeamHomeWinChance(String teamName,
+			int teamWinChance) {
+		if (teamName != null) {
+			if (teamName.equalsIgnoreCase(team1.getName())) {
+				team1HomeWinChance = teamWinChance;
+				team2AwayWinChance = 100 - teamWinChance;
+				team1HomeWinChanceMode = HomeAwayWinChanceModeEnum.CUSTOM_SETTING;
+			} else if (teamName.equalsIgnoreCase(team2.getName())) {
+				team2HomeWinChance = teamWinChance;
+				team1AwayWinChance = 100 - teamWinChance;
+				team2HomeWinChanceMode = HomeAwayWinChanceModeEnum.CUSTOM_SETTING;
+			}
+		}
+	}
+	
+	public int getTeamAwayWinChance(String teamName) {
 		int returnWinChance = -1;
 		
 		if (teamName != null) {
@@ -140,6 +155,21 @@ public class Matchup {
 		}
 		
 		return returnWinChance;
+	}
+	
+	public void setTeamAwayWinChance(String teamName,
+			int teamWinChance) {
+		if (teamName != null) {
+			if (teamName.equalsIgnoreCase(team1.getName())) {
+				team1AwayWinChance = teamWinChance;
+				team2HomeWinChance = 100 - teamWinChance;
+				team2HomeWinChanceMode = HomeAwayWinChanceModeEnum.CUSTOM_SETTING;
+			} else if (teamName.equalsIgnoreCase(team2.getName())) {
+				team2AwayWinChance = teamWinChance;
+				team1HomeWinChance = 100 - teamWinChance;
+				team1HomeWinChanceMode = HomeAwayWinChanceModeEnum.CUSTOM_SETTING;
+			}
+		}
 	}
 	
 	public int getTeamPowerRanking(String teamName) {
