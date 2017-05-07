@@ -24,7 +24,11 @@ public class MatchupMenuTest {
 	
 	private static final int SET_SECOND_TEAM_WIN_CHANCE = 2;
 	
-	private static final int EXIT_OPTION = 3;
+	private static final int CALCULATE_BASED_OFF_POWER_RANKINGS = 3;
+	
+	private static final int CALCULATE_BASED_OFF_ELO_RATINGS = 4;
+	
+	private static final int EXIT_OPTION = 5;
 	
 	private String coltsName = "Colts";
 	
@@ -59,6 +63,13 @@ public class MatchupMenuTest {
 		when(matchup.getOpponentName(coltsName)).thenReturn(eaglesName);
 		when(matchup.getTeamWinChance(coltsName)).thenReturn(coltsWinChance);
 		when(matchup.getTeamWinChance(eaglesName)).thenReturn(eaglesWinChance);
+		when(matchup.getTeamPowerRanking(coltsName)).thenReturn(15);
+		when(matchup.getTeamPowerRanking(eaglesName)).thenReturn(2);
+		when(matchup.getTeamEloRating(coltsName)).thenReturn(1450);
+		when(matchup.getTeamEloRating(eaglesName)).thenReturn(1550);
+		when(matchup.getWinChanceMode()).thenReturn(Matchup.WinChanceModeEnum.CUSTOM_SETTING);
+		when(matchup.calculateTeamWinChancesFromPowerRankings()).thenReturn(true);
+		when(matchup.calculateTeamWinChancesFromEloRatings()).thenReturn(true);
 		
 		setExpectedMenuMessage();
 	}
@@ -123,6 +134,59 @@ public class MatchupMenuTest {
 		verify(matchup, never()).setTeamWinChance(coltsName, -2);
 	}
 	
+	@Test
+	public void calculateWinChanceBasedOnPowerRankingsSoCalculationIsCalledFor() {
+		verifySuccessfulCalculationDone(CALCULATE_BASED_OFF_POWER_RANKINGS, 
+				Matchup.WinChanceModeEnum.POWER_RANKINGS);
+		verify(matchup).calculateTeamWinChancesFromPowerRankings();
+	}
+	
+	@Test
+	public void calculateWinChanceFailsSoTellUserToSetPowerRankings() {
+		when(matchup.calculateTeamWinChancesFromPowerRankings()).thenReturn(false);
+		when(input.askForInt(anyString())).thenReturn(CALCULATE_BASED_OFF_POWER_RANKINGS, 
+				EXIT_OPTION);
+		
+		matchupMenu.launchSubMenu();
+		
+		expectedMenuMessage = "Could not calculate; set Power Rankings on both " +
+				"teams.\n" + expectedMenuMessage;
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+	}
+	
+	@Test
+	public void calculateWinChanceFailsThenOtherOptionSelectedSoErrorMessageOnlyShownOnce() {
+		when(matchup.calculateTeamWinChancesFromPowerRankings()).thenReturn(false);
+		when(input.askForInt(anyString())).thenReturn(CALCULATE_BASED_OFF_POWER_RANKINGS, 
+				SET_FIRST_TEAM_WIN_CHANCE, 56, EXIT_OPTION);
+		
+		matchupMenu.launchSubMenu();
+		
+		expectedMenuMessage = "Could not calculate; set Power Rankings on both " +
+				"teams.\n" + expectedMenuMessage;
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+	}
+	
+	@Test
+	public void calculateWinChanceBasedOnEloRatingsSoCalculationIsCalledFor() {
+		verifySuccessfulCalculationDone(CALCULATE_BASED_OFF_ELO_RATINGS, 
+				Matchup.WinChanceModeEnum.ELO_RATINGS);
+		verify(matchup).calculateTeamWinChancesFromEloRatings();
+	}
+	
+	@Test
+	public void calculateWinChanceFailsSoTellUserToSetEloRatings() {
+		when(matchup.calculateTeamWinChancesFromEloRatings()).thenReturn(false);
+		when(input.askForInt(anyString())).thenReturn(CALCULATE_BASED_OFF_ELO_RATINGS, 
+				EXIT_OPTION);
+		
+		matchupMenu.launchSubMenu();
+		
+		expectedMenuMessage = "Could not calculate; set Elo Ratings on both " +
+				"teams to be above 0.\n" + expectedMenuMessage;
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+	}
+
 	private void setExpectedMenuMessage() {
 		String selectedTeamName = matchupMenu.getSelectedTeamName();
 		String afterOneTeamMessage = " win chance\n";
@@ -130,15 +194,45 @@ public class MatchupMenuTest {
 				"\n" + "Current win chances:\n" + teamNames[0] + ": " + 
 				matchup.getTeamWinChance(teamNames[0]) + "\n" + teamNames[1] + 
 				": " + matchup.getTeamWinChance(teamNames[1]) + "\n" + 
+				"Current win chance determiner: " + 
+				matchup.getWinChanceMode().winChanceModeDescription + "\n" +
 				MenuOptionsUtil.MENU_INTRO + "1. Set " + teamNames[0] + 
 				afterOneTeamMessage + "2. Set " + teamNames[1] + 
-				afterOneTeamMessage + "3. Back to " + selectedTeamName + " Menu";
+				afterOneTeamMessage + "3. Calculate and set win chances based " +
+				"off teams' Power Rankings: #" + matchup.getTeamPowerRanking(teamNames[0]) + 
+				" vs. #" + matchup.getTeamPowerRanking(teamNames[1]) + 
+				"\n4. Calculate and set win chances based off teams' Elo Ratings: " + 
+				matchup.getTeamEloRating(teamNames[0]) + " vs. " + 
+				matchup.getTeamEloRating(teamNames[1]) +
+				"\n5. Back to " + selectedTeamName + " Matchup List";
 	}
 	
 	private void setExpectedSetWinChanceMessage(String teamName) {
 		expectedSetWinChanceMessage = "Current " + teamName + " win chance: " + 
 				matchup.getTeamWinChance(teamName) + 
 				"\nPlease enter in a number between 1 and 99";
+	}
+	
+	private void verifySuccessfulCalculationDone(int menuOption, 
+			Matchup.WinChanceModeEnum winChanceMode) {
+		when(input.askForInt(anyString())).thenReturn(menuOption, 
+				EXIT_OPTION);
+		when(matchup.getTeamWinChance(coltsName)).thenReturn(55, 58);
+		when(matchup.getTeamWinChance(eaglesName)).thenReturn(45, 42);
+		when(matchup.getWinChanceMode()).thenReturn(Matchup.WinChanceModeEnum.CUSTOM_SETTING,
+				winChanceMode);
+		
+		matchupMenu.launchSubMenu();
+		
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+		
+		when(matchup.getTeamWinChance(coltsName)).thenReturn(58);
+		when(matchup.getTeamWinChance(eaglesName)).thenReturn(42);
+		when(matchup.getWinChanceMode()).thenReturn(winChanceMode);
+		
+		setExpectedMenuMessage();
+		
+		verify(input, times(1)).askForInt(expectedMenuMessage);
 	}
 	
 }
