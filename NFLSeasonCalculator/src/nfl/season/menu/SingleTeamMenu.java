@@ -13,8 +13,9 @@ public class SingleTeamMenu extends SubMenu {
 	public enum SingleTeamMenuOptions implements MenuOptions {
 		SET_POWER_RANKING(1, "Set Power Ranking"), 
 		SET_ELO_RATING(2, "Set Elo Rating"),
-		CHOOSE_MATCHUP(3, "Edit Matchup Settings"),
-		EXIT(4, "Back to Teams Menu");
+		SET_HOME_FIELD_ADVANTAGE(3, "Set Home Field Advantage"),
+		CHOOSE_MATCHUP(4, "Edit Matchup Settings"),
+		EXIT(5, "Back to Teams Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -38,6 +39,8 @@ public class SingleTeamMenu extends SubMenu {
 	private static final String POWER_RANKING_MESSAGE_SUFFIX = "\nPlease enter in " +
 			"a number between 1-32 to set the team to that ranking\nor -1 to clear " +
 			"this team's ranking:";
+	
+	private static final String PLEASE_ENTER_NATURAL_NUMBER = "\nPlease enter in an integer above 0";
 	
 	private static final int NON_POWER_RANKING = 0;
 	
@@ -63,7 +66,8 @@ public class SingleTeamMenu extends SubMenu {
 		while (selectedOption != SingleTeamMenuOptions.EXIT.optionNumber) {
 			singleTeamMenuMessage = selectedTeam.getName() + "\nPower Ranking: " + 
 					selectedTeam.getPowerRanking() + "\nElo Rating: " + 
-					selectedTeam.getEloRating() + "\n" + singleTeamMenuMessageSuffix;
+					selectedTeam.getEloRating() + "\nHome Field Advantage: " + 
+					selectedTeam.getHomeFieldAdvantage() + "\n" + singleTeamMenuMessageSuffix;
 			singleTeamMenuMessage = singleTeamMenuMessage.replace("" + Team.CLEAR_RANKING, 
 					Team.UNSET_RANKING_DISPLAY); 
 			
@@ -73,6 +77,9 @@ public class SingleTeamMenu extends SubMenu {
 				launchSetPowerRankingMenu();
 			} else if (SingleTeamMenuOptions.SET_ELO_RATING.optionNumber == selectedOption) {
 				launchSetEloRatingMenu();
+			} else if (SingleTeamMenuOptions.SET_HOME_FIELD_ADVANTAGE.optionNumber == 
+					selectedOption) {
+				launchSetHomeFieldAdvantageMenu();
 			} else if (SingleTeamMenuOptions.CHOOSE_MATCHUP.optionNumber == selectedOption) {
 				launchSelectMatchupMenu();
 			}
@@ -121,14 +128,23 @@ public class SingleTeamMenu extends SubMenu {
 		
 		while (newEloRating <= 0) {
 			String eloRatingMessage = "Current Elo Rating: " + selectedTeam.getEloRating() + 
-					"\nPlease enter in an integer above 0";
+					PLEASE_ENTER_NATURAL_NUMBER;
 			newEloRating = input.askForInt(eloRatingMessage);
 			
 			if (newEloRating > 0) {
 				selectedTeam.setEloRating(newEloRating);
 			}
 		}
+	}
+	
+	private void launchSetHomeFieldAdvantageMenu() {
+		int newHomeFieldAdvantage = -1;
 		
+		String homeFieldMessage = "Current Home Field Advantage: " + 
+				selectedTeam.getHomeFieldAdvantage() + PLEASE_ENTER_NATURAL_NUMBER;
+		newHomeFieldAdvantage = input.askForInt(homeFieldMessage);
+			
+		selectedTeam.setHomeFieldAdvantage(newHomeFieldAdvantage);
 	}
 	
 	private void launchSelectMatchupMenu() {

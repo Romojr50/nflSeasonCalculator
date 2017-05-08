@@ -15,6 +15,8 @@ public class Team {
 	
 	private int eloRating = 1;
 	
+	private int homeFieldAdvantage = 1;
+	
 	private List<Matchup> matchups;
 
 	public Team(String name) {
@@ -40,6 +42,14 @@ public class Team {
 
 	public void setEloRating(int newEloRating) {
 		this.eloRating = newEloRating;
+	}
+	
+	public int getHomeFieldAdvantage() {
+		return homeFieldAdvantage;
+	}
+	
+	public void setHomeFieldAdvantage(int newHomeFieldAdvantage) {
+		this.homeFieldAdvantage = newHomeFieldAdvantage;
 	}
 
 	public List<Matchup> getMatchups() {
