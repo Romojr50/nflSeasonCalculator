@@ -1,6 +1,5 @@
 package nfl.season.menu;
 
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -228,6 +227,8 @@ public class MatchupMenuTest {
 				team1HomeWinChance, SET_SECOND_TEAM_HOME_CHANCE, team2HomeWinChance, 
 				EXIT_OPTION);
 		
+		matchupMenu.launchSubMenu();
+		
 		verify(input, times(3)).askForInt(expectedMenuMessage);
 		
 		setExpectedSetHomeWinChanceMessage(coltsName);
@@ -242,11 +243,21 @@ public class MatchupMenuTest {
 	@Test
 	public void setTeamHomeWinChanceWithNonPositiveNumbersSoNonPositivesAreIgnored() {
 		when(input.askForInt(anyString())).thenReturn(SET_FIRST_TEAM_HOME_CHANCE, 
-				-1, SET_SECOND_TEAM_HOME_CHANCE, 0, EXIT_OPTION);
+				-1, 14, SET_SECOND_TEAM_HOME_CHANCE, 0, 12, EXIT_OPTION);
+		
+		matchupMenu.launchSubMenu();
 		
 		verify(input, times(3)).askForInt(expectedMenuMessage);
+		
+		setExpectedSetHomeWinChanceMessage(coltsName);
 		verify(input, times(2)).askForInt(expectedSetHomeWinChanceMessage);
-		verify(matchup, never()).setTeamHomeWinChance(anyString(), anyInt());
+		setExpectedSetHomeWinChanceMessage(eaglesName);
+		verify(input, times(2)).askForInt(expectedSetHomeWinChanceMessage);
+		
+		verify(matchup, never()).setTeamHomeWinChance(coltsName, -1);
+		verify(matchup, never()).setTeamHomeWinChance(coltsName, 0);
+		verify(matchup, never()).setTeamHomeWinChance(eaglesName, -1);
+		verify(matchup, never()).setTeamHomeWinChance(eaglesName, 0);
 	}
 	
 	@Test
@@ -256,6 +267,8 @@ public class MatchupMenuTest {
 		when(input.askForInt(anyString())).thenReturn(SET_FIRST_TEAM_AWAY_CHANCE, 
 				team1AwayWinChance, SET_SECOND_TEAM_AWAY_CHANCE, team2AwayWinChance, 
 				EXIT_OPTION);
+		
+		matchupMenu.launchSubMenu();
 		
 		verify(input, times(3)).askForInt(expectedMenuMessage);
 		
@@ -271,11 +284,21 @@ public class MatchupMenuTest {
 	@Test
 	public void setTeamAwayWinChanceWithNonPositiveNumbersSoNonPositivesAreIgnored() {
 		when(input.askForInt(anyString())).thenReturn(SET_FIRST_TEAM_AWAY_CHANCE, 
-				-1, SET_SECOND_TEAM_AWAY_CHANCE, 0, EXIT_OPTION);
+				-1, 14, SET_SECOND_TEAM_AWAY_CHANCE, 0, 14, EXIT_OPTION);
+		
+		matchupMenu.launchSubMenu();
 		
 		verify(input, times(3)).askForInt(expectedMenuMessage);
+		
+		setExpectedSetAwayWinChanceMessage(coltsName);
 		verify(input, times(2)).askForInt(expectedSetAwayWinChanceMessage);
-		verify(matchup, never()).setTeamAwayWinChance(anyString(), anyInt());
+		setExpectedSetAwayWinChanceMessage(eaglesName);
+		verify(input, times(2)).askForInt(expectedSetAwayWinChanceMessage);
+		
+		verify(matchup, never()).setTeamAwayWinChance(coltsName, -1);
+		verify(matchup, never()).setTeamAwayWinChance(coltsName, 0);
+		verify(matchup, never()).setTeamAwayWinChance(eaglesName, -1);
+		verify(matchup, never()).setTeamAwayWinChance(eaglesName, 0);
 	}
 	
 	@Test
@@ -329,8 +352,8 @@ public class MatchupMenuTest {
 				matchup.getHomeAwayWinChanceMode(teamNames[1]).winChanceModeDescription +
 				"\n");
 		expectedMenuMessageBuilder.append(MenuOptionsUtil.MENU_INTRO);
-		expectedMenuMessageBuilder.append("1. Set " + teamNames[0] + afterOneTeamMessage);
-		expectedMenuMessageBuilder.append("2. Set " + teamNames[1] + afterOneTeamMessage);
+		expectedMenuMessageBuilder.append("1. Set " + teamNames[0] + " neutral" + afterOneTeamMessage);
+		expectedMenuMessageBuilder.append("2. Set " + teamNames[1] + " neutral" + afterOneTeamMessage);
 		expectedMenuMessageBuilder.append("3. Calculate and set win chances based " +
 				"off teams' Power Rankings: #" + matchup.getTeamPowerRanking(teamNames[0]) + 
 				" vs. #" + matchup.getTeamPowerRanking(teamNames[1]) + 
@@ -339,13 +362,17 @@ public class MatchupMenuTest {
 				matchup.getTeamEloRating(teamNames[0]) + " vs. " + 
 				matchup.getTeamEloRating(teamNames[1]) +
 				"\n");
-		expectedMenuMessageBuilder.append("5. Calculate " + teamNames[0] + " Home " +
+		expectedMenuMessageBuilder.append("5. Set " + teamNames[0] + " home" + afterOneTeamMessage);
+		expectedMenuMessageBuilder.append("6. Set " + teamNames[0] + " away" + afterOneTeamMessage);
+		expectedMenuMessageBuilder.append("7. Set " + teamNames[1] + " home" + afterOneTeamMessage);
+		expectedMenuMessageBuilder.append("8. Set " + teamNames[1] + " away" + afterOneTeamMessage);
+		expectedMenuMessageBuilder.append("9. Calculate " + teamNames[0] + " Home " +
 				"Win Chance by set Home Field Advantage: " + 
 				matchup.getTeamHomeFieldAdvantage(teamNames[0]) + "\n");
-		expectedMenuMessageBuilder.append("6. Calculate " + teamNames[1] + " Home " +
+		expectedMenuMessageBuilder.append("10. Calculate " + teamNames[1] + " Home " +
 				"Win Chance by set Home Field Advantage: " + 
 				matchup.getTeamHomeFieldAdvantage(teamNames[1]) + "\n");
-		expectedMenuMessageBuilder.append("7. Back to " + selectedTeamName + " Matchup List");
+		expectedMenuMessageBuilder.append("11. Back to " + selectedTeamName + " Matchup List");
 		
 		expectedMenuMessage = expectedMenuMessageBuilder.toString();
 	}
@@ -357,13 +384,13 @@ public class MatchupMenuTest {
 	}
 	
 	private void setExpectedSetHomeWinChanceMessage(String teamName) {
-		expectedSetHomeWinChanceMessage = "Current " + " home win chance: " + 
+		expectedSetHomeWinChanceMessage = "Current " + teamName + " home win chance: " + 
 				matchup.getTeamHomeWinChance(teamName) + 
 				"\nPlease enter in a number between 1 and 99";
 	}
 	
 	private void setExpectedSetAwayWinChanceMessage(String teamName) {
-		expectedSetHomeWinChanceMessage = "Current " + " away win chance: " + 
+		expectedSetAwayWinChanceMessage = "Current " + teamName + " away win chance: " + 
 				matchup.getTeamAwayWinChance(teamName) + 
 				"\nPlease enter in a number between 1 and 99";
 	}

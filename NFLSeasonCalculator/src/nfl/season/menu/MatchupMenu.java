@@ -6,17 +6,21 @@ import nfl.season.league.Matchup;
 public class MatchupMenu extends SubMenu {
 
 	public enum MatchupMenuOptions implements MenuOptions {
-		SET_TEAM_1_WIN_CHANCE(1, "Set <Team1> win chance"), 
-		SET_TEAM_2_WIN_CHANCE(2, "Set <Team2> win chance"),
+		SET_TEAM_1_WIN_CHANCE(1, "Set <Team1> neutral win chance"), 
+		SET_TEAM_2_WIN_CHANCE(2, "Set <Team2> neutral win chance"),
 		CALCULATE_BASED_OFF_POWER_RANKINGS(3, "Calculate and set win chances based " +
 				"off teams' Power Rankings: #<Team1Rank> vs. #<Team2Rank>"),
 		CALCULATE_BASED_OFF_ELO_RATINGS(4, "Calculate and set win chances based " + 
 				"off teams' Elo Ratings: <Team1Rating> vs. <Team2Rating>"),
-		CALCULATE_TEAM_1_HOME_WIN_CHANCE(5, "Calculate <Team1> Home " +
+		SET_FIRST_TEAM_HOME_CHANCE(5, "Set <Team1> home win chance"),
+		SET_FIRST_TEAM_AWAY_CHANCE(6, "Set <Team1> away win chance"),
+		SET_SECOND_TEAM_HOME_CHANCE(7, "Set <Team2> home win chance"),
+		SET_SECOND_TEAM_AWAY_CHANCE(8, "Set <Team2> away win chance"),
+		CALCULATE_TEAM_1_HOME_WIN_CHANCE(9, "Calculate <Team1> Home " +
 				"Win Chance by set Home Field Advantage: <Team1Advantage>"),
-		CALCULATE_TEAM_2_HOME_WIN_CHANCE(6, "Calculate <Team2> Home " +
+		CALCULATE_TEAM_2_HOME_WIN_CHANCE(10, "Calculate <Team2> Home " +
 				"Win Chance by set Home Field Advantage: <Team2Advantage>"),
-		BACK_TO_SINGLE_TEAM_MENU(7, "Back to <Team1> Matchup List");
+		BACK_TO_SINGLE_TEAM_MENU(11, "Back to <Team1> Matchup List");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -73,9 +77,9 @@ public class MatchupMenu extends SubMenu {
 			
 			calculationSuccess = true;
 			if (selectedOption == MatchupMenuOptions.SET_TEAM_1_WIN_CHANCE.optionNumber) {
-				launchSetTeamWinChanceMenu(team1Name);
+				launchSetTeamNeutralWinChanceMenu(team1Name);
 			} else if (selectedOption == MatchupMenuOptions.SET_TEAM_2_WIN_CHANCE.optionNumber) {
-				launchSetTeamWinChanceMenu(team2Name);
+				launchSetTeamNeutralWinChanceMenu(team2Name);
 			} else if (selectedOption == 
 					MatchupMenuOptions.CALCULATE_BASED_OFF_POWER_RANKINGS.optionNumber) {
 				calculationSuccess = matchup.calculateTeamWinChancesFromPowerRankings();
@@ -84,6 +88,14 @@ public class MatchupMenu extends SubMenu {
 					MatchupMenuOptions.CALCULATE_BASED_OFF_ELO_RATINGS.optionNumber) {
 				calculationSuccess = matchup.calculateTeamWinChancesFromEloRatings();
 				lastCalculationDone = selectedOption;
+			} else if (selectedOption == MatchupMenuOptions.SET_FIRST_TEAM_HOME_CHANCE.optionNumber) {
+				launchSetTeamHomeWinChanceMenu(team1Name);
+			} else if (selectedOption == MatchupMenuOptions.SET_FIRST_TEAM_AWAY_CHANCE.optionNumber) {
+				launchSetTeamAwayWinChanceMenu(team1Name);
+			} else if (selectedOption == MatchupMenuOptions.SET_SECOND_TEAM_HOME_CHANCE.optionNumber) {
+				launchSetTeamHomeWinChanceMenu(team2Name);
+			} else if (selectedOption == MatchupMenuOptions.SET_SECOND_TEAM_AWAY_CHANCE.optionNumber) {
+				launchSetTeamAwayWinChanceMenu(team2Name);
 			} else if (selectedOption == MatchupMenuOptions.CALCULATE_TEAM_1_HOME_WIN_CHANCE.optionNumber) {
 				matchup.calculateHomeWinChanceFromHomeFieldAdvantage(team1Name);
 			} else if (selectedOption == MatchupMenuOptions.CALCULATE_TEAM_2_HOME_WIN_CHANCE.optionNumber) {
@@ -123,8 +135,8 @@ public class MatchupMenu extends SubMenu {
 		return matchupMenuMessage;
 	}
 
-	private void launchSetTeamWinChanceMenu(String teamName) {
-		String setTeamWinChanceMessage = "Current " + teamName + " win chance: " + 
+	private void launchSetTeamNeutralWinChanceMenu(String teamName) {
+		String setTeamWinChanceMessage = "Current " + teamName + " neutral win chance: " + 
 				matchup.getTeamNeutralWinChance(teamName) + 
 				"\nPlease enter in a number between 1 and 99";
 		int newTeamWinChance = -1;
@@ -132,6 +144,32 @@ public class MatchupMenu extends SubMenu {
 			newTeamWinChance = input.askForInt(setTeamWinChanceMessage);
 			if (newTeamWinChance >= 1 && newTeamWinChance <= 99) {
 				matchup.setTeamNeutralWinChance(teamName, newTeamWinChance);
+			}
+		}
+	}
+	
+	private void launchSetTeamHomeWinChanceMenu(String teamName) {
+		String setTeamWinChanceMessage = "Current " + teamName + " home win chance: " + 
+				matchup.getTeamHomeWinChance(teamName) + 
+				"\nPlease enter in a number between 1 and 99";
+		int newTeamWinChance = -1;
+		while (newTeamWinChance < 1 || newTeamWinChance > 99) {
+			newTeamWinChance = input.askForInt(setTeamWinChanceMessage);
+			if (newTeamWinChance >= 1 && newTeamWinChance <= 99) {
+				matchup.setTeamHomeWinChance(teamName, newTeamWinChance);
+			}
+		}
+	}
+	
+	private void launchSetTeamAwayWinChanceMenu(String teamName) {
+		String setTeamWinChanceMessage = "Current " + teamName + " away win chance: " + 
+				matchup.getTeamAwayWinChance(teamName) + 
+				"\nPlease enter in a number between 1 and 99";
+		int newTeamWinChance = -1;
+		while (newTeamWinChance < 1 || newTeamWinChance > 99) {
+			newTeamWinChance = input.askForInt(setTeamWinChanceMessage);
+			if (newTeamWinChance >= 1 && newTeamWinChance <= 99) {
+				matchup.setTeamAwayWinChance(teamName, newTeamWinChance);
 			}
 		}
 	}
