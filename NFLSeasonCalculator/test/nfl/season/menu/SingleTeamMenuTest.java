@@ -312,7 +312,7 @@ public class SingleTeamMenuTest {
 		
 		verify(input, times(2)).askForInt(expectedMenuMessage);
 		
-		verify(colts, times(1)).setHomeFieldAdvantage(colts.getDefaultHomeFieldAdvantage());
+		verify(colts, times(1)).resetToDefaults();
 	}
 	
 	@Test

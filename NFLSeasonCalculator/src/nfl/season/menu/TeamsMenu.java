@@ -13,8 +13,9 @@ public class TeamsMenu extends SubMenu {
 
 	public enum TeamsMenuOptions implements MenuOptions {
 		SELECT_TEAM(1, "Select Team"), 
-		SET_ALL_RANKINGS(2, "Set all Team Power Rankings"), 
-		EXIT(3, "Back to Main Menu");
+		SET_ALL_RANKINGS(2, "Set all Team Power Rankings"),
+		RESET_TO_DEFAULTS(3, "Revert All Teams and Matchups to Default Settings"),
+		EXIT(4, "Back to Main Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -59,6 +60,11 @@ public class TeamsMenu extends SubMenu {
 				launchTeamSelect();
 			} else if (TeamsMenuOptions.SET_ALL_RANKINGS.optionNumber == selectedOption) {
 				launchSetAllRankings();
+			} else if (TeamsMenuOptions.RESET_TO_DEFAULTS.optionNumber == selectedOption) {
+				List<Team> allTeams = nfl.getTeams();
+				for (Team team : allTeams) {
+					team.resetToDefaults();
+				}
 			}
 		}
 	}

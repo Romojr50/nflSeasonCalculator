@@ -83,5 +83,9 @@ public class Team {
 	public int getDefaultHomeFieldAdvantage() {
 		return defaultHomeFieldAdvantage;
 	}
+
+	public void resetToDefaults() {
+		homeFieldAdvantage = defaultHomeFieldAdvantage;
+	}
 	
 }

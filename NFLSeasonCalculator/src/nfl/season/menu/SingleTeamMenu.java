@@ -87,8 +87,7 @@ public class SingleTeamMenu extends SubMenu {
 				selectedTeam.setHomeFieldAdvantage(
 						selectedTeam.getDefaultHomeFieldAdvantage());
 			} else if (SingleTeamMenuOptions.SET_ALL_DEFAULTS.optionNumber == selectedOption) {
-				selectedTeam.setHomeFieldAdvantage(
-						selectedTeam.getDefaultHomeFieldAdvantage());
+				selectedTeam.resetToDefaults();
 			} else if (SingleTeamMenuOptions.CHOOSE_MATCHUP.optionNumber == selectedOption) {
 				launchSelectMatchupMenu();
 			}
