@@ -14,10 +14,11 @@ public class SingleTeamMenu extends SubMenu {
 		SET_POWER_RANKING(1, "Set Power Ranking"), 
 		SET_ELO_RATING(2, "Set Elo Rating"),
 		SET_HOME_FIELD_ADVANTAGE(3, "Set Home Field Advantage"),
-		SET_DEFAULT_HOME_FIELD_ADVANTAGE(4, "Set Home Field Advantage to Default"),
-		SET_ALL_DEFAULTS(5, "Revert All Team Values to Defaults"),
-		CHOOSE_MATCHUP(6, "Edit Matchup Settings"),
-		EXIT(7, "Back to Teams Menu");
+		SET_DEFAULT_POWER_RANKING(4, "Set Power Ranking to Default"),
+		SET_DEFAULT_HOME_FIELD_ADVANTAGE(5, "Set Home Field Advantage to Default"),
+		SET_ALL_DEFAULTS(6, "Revert All Team Values to Defaults"),
+		CHOOSE_MATCHUP(7, "Edit Matchup Settings"),
+		EXIT(8, "Back to Teams Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -75,22 +76,7 @@ public class SingleTeamMenu extends SubMenu {
 			
 			selectedOption = input.askForInt(singleTeamMenuMessage);
 				
-			if (SingleTeamMenuOptions.SET_POWER_RANKING.optionNumber == selectedOption) {
-				launchSetPowerRankingMenu();
-			} else if (SingleTeamMenuOptions.SET_ELO_RATING.optionNumber == selectedOption) {
-				launchSetEloRatingMenu();
-			} else if (SingleTeamMenuOptions.SET_HOME_FIELD_ADVANTAGE.optionNumber == 
-					selectedOption) {
-				launchSetHomeFieldAdvantageMenu();
-			} else if (SingleTeamMenuOptions.SET_DEFAULT_HOME_FIELD_ADVANTAGE.optionNumber == 
-					selectedOption) {
-				selectedTeam.setHomeFieldAdvantage(
-						selectedTeam.getDefaultHomeFieldAdvantage());
-			} else if (SingleTeamMenuOptions.SET_ALL_DEFAULTS.optionNumber == selectedOption) {
-				selectedTeam.resetToDefaults();
-			} else if (SingleTeamMenuOptions.CHOOSE_MATCHUP.optionNumber == selectedOption) {
-				launchSelectMatchupMenu();
-			}
+			executeSelectedOption(selectedOption);
 		}
 	}
 
@@ -106,6 +92,28 @@ public class SingleTeamMenu extends SubMenu {
 			matchupMenu.setSelectedTeamName(selectedTeam.getName());
 		}
 		return matchupMenu;
+	}
+	
+	private void executeSelectedOption(int selectedOption) {
+		if (SingleTeamMenuOptions.SET_POWER_RANKING.optionNumber == selectedOption) {
+			launchSetPowerRankingMenu();
+		} else if (SingleTeamMenuOptions.SET_ELO_RATING.optionNumber == selectedOption) {
+			launchSetEloRatingMenu();
+		} else if (SingleTeamMenuOptions.SET_HOME_FIELD_ADVANTAGE.optionNumber == 
+				selectedOption) {
+			launchSetHomeFieldAdvantageMenu();
+		} else if (SingleTeamMenuOptions.SET_DEFAULT_POWER_RANKING.optionNumber == 
+				selectedOption) {
+			selectedTeam.setPowerRanking(selectedTeam.getDefaultPowerRanking());
+		} else if (SingleTeamMenuOptions.SET_DEFAULT_HOME_FIELD_ADVANTAGE.optionNumber == 
+				selectedOption) {
+			selectedTeam.setHomeFieldAdvantage(
+					selectedTeam.getDefaultHomeFieldAdvantage());
+		} else if (SingleTeamMenuOptions.SET_ALL_DEFAULTS.optionNumber == selectedOption) {
+			selectedTeam.resetToDefaults();
+		} else if (SingleTeamMenuOptions.CHOOSE_MATCHUP.optionNumber == selectedOption) {
+			launchSelectMatchupMenu();
+		}
 	}
 
 	private void launchSetPowerRankingMenu() {

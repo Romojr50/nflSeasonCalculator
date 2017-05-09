@@ -27,6 +27,7 @@ public class Team {
 		this.name = name;
 		this.defaultPowerRanking = defaultPowerRanking;
 		this.defaultHomeFieldAdvantage = defaultHomeFieldAdvantage;
+		this.powerRanking = defaultPowerRanking;
 		this.homeFieldAdvantage = defaultHomeFieldAdvantage;
 		this.matchups = new ArrayList<Matchup>();
 	}
@@ -81,6 +82,10 @@ public class Team {
 
 	public void addMatchup(Matchup matchup) {
 		matchups.add(matchup);
+	}
+	
+	public int getDefaultPowerRanking() {
+		return defaultPowerRanking;
 	}
 
 	public int getDefaultHomeFieldAdvantage() {

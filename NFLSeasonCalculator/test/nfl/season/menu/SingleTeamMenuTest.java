@@ -31,13 +31,15 @@ public class SingleTeamMenuTest {
 	
 	private static final int SET_HOME_FIELD_ADVANTAGE = 3;
 	
-	private static final int SET_DEFAULT_HOME_FIELD_ADVANTAGE = 4;
+	private static final int SET_DEFAULT_POWER_RANKING = 4;
 	
-	private static final int SET_ALL_DEFAULTS = 5;
+	private static final int SET_DEFAULT_HOME_FIELD_ADVANTAGE = 5;
+	
+	private static final int SET_ALL_DEFAULTS = 6;
 
-	private static final int CHOOSE_MATCHUP = 6;
+	private static final int CHOOSE_MATCHUP = 7;
 	
-	private static final int EXIT_FROM_SINGLE_TEAM_MENU = 7;
+	private static final int EXIT_FROM_SINGLE_TEAM_MENU = 8;
 	
 	private String expectedMenuMessage;
 	
@@ -291,6 +293,19 @@ public class SingleTeamMenuTest {
 	}
 	
 	@Test
+	public void defaultPowerRankingIsSet() {
+		when(input.askForInt(anyString())).thenReturn(SET_DEFAULT_POWER_RANKING, 
+				EXIT_FROM_SINGLE_TEAM_MENU);
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, never()).askForInt(expectedPowerRankingsMessage);
+		
+		verify(colts, times(1)).setPowerRanking(colts.getDefaultPowerRanking());
+	}
+	
+	@Test
 	public void defaultHomeFieldAdvantageIsSet() {
 		when(input.askForInt(anyString())).thenReturn(SET_DEFAULT_HOME_FIELD_ADVANTAGE, 
 				EXIT_FROM_SINGLE_TEAM_MENU);
@@ -359,8 +374,9 @@ public class SingleTeamMenuTest {
 				"\nElo Rating: " + colts.getEloRating() + "\nHome Field Advantage: " + 
 				colts.getHomeFieldAdvantage() + "\n" + MenuOptionsUtil.MENU_INTRO + 
 				"1. Set Power Ranking\n2. Set Elo Rating\n3. Set Home Field Advantage\n" +
-				"4. Set Home Field Advantage to Default\n5. Revert All Team Values to Defaults\n" +
-				"6. Edit Matchup Settings\n7. Back to Teams Menu";
+				"4. Set Power Ranking to Default\n5. Set Home Field Advantage to Default\n" +
+				"6. Revert All Team Values to Defaults\n7. Edit Matchup Settings\n" +
+				"8. Back to Teams Menu";
 	}
 	
 
