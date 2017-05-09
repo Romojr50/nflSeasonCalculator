@@ -30,10 +30,14 @@ public class SingleTeamMenuTest {
 	private static final int SET_ELO_RATING = 2;
 	
 	private static final int SET_HOME_FIELD_ADVANTAGE = 3;
-
-	private static final int CHOOSE_MATCHUP = 4;
 	
-	private static final int EXIT_FROM_SINGLE_TEAM_MENU = 5;
+	private static final int SET_DEFAULT_HOME_FIELD_ADVANTAGE = 4;
+	
+	private static final int SET_ALL_DEFAULTS = 5;
+
+	private static final int CHOOSE_MATCHUP = 6;
+	
+	private static final int EXIT_FROM_SINGLE_TEAM_MENU = 7;
 	
 	private String expectedMenuMessage;
 	
@@ -82,7 +86,8 @@ public class SingleTeamMenuTest {
 		when(colts.getName()).thenReturn("Colts");
 		when(colts.getPowerRanking()).thenReturn(19);
 		when(colts.getEloRating()).thenReturn(48);
-		when(colts.getHomeFieldAdvantage()).thenReturn(10);
+		when(colts.getHomeFieldAdvantage()).thenReturn(14);
+		when(colts.getDefaultHomeFieldAdvantage()).thenReturn(10);
 		
 		setExpectedMenuMessage();
 		setExpectedPowerRankingsMessage();
@@ -286,6 +291,31 @@ public class SingleTeamMenuTest {
 	}
 	
 	@Test
+	public void defaultHomeFieldAdvantageIsSet() {
+		when(input.askForInt(anyString())).thenReturn(SET_DEFAULT_HOME_FIELD_ADVANTAGE, 
+				EXIT_FROM_SINGLE_TEAM_MENU);
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, never()).askForInt(expectedHomeFieldMessage);
+		
+		verify(colts, times(1)).setHomeFieldAdvantage(colts.getDefaultHomeFieldAdvantage());
+	}
+	
+	@Test
+	public void teamIsResetToDefault() {
+		when(input.askForInt(anyString())).thenReturn(SET_ALL_DEFAULTS, 
+				EXIT_FROM_SINGLE_TEAM_MENU);
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		
+		verify(colts, times(1)).setHomeFieldAdvantage(colts.getDefaultHomeFieldAdvantage());
+	}
+	
+	@Test
 	public void setSubMenuWithSingleTeamsMenuSoSingleTeamsMenuIsSet() {
 		singleTeamMenu.setSubMenu(matchupMenu, 1);
 		
@@ -329,7 +359,8 @@ public class SingleTeamMenuTest {
 				"\nElo Rating: " + colts.getEloRating() + "\nHome Field Advantage: " + 
 				colts.getHomeFieldAdvantage() + "\n" + MenuOptionsUtil.MENU_INTRO + 
 				"1. Set Power Ranking\n2. Set Elo Rating\n3. Set Home Field Advantage\n" +
-				"4. Edit Matchup Settings\n5. Back to Teams Menu";
+				"4. Set Home Field Advantage to Default\n5. Revert All Team Values to Defaults\n" +
+				"6. Edit Matchup Settings\n7. Back to Teams Menu";
 	}
 	
 
