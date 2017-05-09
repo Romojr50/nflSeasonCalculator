@@ -17,10 +17,14 @@ public class Team {
 	
 	private int homeFieldAdvantage = 1;
 	
+	private final int defaultHomeFieldAdvantage;
+	
 	private List<Matchup> matchups;
 
-	public Team(String name) {
+	public Team(String name, int defaultHomeFieldAdvantage) {
 		this.name = name;
+		this.defaultHomeFieldAdvantage = defaultHomeFieldAdvantage;
+		this.homeFieldAdvantage = defaultHomeFieldAdvantage;
 		this.matchups = new ArrayList<Matchup>();
 	}
 
@@ -74,6 +78,14 @@ public class Team {
 
 	public void addMatchup(Matchup matchup) {
 		matchups.add(matchup);
+	}
+
+	public int getDefaultHomeFieldAdvantage() {
+		return defaultHomeFieldAdvantage;
+	}
+
+	public void resetToDefaults() {
+		homeFieldAdvantage = defaultHomeFieldAdvantage;
 	}
 	
 }

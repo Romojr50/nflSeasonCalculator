@@ -33,27 +33,11 @@ public class LeagueTest {
 		
 		List<Team> allTeams = nfl.getTeams();
 		for (Team team : allTeams) {
-			String teamName = team.getName();
-			List<Matchup> teamMatchups = team.getMatchups();
-			assertEquals(NFLTeamEnum.values().length - 1, teamMatchups.size());
-			List<String> matchupTeamNames = new ArrayList<String>();
-			for (Matchup matchup : teamMatchups) {
-				matchupTeamNames.add(matchup.getOpponentName(teamName));
-			}
-			for (Team opponent : allTeams) {
-				String opponentName = opponent.getName();
-				if (!opponentName.equalsIgnoreCase(teamName)) {
-					assertTrue(matchupTeamNames.contains(opponent.getName()));
-				}
-				Matchup teamMatchup = team.getMatchup(opponentName);
-				Matchup opponentMatchup = opponent.getMatchup(teamName);
-				assertEquals(teamMatchup, opponentMatchup);
-			}
-			
+			assertTeamIsPopulatedCorrectly(allTeams, team);
 		}
 		
 	}
-	
+
 	@Test
 	public void getTeamInLeagueReturnsTeamAtIndex() {
 		League nfl = new League(League.NFL);
@@ -104,6 +88,45 @@ public class LeagueTest {
 		assertAFCHasExpectedTeams(afc);
 		
 		assertNFCHasExpectedTeams(nfc);
+	}
+	
+	private NFLTeamEnum assertTeamIsPopulatedCorrectly(List<Team> allTeams,
+			Team team) {
+		String teamName = team.getName();
+		
+		assertTeamHasExpectedMatchups(allTeams, team, teamName);
+		
+		NFLTeamEnum correspondingEnum = null;
+		for (NFLTeamEnum teamEnum : NFLTeamEnum.values()) {
+			if (teamEnum.getTeamName().equalsIgnoreCase(teamName)) {
+				correspondingEnum = teamEnum;
+				break;
+			}
+		}
+		
+		int expectedDefaultHomeFieldAdvantage = correspondingEnum.getDefaultHomeFieldAdvantage();
+		assertEquals(expectedDefaultHomeFieldAdvantage, team.getDefaultHomeFieldAdvantage());
+		assertEquals(expectedDefaultHomeFieldAdvantage, team.getHomeFieldAdvantage());
+		return correspondingEnum;
+	}
+	
+	private void assertTeamHasExpectedMatchups(List<Team> allTeams, Team team,
+			String teamName) {
+		List<Matchup> teamMatchups = team.getMatchups();
+		assertEquals(NFLTeamEnum.values().length - 1, teamMatchups.size());
+		List<String> matchupTeamNames = new ArrayList<String>();
+		for (Matchup matchup : teamMatchups) {
+			matchupTeamNames.add(matchup.getOpponentName(teamName));
+		}
+		for (Team opponent : allTeams) {
+			String opponentName = opponent.getName();
+			if (!opponentName.equalsIgnoreCase(teamName)) {
+				assertTrue(matchupTeamNames.contains(opponent.getName()));
+			}
+			Matchup teamMatchup = team.getMatchup(opponentName);
+			Matchup opponentMatchup = opponent.getMatchup(teamName);
+			assertEquals(teamMatchup, opponentMatchup);
+		}
 	}
 
 	private void assertAFCHasExpectedTeams(Conference afc) {

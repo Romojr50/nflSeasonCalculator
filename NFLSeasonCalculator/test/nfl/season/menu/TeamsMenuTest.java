@@ -29,8 +29,10 @@ public class TeamsMenuTest {
 	private static final int GO_TO_TEAM_SELECT = 1;
 	
 	private static final int GO_TO_SET_ALL_RANKINGS = 2;
+	
+	private static final int RESET_TO_DEFAULTS = 3;
 
-	private static final int EXIT_FROM_TEAMS_MENU = 3;
+	private static final int EXIT_FROM_TEAMS_MENU = 4;
 	
 	private static final int EXIT_FROM_TEAM_SELECT = NFLTeamEnum.values().length + 1;
 
@@ -76,7 +78,10 @@ public class TeamsMenuTest {
 		teamsMenu.setSubMenu(singleTeamMenu, TeamsMenuOptions.SELECT_TEAM.getOptionNumber());
 		
 		expectedMenuMessage = 
-				MenuOptionsUtil.MENU_INTRO + "1. Select Team\n2. Set all Team Power Rankings\n3. Back to Main Menu";
+				MenuOptionsUtil.MENU_INTRO + "1. Select Team\n" +
+				"2. Set all Team Power Rankings\n" +
+				"3. Revert All Teams and Matchups to Default Settings\n" +
+				"4. Back to Main Menu";
 		
 		confirmationMessage = "All rankings will be cleared. Proceed? (Y/N)";
 		
@@ -234,6 +239,17 @@ public class TeamsMenuTest {
 		teamsMenu.launchSubMenu();
 		
 		verifyTeamListMessagesForSetAllRankings(2, 2);
+	}
+	
+	@Test
+	public void revertAllTeamsToDefaultsSoTeamsAreReset() {
+		when(input.askForInt(anyString())).thenReturn(RESET_TO_DEFAULTS, EXIT_FROM_TEAMS_MENU);
+		
+		teamsMenu.launchSubMenu();
+		
+		for (Team team : mockTeams) {
+			verify(team).resetToDefaults();
+		}
 	}
 
 	private String buildTeamListMessage() {
