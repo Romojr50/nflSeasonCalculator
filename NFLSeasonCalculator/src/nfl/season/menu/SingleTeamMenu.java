@@ -14,10 +14,11 @@ public class SingleTeamMenu extends SubMenu {
 		SET_POWER_RANKING(1, "Set Power Ranking"), 
 		SET_ELO_RATING(2, "Set Elo Rating"),
 		SET_HOME_FIELD_ADVANTAGE(3, "Set Home Field Advantage"),
-		SET_DEFAULT_HOME_FIELD_ADVANTAGE(4, "Set Home Field Advantage to Default"),
-		SET_ALL_DEFAULTS(5, "Revert All Team Values to Defaults"),
-		CHOOSE_MATCHUP(6, "Edit Matchup Settings"),
-		EXIT(7, "Back to Teams Menu");
+		SET_DEFAULT_POWER_RANKING(4, "Set Power Ranking to Default"),
+		SET_DEFAULT_HOME_FIELD_ADVANTAGE(5, "Set Home Field Advantage to Default"),
+		SET_ALL_DEFAULTS(6, "Revert All Team Values to Defaults"),
+		CHOOSE_MATCHUP(7, "Edit Matchup Settings"),
+		EXIT(8, "Back to Teams Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -75,22 +76,7 @@ public class SingleTeamMenu extends SubMenu {
 			
 			selectedOption = input.askForInt(singleTeamMenuMessage);
 				
-			if (SingleTeamMenuOptions.SET_POWER_RANKING.optionNumber == selectedOption) {
-				launchSetPowerRankingMenu();
-			} else if (SingleTeamMenuOptions.SET_ELO_RATING.optionNumber == selectedOption) {
-				launchSetEloRatingMenu();
-			} else if (SingleTeamMenuOptions.SET_HOME_FIELD_ADVANTAGE.optionNumber == 
-					selectedOption) {
-				launchSetHomeFieldAdvantageMenu();
-			} else if (SingleTeamMenuOptions.SET_DEFAULT_HOME_FIELD_ADVANTAGE.optionNumber == 
-					selectedOption) {
-				selectedTeam.setHomeFieldAdvantage(
-						selectedTeam.getDefaultHomeFieldAdvantage());
-			} else if (SingleTeamMenuOptions.SET_ALL_DEFAULTS.optionNumber == selectedOption) {
-				selectedTeam.resetToDefaults();
-			} else if (SingleTeamMenuOptions.CHOOSE_MATCHUP.optionNumber == selectedOption) {
-				launchSelectMatchupMenu();
-			}
+			executeSelectedOption(selectedOption);
 		}
 	}
 
@@ -107,6 +93,28 @@ public class SingleTeamMenu extends SubMenu {
 		}
 		return matchupMenu;
 	}
+	
+	private void executeSelectedOption(int selectedOption) {
+		if (SingleTeamMenuOptions.SET_POWER_RANKING.optionNumber == selectedOption) {
+			launchSetPowerRankingMenu();
+		} else if (SingleTeamMenuOptions.SET_ELO_RATING.optionNumber == selectedOption) {
+			launchSetEloRatingMenu();
+		} else if (SingleTeamMenuOptions.SET_HOME_FIELD_ADVANTAGE.optionNumber == 
+				selectedOption) {
+			launchSetHomeFieldAdvantageMenu();
+		} else if (SingleTeamMenuOptions.SET_DEFAULT_POWER_RANKING.optionNumber == 
+				selectedOption) {
+			launchSetDefaultPowerRankingMenu();
+		} else if (SingleTeamMenuOptions.SET_DEFAULT_HOME_FIELD_ADVANTAGE.optionNumber == 
+				selectedOption) {
+			selectedTeam.setHomeFieldAdvantage(
+					selectedTeam.getDefaultHomeFieldAdvantage());
+		} else if (SingleTeamMenuOptions.SET_ALL_DEFAULTS.optionNumber == selectedOption) {
+			selectedTeam.resetToDefaults();
+		} else if (SingleTeamMenuOptions.CHOOSE_MATCHUP.optionNumber == selectedOption) {
+			launchSelectMatchupMenu();
+		}
+	}
 
 	private void launchSetPowerRankingMenu() {
 		int newPowerRanking = NON_POWER_RANKING;
@@ -117,18 +125,13 @@ public class SingleTeamMenu extends SubMenu {
 					POWER_RANKING_MESSAGE_SUFFIX;
 			newPowerRanking = input.askForInt(powerRankingMessage);
 			
-			Team teamWithThatRanking = null;
-			if (newPowerRanking != Team.CLEAR_RANKING) {
-				teamWithThatRanking = league.getTeamWithPowerRanking(newPowerRanking);
-			}
-			
-			if (teamWithThatRanking == null) {
-				selectedTeam.setPowerRanking(newPowerRanking);
-			} else {
-				newPowerRanking = launchRankingOverwriteMenu(newPowerRanking, 
-						teamWithThatRanking);
-			}
+			newPowerRanking = handleOverwritePowerRankings(newPowerRanking);
 		}
+	}
+	
+	private void launchSetDefaultPowerRankingMenu() {
+		int defaultPowerRanking = selectedTeam.getDefaultPowerRanking();
+		handleOverwritePowerRankings(defaultPowerRanking);
 	}
 	
 	private void launchSetEloRatingMenu() {
@@ -171,7 +174,41 @@ public class SingleTeamMenu extends SubMenu {
 			}
 		}
 	}
-
+	
+	private int handleOverwritePowerRankings(int newPowerRanking) {
+		Team teamWithThatRanking = null;
+		if (newPowerRanking != Team.CLEAR_RANKING) {
+			teamWithThatRanking = league.getTeamWithPowerRanking(newPowerRanking);
+		}
+		
+		if (teamWithThatRanking == null) {
+			selectedTeam.setPowerRanking(newPowerRanking);
+		} else {
+			newPowerRanking = launchRankingOverwriteMenu(newPowerRanking, 
+					teamWithThatRanking);
+		}
+		return newPowerRanking;
+	}
+	
+	private String getMatchupMenuMessage() {
+		StringBuilder matchupMenuMessageBuilder = new StringBuilder();
+		matchupMenuMessageBuilder.append(MenuOptionsUtil.MENU_INTRO);
+		int matchupIndex = 1;
+		List<Matchup> teamMatchups = selectedTeam.getMatchups();
+		for (Matchup matchup : teamMatchups) {
+			matchupMenuMessageBuilder.append(matchupIndex + ". ");
+			String opponentName = matchup.getOpponentName(selectedTeam.getName());
+			matchupMenuMessageBuilder.append(opponentName + "\n");
+			
+			matchupIndex++;
+		}
+		int exitMatchup = matchupIndex;
+		matchupMenuMessageBuilder.append(exitMatchup + ". Back to Team Menu");
+		
+		String matchupMenuMessage = matchupMenuMessageBuilder.toString();
+		return matchupMenuMessage;
+	}
+	
 	private int launchRankingOverwriteMenu(int newPowerRanking,
 			Team teamWithThatRanking) {
 		String overwriteAnswer = "";
@@ -194,25 +231,6 @@ public class SingleTeamMenu extends SubMenu {
 		}
 		
 		return newPowerRanking;
-	}
-	
-	private String getMatchupMenuMessage() {
-		StringBuilder matchupMenuMessageBuilder = new StringBuilder();
-		matchupMenuMessageBuilder.append(MenuOptionsUtil.MENU_INTRO);
-		int matchupIndex = 1;
-		List<Matchup> teamMatchups = selectedTeam.getMatchups();
-		for (Matchup matchup : teamMatchups) {
-			matchupMenuMessageBuilder.append(matchupIndex + ". ");
-			String opponentName = matchup.getOpponentName(selectedTeam.getName());
-			matchupMenuMessageBuilder.append(opponentName + "\n");
-			
-			matchupIndex++;
-		}
-		int exitMatchup = matchupIndex;
-		matchupMenuMessageBuilder.append(exitMatchup + ". Back to Team Menu");
-		
-		String matchupMenuMessage = matchupMenuMessageBuilder.toString();
-		return matchupMenuMessage;
 	}
 	
 }

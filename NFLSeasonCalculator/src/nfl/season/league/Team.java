@@ -17,13 +17,17 @@ public class Team {
 	
 	private int homeFieldAdvantage = 1;
 	
+	private final int defaultPowerRanking;
+	
 	private final int defaultHomeFieldAdvantage;
 	
 	private List<Matchup> matchups;
 
-	public Team(String name, int defaultHomeFieldAdvantage) {
+	public Team(String name, int defaultPowerRanking, int defaultHomeFieldAdvantage) {
 		this.name = name;
+		this.defaultPowerRanking = defaultPowerRanking;
 		this.defaultHomeFieldAdvantage = defaultHomeFieldAdvantage;
+		this.powerRanking = defaultPowerRanking;
 		this.homeFieldAdvantage = defaultHomeFieldAdvantage;
 		this.matchups = new ArrayList<Matchup>();
 	}
@@ -79,12 +83,17 @@ public class Team {
 	public void addMatchup(Matchup matchup) {
 		matchups.add(matchup);
 	}
+	
+	public int getDefaultPowerRanking() {
+		return defaultPowerRanking;
+	}
 
 	public int getDefaultHomeFieldAdvantage() {
 		return defaultHomeFieldAdvantage;
 	}
 
 	public void resetToDefaults() {
+		powerRanking = defaultPowerRanking;
 		homeFieldAdvantage = defaultHomeFieldAdvantage;
 	}
 	
