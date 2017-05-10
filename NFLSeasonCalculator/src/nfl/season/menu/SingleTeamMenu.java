@@ -104,7 +104,7 @@ public class SingleTeamMenu extends SubMenu {
 			launchSetHomeFieldAdvantageMenu();
 		} else if (SingleTeamMenuOptions.SET_DEFAULT_POWER_RANKING.optionNumber == 
 				selectedOption) {
-			selectedTeam.setPowerRanking(selectedTeam.getDefaultPowerRanking());
+			launchSetDefaultPowerRankingMenu();
 		} else if (SingleTeamMenuOptions.SET_DEFAULT_HOME_FIELD_ADVANTAGE.optionNumber == 
 				selectedOption) {
 			selectedTeam.setHomeFieldAdvantage(
@@ -125,18 +125,13 @@ public class SingleTeamMenu extends SubMenu {
 					POWER_RANKING_MESSAGE_SUFFIX;
 			newPowerRanking = input.askForInt(powerRankingMessage);
 			
-			Team teamWithThatRanking = null;
-			if (newPowerRanking != Team.CLEAR_RANKING) {
-				teamWithThatRanking = league.getTeamWithPowerRanking(newPowerRanking);
-			}
-			
-			if (teamWithThatRanking == null) {
-				selectedTeam.setPowerRanking(newPowerRanking);
-			} else {
-				newPowerRanking = launchRankingOverwriteMenu(newPowerRanking, 
-						teamWithThatRanking);
-			}
+			newPowerRanking = handleOverwritePowerRankings(newPowerRanking);
 		}
+	}
+	
+	private void launchSetDefaultPowerRankingMenu() {
+		int defaultPowerRanking = selectedTeam.getDefaultPowerRanking();
+		handleOverwritePowerRankings(defaultPowerRanking);
 	}
 	
 	private void launchSetEloRatingMenu() {
@@ -179,7 +174,41 @@ public class SingleTeamMenu extends SubMenu {
 			}
 		}
 	}
-
+	
+	private int handleOverwritePowerRankings(int newPowerRanking) {
+		Team teamWithThatRanking = null;
+		if (newPowerRanking != Team.CLEAR_RANKING) {
+			teamWithThatRanking = league.getTeamWithPowerRanking(newPowerRanking);
+		}
+		
+		if (teamWithThatRanking == null) {
+			selectedTeam.setPowerRanking(newPowerRanking);
+		} else {
+			newPowerRanking = launchRankingOverwriteMenu(newPowerRanking, 
+					teamWithThatRanking);
+		}
+		return newPowerRanking;
+	}
+	
+	private String getMatchupMenuMessage() {
+		StringBuilder matchupMenuMessageBuilder = new StringBuilder();
+		matchupMenuMessageBuilder.append(MenuOptionsUtil.MENU_INTRO);
+		int matchupIndex = 1;
+		List<Matchup> teamMatchups = selectedTeam.getMatchups();
+		for (Matchup matchup : teamMatchups) {
+			matchupMenuMessageBuilder.append(matchupIndex + ". ");
+			String opponentName = matchup.getOpponentName(selectedTeam.getName());
+			matchupMenuMessageBuilder.append(opponentName + "\n");
+			
+			matchupIndex++;
+		}
+		int exitMatchup = matchupIndex;
+		matchupMenuMessageBuilder.append(exitMatchup + ". Back to Team Menu");
+		
+		String matchupMenuMessage = matchupMenuMessageBuilder.toString();
+		return matchupMenuMessage;
+	}
+	
 	private int launchRankingOverwriteMenu(int newPowerRanking,
 			Team teamWithThatRanking) {
 		String overwriteAnswer = "";
@@ -202,25 +231,6 @@ public class SingleTeamMenu extends SubMenu {
 		}
 		
 		return newPowerRanking;
-	}
-	
-	private String getMatchupMenuMessage() {
-		StringBuilder matchupMenuMessageBuilder = new StringBuilder();
-		matchupMenuMessageBuilder.append(MenuOptionsUtil.MENU_INTRO);
-		int matchupIndex = 1;
-		List<Matchup> teamMatchups = selectedTeam.getMatchups();
-		for (Matchup matchup : teamMatchups) {
-			matchupMenuMessageBuilder.append(matchupIndex + ". ");
-			String opponentName = matchup.getOpponentName(selectedTeam.getName());
-			matchupMenuMessageBuilder.append(opponentName + "\n");
-			
-			matchupIndex++;
-		}
-		int exitMatchup = matchupIndex;
-		matchupMenuMessageBuilder.append(exitMatchup + ". Back to Team Menu");
-		
-		String matchupMenuMessage = matchupMenuMessageBuilder.toString();
-		return matchupMenuMessage;
 	}
 	
 }

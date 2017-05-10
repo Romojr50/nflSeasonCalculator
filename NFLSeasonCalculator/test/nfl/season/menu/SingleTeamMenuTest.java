@@ -155,9 +155,8 @@ public class SingleTeamMenuTest {
 	public void setPowerRankingThatOtherTeamAlreadyHasSoAskAndThenOverwriteOtherTeam() {
 		int powerRanking = 11;
 		String eaglesName = eagles.getName();
-		String overwriteMessage = "The " + eaglesName + " already are #" + 
-				powerRanking + ". Clear the " + eaglesName + " ranking and assign #" + 
-				powerRanking + " to " + colts.getName() + "? (Y/N)";
+		String overwriteMessage = getOverwritePowerRankingMessage(powerRanking,
+				eaglesName);
 		
 		when(nfl.getTeamWithPowerRanking(powerRanking)).thenReturn(eagles);
 		when(input.askForInt(anyString())).thenReturn(SET_POWER_RANKING, powerRanking, 
@@ -178,9 +177,8 @@ public class SingleTeamMenuTest {
 		int overwritePowerRanking = 8;
 		int newPowerRanking = 15;
 		String eaglesName = eagles.getName();
-		String overwriteMessage = "The " + eaglesName + " already are #" + 
-				overwritePowerRanking + ". Clear the " + eaglesName + " ranking and assign #" + 
-				overwritePowerRanking + " to " + colts.getName() + "? (Y/N)";
+		String overwriteMessage = getOverwritePowerRankingMessage(
+				overwritePowerRanking, eaglesName);
 		
 		when(nfl.getTeamWithPowerRanking(overwritePowerRanking)).thenReturn(eagles);
 		when(input.askForInt(anyString())).thenReturn(SET_POWER_RANKING, overwritePowerRanking, 
@@ -200,9 +198,8 @@ public class SingleTeamMenuTest {
 	public void setPowerRankingThatOtherTeamAlreadyHasSoAskButGetBadInputWhichIsIgnored() {
 		int overwritePowerRanking = 8;
 		String eaglesName = eagles.getName();
-		String overwriteMessage = "The " + eaglesName + " already are #" + 
-				overwritePowerRanking + ". Clear the " + eaglesName + " ranking and assign #" + 
-				overwritePowerRanking + " to " + colts.getName() + "? (Y/N)";
+		String overwriteMessage = getOverwritePowerRankingMessage(
+				overwritePowerRanking, eaglesName);
 		
 		when(nfl.getTeamWithPowerRanking(overwritePowerRanking)).thenReturn(eagles);
 		when(input.askForInt(anyString())).thenReturn(SET_POWER_RANKING, overwritePowerRanking, 
@@ -305,6 +302,69 @@ public class SingleTeamMenuTest {
 		verify(colts, times(1)).setPowerRanking(colts.getDefaultPowerRanking());
 	}
 	
+	@Test
+	public void setDefaultPowerRankingThatOtherTeamAlreadyHasSoAskAndThenOverwriteOtherTeam() {
+		int powerRanking = 11;
+		when(colts.getDefaultPowerRanking()).thenReturn(powerRanking);
+		
+		String eaglesName = eagles.getName();
+		String overwriteMessage = getOverwritePowerRankingMessage(powerRanking,
+				eaglesName);
+		
+		when(nfl.getTeamWithPowerRanking(powerRanking)).thenReturn(eagles);
+		when(input.askForInt(anyString())).thenReturn(SET_DEFAULT_POWER_RANKING, 
+				SET_DEFAULT_POWER_RANKING, EXIT_FROM_SINGLE_TEAM_MENU);
+		when(input.askForString(overwriteMessage)).thenReturn("Y", "y");
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, times(3)).askForInt(expectedMenuMessage);
+		verify(colts, times(2)).setPowerRanking(powerRanking);
+		verify(eagles, times(2)).setPowerRanking(Team.CLEAR_RANKING);
+	}
+	
+	@Test
+	public void setDefaultPowerRankingThatOtherTeamAlreadyHasSoAskAndThenAskForNewRanking() {
+		int overwritePowerRanking = 8;
+		when(colts.getDefaultPowerRanking()).thenReturn(overwritePowerRanking);
+		String eaglesName = eagles.getName();
+		String overwriteMessage = getOverwritePowerRankingMessage(
+				overwritePowerRanking, eaglesName);
+		
+		when(nfl.getTeamWithPowerRanking(overwritePowerRanking)).thenReturn(eagles);
+		when(input.askForInt(anyString())).thenReturn(SET_DEFAULT_POWER_RANKING, 
+				SET_DEFAULT_POWER_RANKING, EXIT_FROM_SINGLE_TEAM_MENU);
+		when(input.askForString(overwriteMessage)).thenReturn("N", "n");
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, times(3)).askForInt(expectedMenuMessage);
+		verify(input, times(2)).askForString(overwriteMessage);
+		verify(colts, never()).setPowerRanking(anyInt());
+		verify(eagles, never()).setPowerRanking(anyInt());
+	}
+	
+	@Test
+	public void setDefaultPowerRankingThatOtherTeamAlreadyHasSoAskButGetBadInputWhichIsIgnored() {
+		int overwritePowerRanking = 8;
+		when(colts.getDefaultPowerRanking()).thenReturn(overwritePowerRanking);
+		String eaglesName = eagles.getName();
+		String overwriteMessage = getOverwritePowerRankingMessage(
+				overwritePowerRanking, eaglesName);
+		
+		when(nfl.getTeamWithPowerRanking(overwritePowerRanking)).thenReturn(eagles);
+		when(input.askForInt(anyString())).thenReturn(SET_DEFAULT_POWER_RANKING, 
+				EXIT_FROM_SINGLE_TEAM_MENU);
+		when(input.askForString(overwriteMessage)).thenReturn("ab", "Y");
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, times(2)).askForString(overwriteMessage);
+		verify(colts, times(1)).setPowerRanking(overwritePowerRanking);
+		verify(eagles, times(1)).setPowerRanking(Team.CLEAR_RANKING);
+	}
+
 	@Test
 	public void defaultHomeFieldAdvantageIsSet() {
 		when(input.askForInt(anyString())).thenReturn(SET_DEFAULT_HOME_FIELD_ADVANTAGE, 
@@ -421,6 +481,14 @@ public class SingleTeamMenuTest {
 		expectedMatchupMessage = expectedMatchupMessageBuilder.toString();
 		
 		when(colts.getMatchups()).thenReturn(matchups);
+	}
+	
+	private String getOverwritePowerRankingMessage(int overwritePowerRanking,
+			String eaglesName) {
+		String overwriteMessage = "The " + eaglesName + " already are #" + 
+				overwritePowerRanking + ". Clear the " + eaglesName + " ranking and assign #" + 
+				overwritePowerRanking + " to " + colts.getName() + "? (Y/N)";
+		return overwriteMessage;
 	}
 	
 }
