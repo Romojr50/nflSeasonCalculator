@@ -105,12 +105,15 @@ public class LeagueTest {
 		}
 		
 		int expectedDefaultPowerRanking = correspondingEnum.getDefaultPowerRanking();
+		int expectedDefaultEloRating = correspondingEnum.getDefaultEloRating();
 		int expectedDefaultHomeFieldAdvantage = correspondingEnum.getDefaultHomeFieldAdvantage();
 		
 		assertEquals(expectedDefaultPowerRanking, team.getDefaultPowerRanking());
 		assertEquals(expectedDefaultPowerRanking, team.getPowerRanking());
+		assertEquals(expectedDefaultEloRating, team.getEloRating());
 		assertEquals(expectedDefaultHomeFieldAdvantage, team.getDefaultHomeFieldAdvantage());
 		assertEquals(expectedDefaultHomeFieldAdvantage, team.getHomeFieldAdvantage());
+		assertEquals(expectedDefaultEloRating, team.getDefaultEloRating());
 		return correspondingEnum;
 	}
 	

@@ -110,7 +110,7 @@ public class League {
 	private void initializeTeam(Division newDivision, NFLTeamEnum nflTeam) {
 		String newTeamName = nflTeam.getTeamName();
 		Team newTeam = new Team(newTeamName, nflTeam.getDefaultPowerRanking(), 
-				nflTeam.getDefaultHomeFieldAdvantage());
+				nflTeam.getDefaultEloRating(), nflTeam.getDefaultHomeFieldAdvantage());
 		newDivision.addTeam(newTeam);
 		allTeams.add(newTeam);
 	}
