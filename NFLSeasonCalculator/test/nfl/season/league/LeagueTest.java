@@ -133,6 +133,9 @@ public class LeagueTest {
 			Matchup teamMatchup = team.getMatchup(opponentName);
 			Matchup opponentMatchup = opponent.getMatchup(teamName);
 			assertEquals(teamMatchup, opponentMatchup);
+			
+			assertMatchupWinChancesDefaultedToPowerRankingCalculations(team,
+					opponent, teamMatchup);
 		}
 	}
 
@@ -172,12 +175,58 @@ public class LeagueTest {
 		assertDivisionHasExpectedTeams(nfcWest, teamsExpectedInNFCWest);
 	}
 	
+	private void assertMatchupWinChancesDefaultedToPowerRankingCalculations(
+			Team team, Team opponent, Matchup teamMatchup) {
+		String teamName = team.getName();
+		
+		int team1Ranking = team.getPowerRanking();
+		int team2Ranking = opponent.getPowerRanking();
+		
+		if (teamMatchup != null) {
+			assertEquals(Matchup.WinChanceModeEnum.POWER_RANKINGS, 
+					teamMatchup.getWinChanceMode());
+			assertEquals(Matchup.HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE,
+					teamMatchup.getHomeAwayWinChanceMode(teamName));
+			assertEquals(Matchup.HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE,
+					teamMatchup.getHomeAwayWinChanceMode(teamName));
+			
+			if (team1Ranking == 1 && team2Ranking == 25) {
+				assertTeamHasExpectedHomeAndAwayWinChances(team, opponent,
+						teamMatchup, 90);
+			} else if (team1Ranking == 1 && team2Ranking == 2) {
+				assertTeamHasExpectedHomeAndAwayWinChances(team, opponent,
+						teamMatchup, 55);
+			} else if (team1Ranking == 24 && team2Ranking == 5) {
+				assertTeamHasExpectedHomeAndAwayWinChances(team, opponent,
+						teamMatchup, 18);
+			} else if (team1Ranking == 18 && team2Ranking == 12) {
+				assertTeamHasExpectedHomeAndAwayWinChances(team, opponent,
+						teamMatchup, 37);
+			}
+		}
+	}
+	
 	private void assertDivisionHasExpectedTeams(Division division,
 			List<NFLTeamEnum> teamsExpectedInDivision) {
 		for (NFLTeamEnum teamExpected : teamsExpectedInDivision) {
 			Team expectedTeam = division.getTeam(teamExpected.getTeamName());
 			assertNotNull(expectedTeam);
 		}
+	}
+	
+	private void assertTeamHasExpectedHomeAndAwayWinChances(Team team,
+			Team opponent, Matchup teamMatchup, int expectedNeutralWinChance) {
+		String teamName = team.getName();
+		
+		assertEquals(expectedNeutralWinChance, 
+				teamMatchup.getTeamNeutralWinChance(teamName));
+		
+		int expectedHomeWinChance = Math.min(99, Math.round(
+				expectedNeutralWinChance + (team.getHomeFieldAdvantage() / 2)));
+		int expectedAwayWinChance = Math.min(99, Math.round(
+				expectedNeutralWinChance - (opponent.getHomeFieldAdvantage() / 2)));
+		assertEquals(expectedHomeWinChance, teamMatchup.getTeamHomeWinChance(teamName));
+		assertEquals(expectedAwayWinChance, teamMatchup.getTeamAwayWinChance(teamName));
 	}
 	
 }
