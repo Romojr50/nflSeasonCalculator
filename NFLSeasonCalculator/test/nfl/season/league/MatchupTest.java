@@ -183,6 +183,8 @@ public class MatchupTest {
 		testRankingCalculation(82, 8, 27);
 		testRankingCalculation(18, 24, 5);
 		testRankingCalculation(37, 18, 12);
+		testRankingCalculation(99, 1, 32);
+		testRankingCalculation(1, 32, 1);
 	}
 	
 	@Test
@@ -288,7 +290,8 @@ public class MatchupTest {
 		matchup.setTeamNeutralWinChance(team1Name, team1NeutralWinChance);
 		matchup.setTeamNeutralWinChance(team2Name, team2NeutralWinChance);
 		
-		int expectedTeam1WinChance = team1NeutralWinChance + Math.round(team1HomeFieldAdvantage / 2);
+		int expectedTeam1WinChance = Math.min(99, 
+				team1NeutralWinChance + Math.round(team1HomeFieldAdvantage / 2));
 		int expectedTeam2WinChance = 100 - expectedTeam1WinChance;
 		
 		boolean calculationSuccessful = matchup.calculateHomeWinChanceFromHomeFieldAdvantage(team1Name);
@@ -298,7 +301,8 @@ public class MatchupTest {
 		assertEquals(expectedTeam1WinChance, matchup.getTeamHomeWinChance(team1Name));
 		assertEquals(expectedTeam2WinChance, matchup.getTeamAwayWinChance(team2Name));
 		
-		expectedTeam2WinChance = team2NeutralWinChance + Math.round(team2HomeFieldAdvantage / 2);
+		expectedTeam2WinChance = Math.max(1, 
+				team2NeutralWinChance + Math.round(team2HomeFieldAdvantage / 2));
 		expectedTeam1WinChance = 100 - expectedTeam2WinChance;
 		
 		calculationSuccessful = matchup.calculateHomeWinChanceFromHomeFieldAdvantage(team2Name);

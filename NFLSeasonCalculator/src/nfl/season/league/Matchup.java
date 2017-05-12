@@ -269,11 +269,13 @@ public class Matchup {
 			if (teamName.equalsIgnoreCase(team1.getName())) {
 				homeFieldAdvantage = team1.getHomeFieldAdvantage();
 				team1HomeWinChance = team1NeutralWinChance + Math.round(homeFieldAdvantage / 2);
+				team1HomeWinChance = Math.min(99, team1HomeWinChance);
 				team2AwayWinChance = 100 - team1HomeWinChance;
 				team1HomeWinChanceMode = HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE;
 			} else if (teamName.equalsIgnoreCase(team2.getName())) {
 				homeFieldAdvantage = team2.getHomeFieldAdvantage();
 				team2HomeWinChance = team2NeutralWinChance + Math.round(homeFieldAdvantage / 2);
+				team2HomeWinChance = Math.min(99, team2HomeWinChance);
 				team1AwayWinChance = 100 - team2HomeWinChance;
 				team2HomeWinChanceMode = HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE;
 			}
@@ -307,6 +309,7 @@ public class Matchup {
 		
 		int betterWinChance = (int) Math.round(BETTER_TEAM_WIN_CHANCE_WHEN_BETTER_BY_24_SPOTS + 
 				(rankingDifferenceComparedTo24Difference * WIN_CHANCE_DIFFERENCE_BY_SPOT));
+		betterWinChance = Math.min(99, betterWinChance);
 		return betterWinChance;
 	}
 
