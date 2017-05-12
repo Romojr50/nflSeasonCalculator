@@ -124,6 +124,9 @@ public class League {
 					Matchup matchup = team.getMatchup(opponentName);
 					if (matchup == null) {
 						Matchup newMatchup = new Matchup(team, opponent);
+						newMatchup.calculateTeamWinChancesFromPowerRankings();
+						newMatchup.calculateHomeWinChanceFromHomeFieldAdvantage(teamName);
+						newMatchup.calculateHomeWinChanceFromHomeFieldAdvantage(opponentName);
 						team.addMatchup(newMatchup);
 						opponent.addMatchup(newMatchup);
 					}
