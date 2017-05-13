@@ -2,6 +2,7 @@ package nfl.season.input;
 
 import java.util.List;
 
+import nfl.season.league.League;
 import nfl.season.league.Matchup;
 import nfl.season.league.Matchup.HomeAwayWinChanceModeEnum;
 import nfl.season.league.Matchup.WinChanceModeEnum;
@@ -49,6 +50,15 @@ public class NFLTeamSettings {
 		}
 		
 		return teamSection;
+	}
+
+	public String createTeamSettingsFileString(League league) {
+		StringBuilder teamSettingsFileBuilder = new StringBuilder();
+		List<Team> teamList = league.getTeams();
+		for (Team team : teamList) {
+			teamSettingsFileBuilder.append(createTeamSection(team));
+		}
+		return teamSettingsFileBuilder.toString();
 	}
 
 }
