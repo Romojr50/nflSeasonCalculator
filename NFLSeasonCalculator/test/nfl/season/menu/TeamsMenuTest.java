@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nfl.season.input.NFLSeasonInput;
+import nfl.season.input.NFLTeamSettings;
+import nfl.season.input.NFLTeamSettingsFileWriterFactory;
 import nfl.season.league.League;
 import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
@@ -31,8 +33,10 @@ public class TeamsMenuTest {
 	private static final int GO_TO_SET_ALL_RANKINGS = 2;
 	
 	private static final int RESET_TO_DEFAULTS = 3;
+	
+	private static final int SAVE_CURRENT_TEAM_SETTINGS = 4;
 
-	private static final int EXIT_FROM_TEAMS_MENU = 4;
+	private static final int EXIT_FROM_TEAMS_MENU = 5;
 	
 	private static final int EXIT_FROM_TEAM_SELECT = NFLTeamEnum.values().length + 1;
 
@@ -68,20 +72,27 @@ public class TeamsMenuTest {
 	@Mock
 	private SingleTeamMenu singleTeamMenu;
 	
+	@Mock
+	private NFLTeamSettings nflTeamSettings;
+	
+	@Mock
+	private NFLTeamSettingsFileWriterFactory fileWriterFactory;
+	
 	private String expectedMenuMessage;
 	
 	String confirmationMessage;
 	
 	@Before
 	public void setUp() {
-		teamsMenu = new TeamsMenu(input, nfl);
+		teamsMenu = new TeamsMenu(input, nfl, nflTeamSettings, fileWriterFactory);
 		teamsMenu.setSubMenu(singleTeamMenu, TeamsMenuOptions.SELECT_TEAM.getOptionNumber());
 		
 		expectedMenuMessage = 
 				MenuOptionsUtil.MENU_INTRO + "1. Select Team\n" +
 				"2. Set all Team Power Rankings\n" +
 				"3. Revert All Teams and Matchups to Default Settings\n" +
-				"4. Back to Main Menu";
+				"4. Save Current Team and Matchup Settings\n" +
+				"5. Back to Main Menu";
 		
 		confirmationMessage = "All rankings will be cleared. Proceed? (Y/N)";
 		
@@ -250,6 +261,16 @@ public class TeamsMenuTest {
 		for (Team team : mockTeams) {
 			verify(team).resetToDefaults();
 		}
+	}
+	
+	@Test
+	public void saveTeamSettingsCallsOnTeamSettingsSaver() {
+		when(input.askForInt(anyString())).thenReturn(SAVE_CURRENT_TEAM_SETTINGS, 
+				EXIT_FROM_TEAMS_MENU);
+		
+		teamsMenu.launchSubMenu();
+		
+		verify(nflTeamSettings).saveToSettingsFile(nfl, fileWriterFactory);
 	}
 
 	private String buildTeamListMessage() {

@@ -1,6 +1,8 @@
 package nfl.season.calculator;
 
 import nfl.season.input.NFLSeasonInput;
+import nfl.season.input.NFLTeamSettings;
+import nfl.season.input.NFLTeamSettingsFileWriterFactory;
 import nfl.season.league.League;
 import nfl.season.menu.MainMenu;
 import nfl.season.menu.MatchupMenu;
@@ -30,7 +32,11 @@ public class NFLSeasonCalculator {
 	}
 
 	public static TeamsMenu createTeamsMenu(NFLSeasonInput input, League nfl) {
-		TeamsMenu teamsMenu = new TeamsMenu(input, nfl);
+		NFLTeamSettings nflTeamSettings = new NFLTeamSettings();
+		NFLTeamSettingsFileWriterFactory teamSettingsFileWriterFactory = 
+				new NFLTeamSettingsFileWriterFactory();
+		TeamsMenu teamsMenu = new TeamsMenu(input, nfl, nflTeamSettings, 
+				teamSettingsFileWriterFactory);
 		
 		SingleTeamMenu singleTeamMenu = new SingleTeamMenu(input, nfl);
 		MatchupMenu matchupMenu = new MatchupMenu(input);
