@@ -1,5 +1,6 @@
 package nfl.season.menu;
 
+import java.io.IOException;
 import java.util.List;
 
 import nfl.season.input.NFLSeasonInput;
@@ -61,10 +62,13 @@ public class TeamsMenu extends SubMenu {
 	@Override
 	public void launchSubMenu() {
 		String teamsMenuMessage = MenuOptionsUtil.createMenuMessage(TeamsMenuOptions.class);
+		String saveFilePrefix = "";
 		
 		int selectedOption = -1;
 		while (selectedOption != TeamsMenuOptions.EXIT.optionNumber) {
+			teamsMenuMessage = saveFilePrefix + teamsMenuMessage;
 			selectedOption = input.askForInt(teamsMenuMessage);
+			saveFilePrefix = "";
 				
 			if (TeamsMenuOptions.SELECT_TEAM.optionNumber == selectedOption) {
 				launchTeamSelect();
@@ -77,7 +81,12 @@ public class TeamsMenu extends SubMenu {
 				}
 			} else if (TeamsMenuOptions.SAVE_CURRENT_TEAM_SETTINGS.optionNumber == 
 					selectedOption) {
-				nflTeamSettings.saveToSettingsFile(nfl, fileWriterFactory);
+				try {
+					nflTeamSettings.saveToSettingsFile(nfl, fileWriterFactory);
+					saveFilePrefix = "Team Settings Saved Successfully\n";
+				} catch (IOException e) {
+					saveFilePrefix = "Team Settings Save FAILED\n";
+				}
 			}
 		}
 	}

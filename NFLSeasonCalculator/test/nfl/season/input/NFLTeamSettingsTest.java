@@ -1,6 +1,7 @@
 package nfl.season.input;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,11 +33,11 @@ public class NFLTeamSettingsTest {
 	
 	private static final String COLTS_LINE = "12,1542,9";
 	
-	private static final String COLTS_EAGLES_LINE = "-Eagles-56,P,63,C,51,H";
+	private static final String COLTS_EAGLES_LINE = "/Eagles/56,P,63,C,51,H";
 	
-	private static final String COLTS_TEXANS_LINE = "-Texans-62,E,70,C,49,H";
+	private static final String COLTS_TEXANS_LINE = "/Texans/62,E,70,C,49,H";
 
-	private static final String COLTS_CARDINALS_LINE = "-Cardinals-49,C,52,C,37,H";
+	private static final String COLTS_CARDINALS_LINE = "/Cardinals/49,C,52,C,37,H";
 	
 	private static final String COLTS_SECTION = "=" + COLTS_NAME + "=\n" + COLTS_LINE + "\n" + 
 			COLTS_EAGLES_LINE + "\n" + COLTS_TEXANS_LINE + "\n" + 
@@ -49,11 +50,11 @@ public class NFLTeamSettingsTest {
 	
 	private static final String EAGLES_LINE = "9,1436,12";
 	
-	private static final String EAGLES_COLTS_LINE = "-Colts-44,P,49,C,37,H";
+	private static final String EAGLES_COLTS_LINE = "/Colts/44,P,49,C,37,H";
 	
-	private static final String EAGLES_TEXANS_LINE = "-Texans-59,E,89,C,43,H";
+	private static final String EAGLES_TEXANS_LINE = "/Texans/59,E,89,C,43,H";
 	
-	private static final String EAGLES_CARDINALS_LINE = "-Cardinals-1,C,5,C,3,H";
+	private static final String EAGLES_CARDINALS_LINE = "/Cardinals/1,C,5,C,3,H";
 	
 	private static final String EAGLES_SECTION = "=" + EAGLES_NAME + "=\n" + EAGLES_LINE + "\n" + 
 			EAGLES_COLTS_LINE + "\n" + EAGLES_TEXANS_LINE + "\n" + 
@@ -238,16 +239,13 @@ public class NFLTeamSettingsTest {
 	public void saveToSettingsFileWritesAllSettingsToFile() {
 		String teamSettingsFileString = nflTeamSettings.createTeamSettingsFileString(league);
 		
-		nflTeamSettings.saveToSettingsFile(league, fileWriterFactory);
-		
 		try {
+			nflTeamSettings.saveToSettingsFile(league, fileWriterFactory);
 			verify(fileWriterFactory).createNFLTeamSettingsWriter();
 			verify(fileWriter).write(teamSettingsFileString.getBytes());
 			verify(fileWriter).close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
+			assertTrue(e.getMessage(), false);
 		}
 	}
 	

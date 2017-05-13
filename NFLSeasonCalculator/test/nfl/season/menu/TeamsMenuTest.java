@@ -3,11 +3,13 @@ package nfl.season.menu;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -264,11 +266,31 @@ public class TeamsMenuTest {
 	}
 	
 	@Test
-	public void saveTeamSettingsCallsOnTeamSettingsSaver() {
+	public void saveTeamSettingsCallsOnTeamSettingsSaver() throws IOException {
 		when(input.askForInt(anyString())).thenReturn(SAVE_CURRENT_TEAM_SETTINGS, 
 				EXIT_FROM_TEAMS_MENU);
 		
 		teamsMenu.launchSubMenu();
+		
+		String expectedMessageWithSuccessfulSave = "Team Settings Saved Successfully\n" +
+				expectedMenuMessage;
+		verify(input, times(1)).askForInt(expectedMessageWithSuccessfulSave);
+		
+		verify(nflTeamSettings).saveToSettingsFile(nfl, fileWriterFactory);
+	}
+	
+	@Test
+	public void saveTeamSettingsFailsSoUserIsNotified() throws IOException {
+		when(input.askForInt(anyString())).thenReturn(SAVE_CURRENT_TEAM_SETTINGS, 
+				EXIT_FROM_TEAMS_MENU);
+		doThrow(new IOException()).when(nflTeamSettings).saveToSettingsFile(nfl, 
+				fileWriterFactory);
+		
+		teamsMenu.launchSubMenu();
+		
+		String expectedMessageWithSuccessfulSave = "Team Settings Save FAILED\n" +
+				expectedMenuMessage;
+		verify(input, times(1)).askForInt(expectedMessageWithSuccessfulSave);
 		
 		verify(nflTeamSettings).saveToSettingsFile(nfl, fileWriterFactory);
 	}

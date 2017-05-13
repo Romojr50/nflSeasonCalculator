@@ -33,7 +33,7 @@ public class NFLTeamSettings {
 		HomeAwayWinChanceModeEnum awayWinChanceMode = 
 				matchup.getHomeAwayWinChanceMode(opponentName);
 		
-		String matchupLine = "-" + opponentName + "-" + neutralWinChance + "," + 
+		String matchupLine = "/" + opponentName + "/" + neutralWinChance + "," + 
 				neutralWinChanceMode.winChanceModeDescription.charAt(0) + "," + 
 				homeWinChance + "," + homeWinChanceMode.winChanceModeDescription.charAt(0) + 
 				"," + awayWinChance + "," + 
@@ -64,15 +64,11 @@ public class NFLTeamSettings {
 	}
 
 	public void saveToSettingsFile(League league, 
-			NFLTeamSettingsFileWriterFactory fileWriterFactory) {
-		try {
-			FileOutputStream fileWriter = fileWriterFactory.createNFLTeamSettingsWriter();
-			String teamSettingsFileString = createTeamSettingsFileString(league);
-			fileWriter.write(teamSettingsFileString.getBytes());
-			fileWriter.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			NFLTeamSettingsFileWriterFactory fileWriterFactory) throws IOException {
+		FileOutputStream fileWriter = fileWriterFactory.createNFLTeamSettingsWriter();
+		String teamSettingsFileString = createTeamSettingsFileString(league);
+		fileWriter.write(teamSettingsFileString.getBytes());
+		fileWriter.close();
 	}
 
 }
