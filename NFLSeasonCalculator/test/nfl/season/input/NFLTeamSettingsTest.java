@@ -1,8 +1,12 @@
 package nfl.season.input;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,10 +96,16 @@ public class NFLTeamSettingsTest {
 	
 	private List<Team> leagueTeamList;
 	
+	@Mock
+	private FileOutputStream fileWriter;
+	
+	@Mock
+	private NFLTeamSettingsFileWriterFactory fileWriterFactory;
+	
 	private NFLTeamSettings nflTeamSettings;
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws FileNotFoundException {
 		nflTeamSettings = new NFLTeamSettings();
 		
 		setUpTeamWithSettings(colts, 12, 1542, 9);
@@ -113,6 +123,8 @@ public class NFLTeamSettingsTest {
 		leagueTeamList.add(colts);
 		leagueTeamList.add(eagles);
 		when(league.getTeams()).thenReturn(leagueTeamList);
+		
+		when(fileWriterFactory.createNFLTeamSettingsWriter()).thenReturn(fileWriter);
 	}
 
 	private void setUpTeamWithSettings(Team team, int powerRanking, int eloRating, 
@@ -220,6 +232,23 @@ public class NFLTeamSettingsTest {
 		String teamSettingsFileString = nflTeamSettings.createTeamSettingsFileString(league);
 		
 		assertEquals(expectedTeamSettingsFileString, teamSettingsFileString);
+	}
+	
+	@Test
+	public void saveToSettingsFileWritesAllSettingsToFile() {
+		String teamSettingsFileString = nflTeamSettings.createTeamSettingsFileString(league);
+		
+		nflTeamSettings.saveToSettingsFile(league, fileWriterFactory);
+		
+		try {
+			verify(fileWriterFactory).createNFLTeamSettingsWriter();
+			verify(fileWriter).write(teamSettingsFileString.getBytes());
+			verify(fileWriter).close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 }

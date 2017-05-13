@@ -1,5 +1,7 @@
 package nfl.season.input;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import nfl.season.league.League;
@@ -59,6 +61,18 @@ public class NFLTeamSettings {
 			teamSettingsFileBuilder.append(createTeamSection(team));
 		}
 		return teamSettingsFileBuilder.toString();
+	}
+
+	public void saveToSettingsFile(League league, 
+			NFLTeamSettingsFileWriterFactory fileWriterFactory) {
+		try {
+			FileOutputStream fileWriter = fileWriterFactory.createNFLTeamSettingsWriter();
+			String teamSettingsFileString = createTeamSettingsFileString(league);
+			fileWriter.write(teamSettingsFileString.getBytes());
+			fileWriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
