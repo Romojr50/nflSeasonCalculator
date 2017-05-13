@@ -33,27 +33,11 @@ public class LeagueTest {
 		
 		List<Team> allTeams = nfl.getTeams();
 		for (Team team : allTeams) {
-			String teamName = team.getName();
-			List<Matchup> teamMatchups = team.getMatchups();
-			assertEquals(NFLTeamEnum.values().length - 1, teamMatchups.size());
-			List<String> matchupTeamNames = new ArrayList<String>();
-			for (Matchup matchup : teamMatchups) {
-				matchupTeamNames.add(matchup.getOpponentName(teamName));
-			}
-			for (Team opponent : allTeams) {
-				String opponentName = opponent.getName();
-				if (!opponentName.equalsIgnoreCase(teamName)) {
-					assertTrue(matchupTeamNames.contains(opponent.getName()));
-				}
-				Matchup teamMatchup = team.getMatchup(opponentName);
-				Matchup opponentMatchup = opponent.getMatchup(teamName);
-				assertEquals(teamMatchup, opponentMatchup);
-			}
-			
+			assertTeamIsPopulatedCorrectly(allTeams, team);
 		}
 		
 	}
-	
+
 	@Test
 	public void getTeamInLeagueReturnsTeamAtIndex() {
 		League nfl = new League(League.NFL);
@@ -105,6 +89,55 @@ public class LeagueTest {
 		
 		assertNFCHasExpectedTeams(nfc);
 	}
+	
+	private NFLTeamEnum assertTeamIsPopulatedCorrectly(List<Team> allTeams,
+			Team team) {
+		String teamName = team.getName();
+		
+		assertTeamHasExpectedMatchups(allTeams, team, teamName);
+		
+		NFLTeamEnum correspondingEnum = null;
+		for (NFLTeamEnum teamEnum : NFLTeamEnum.values()) {
+			if (teamEnum.getTeamName().equalsIgnoreCase(teamName)) {
+				correspondingEnum = teamEnum;
+				break;
+			}
+		}
+		
+		int expectedDefaultPowerRanking = correspondingEnum.getDefaultPowerRanking();
+		int expectedDefaultEloRating = correspondingEnum.getDefaultEloRating();
+		int expectedDefaultHomeFieldAdvantage = correspondingEnum.getDefaultHomeFieldAdvantage();
+		
+		assertEquals(expectedDefaultPowerRanking, team.getDefaultPowerRanking());
+		assertEquals(expectedDefaultPowerRanking, team.getPowerRanking());
+		assertEquals(expectedDefaultEloRating, team.getEloRating());
+		assertEquals(expectedDefaultHomeFieldAdvantage, team.getDefaultHomeFieldAdvantage());
+		assertEquals(expectedDefaultHomeFieldAdvantage, team.getHomeFieldAdvantage());
+		assertEquals(expectedDefaultEloRating, team.getDefaultEloRating());
+		return correspondingEnum;
+	}
+	
+	private void assertTeamHasExpectedMatchups(List<Team> allTeams, Team team,
+			String teamName) {
+		List<Matchup> teamMatchups = team.getMatchups();
+		assertEquals(NFLTeamEnum.values().length - 1, teamMatchups.size());
+		List<String> matchupTeamNames = new ArrayList<String>();
+		for (Matchup matchup : teamMatchups) {
+			matchupTeamNames.add(matchup.getOpponentName(teamName));
+		}
+		for (Team opponent : allTeams) {
+			String opponentName = opponent.getName();
+			if (!opponentName.equalsIgnoreCase(teamName)) {
+				assertTrue(matchupTeamNames.contains(opponent.getName()));
+			}
+			Matchup teamMatchup = team.getMatchup(opponentName);
+			Matchup opponentMatchup = opponent.getMatchup(teamName);
+			assertEquals(teamMatchup, opponentMatchup);
+			
+			assertMatchupWinChancesDefaultedToPowerRankingCalculations(team,
+					opponent, teamMatchup);
+		}
+	}
 
 	private void assertAFCHasExpectedTeams(Conference afc) {
 		Division afcEast = afc.getDivision(NFLDivisionEnum.EAST.name());
@@ -142,12 +175,58 @@ public class LeagueTest {
 		assertDivisionHasExpectedTeams(nfcWest, teamsExpectedInNFCWest);
 	}
 	
+	private void assertMatchupWinChancesDefaultedToPowerRankingCalculations(
+			Team team, Team opponent, Matchup teamMatchup) {
+		String teamName = team.getName();
+		
+		int team1Ranking = team.getPowerRanking();
+		int team2Ranking = opponent.getPowerRanking();
+		
+		if (teamMatchup != null) {
+			assertEquals(Matchup.WinChanceModeEnum.POWER_RANKINGS, 
+					teamMatchup.getWinChanceMode());
+			assertEquals(Matchup.HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE,
+					teamMatchup.getHomeAwayWinChanceMode(teamName));
+			assertEquals(Matchup.HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE,
+					teamMatchup.getHomeAwayWinChanceMode(teamName));
+			
+			if (team1Ranking == 1 && team2Ranking == 25) {
+				assertTeamHasExpectedHomeAndAwayWinChances(team, opponent,
+						teamMatchup, 90);
+			} else if (team1Ranking == 1 && team2Ranking == 2) {
+				assertTeamHasExpectedHomeAndAwayWinChances(team, opponent,
+						teamMatchup, 55);
+			} else if (team1Ranking == 24 && team2Ranking == 5) {
+				assertTeamHasExpectedHomeAndAwayWinChances(team, opponent,
+						teamMatchup, 18);
+			} else if (team1Ranking == 18 && team2Ranking == 12) {
+				assertTeamHasExpectedHomeAndAwayWinChances(team, opponent,
+						teamMatchup, 37);
+			}
+		}
+	}
+	
 	private void assertDivisionHasExpectedTeams(Division division,
 			List<NFLTeamEnum> teamsExpectedInDivision) {
 		for (NFLTeamEnum teamExpected : teamsExpectedInDivision) {
 			Team expectedTeam = division.getTeam(teamExpected.getTeamName());
 			assertNotNull(expectedTeam);
 		}
+	}
+	
+	private void assertTeamHasExpectedHomeAndAwayWinChances(Team team,
+			Team opponent, Matchup teamMatchup, int expectedNeutralWinChance) {
+		String teamName = team.getName();
+		
+		assertEquals(expectedNeutralWinChance, 
+				teamMatchup.getTeamNeutralWinChance(teamName));
+		
+		int expectedHomeWinChance = Math.min(99, Math.round(
+				expectedNeutralWinChance + (team.getHomeFieldAdvantage() / 2)));
+		int expectedAwayWinChance = Math.min(99, Math.round(
+				expectedNeutralWinChance - (opponent.getHomeFieldAdvantage() / 2)));
+		assertEquals(expectedHomeWinChance, teamMatchup.getTeamHomeWinChance(teamName));
+		assertEquals(expectedAwayWinChance, teamMatchup.getTeamAwayWinChance(teamName));
 	}
 	
 }

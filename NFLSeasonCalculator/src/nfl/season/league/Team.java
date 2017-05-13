@@ -15,10 +15,25 @@ public class Team {
 	
 	private int eloRating = 1;
 	
+	private int homeFieldAdvantage = 1;
+	
+	private final int defaultPowerRanking;
+	
+	private final int defaultHomeFieldAdvantage;
+	
+	private final int defaultEloRating;
+	
 	private List<Matchup> matchups;
 
-	public Team(String name) {
+	public Team(String name, int defaultPowerRanking, int defaultEloRating, 
+			int defaultHomeFieldAdvantage) {
 		this.name = name;
+		this.defaultPowerRanking = defaultPowerRanking;
+		this.defaultEloRating = defaultEloRating;
+		this.defaultHomeFieldAdvantage = defaultHomeFieldAdvantage;
+		this.powerRanking = defaultPowerRanking;
+		this.eloRating = defaultEloRating;
+		this.homeFieldAdvantage = defaultHomeFieldAdvantage;
 		this.matchups = new ArrayList<Matchup>();
 	}
 
@@ -40,6 +55,14 @@ public class Team {
 
 	public void setEloRating(int newEloRating) {
 		this.eloRating = newEloRating;
+	}
+	
+	public int getHomeFieldAdvantage() {
+		return homeFieldAdvantage;
+	}
+	
+	public void setHomeFieldAdvantage(int newHomeFieldAdvantage) {
+		this.homeFieldAdvantage = newHomeFieldAdvantage;
 	}
 
 	public List<Matchup> getMatchups() {
@@ -64,6 +87,24 @@ public class Team {
 
 	public void addMatchup(Matchup matchup) {
 		matchups.add(matchup);
+	}
+	
+	public int getDefaultPowerRanking() {
+		return defaultPowerRanking;
+	}
+	
+	public int getDefaultEloRating() {
+		return defaultEloRating;
+	}
+
+	public int getDefaultHomeFieldAdvantage() {
+		return defaultHomeFieldAdvantage;
+	}
+
+	public void resetToDefaults() {
+		powerRanking = defaultPowerRanking;
+		eloRating = defaultEloRating;
+		homeFieldAdvantage = defaultHomeFieldAdvantage;
 	}
 	
 }

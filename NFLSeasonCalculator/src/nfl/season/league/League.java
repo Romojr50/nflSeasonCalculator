@@ -109,7 +109,8 @@ public class League {
 
 	private void initializeTeam(Division newDivision, NFLTeamEnum nflTeam) {
 		String newTeamName = nflTeam.getTeamName();
-		Team newTeam = new Team(newTeamName);
+		Team newTeam = new Team(newTeamName, nflTeam.getDefaultPowerRanking(), 
+				nflTeam.getDefaultEloRating(), nflTeam.getDefaultHomeFieldAdvantage());
 		newDivision.addTeam(newTeam);
 		allTeams.add(newTeam);
 	}
@@ -123,6 +124,9 @@ public class League {
 					Matchup matchup = team.getMatchup(opponentName);
 					if (matchup == null) {
 						Matchup newMatchup = new Matchup(team, opponent);
+						newMatchup.calculateTeamWinChancesFromPowerRankings();
+						newMatchup.calculateHomeWinChanceFromHomeFieldAdvantage(teamName);
+						newMatchup.calculateHomeWinChanceFromHomeFieldAdvantage(opponentName);
 						team.addMatchup(newMatchup);
 						opponent.addMatchup(newMatchup);
 					}

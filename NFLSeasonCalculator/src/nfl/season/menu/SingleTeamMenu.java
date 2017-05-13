@@ -13,8 +13,13 @@ public class SingleTeamMenu extends SubMenu {
 	public enum SingleTeamMenuOptions implements MenuOptions {
 		SET_POWER_RANKING(1, "Set Power Ranking"), 
 		SET_ELO_RATING(2, "Set Elo Rating"),
-		CHOOSE_MATCHUP(3, "Edit Matchup Settings"),
-		EXIT(4, "Back to Teams Menu");
+		SET_HOME_FIELD_ADVANTAGE(3, "Set Home Field Advantage"),
+		SET_DEFAULT_POWER_RANKING(4, "Set Power Ranking to Default"),
+		SET_DEFAULT_ELO_RATING(5, "Set Elo Rating to Default"),
+		SET_DEFAULT_HOME_FIELD_ADVANTAGE(6, "Set Home Field Advantage to Default"),
+		SET_ALL_DEFAULTS(7, "Revert All Team Values to Defaults"),
+		CHOOSE_MATCHUP(8, "Edit Matchup Settings"),
+		EXIT(9, "Back to Teams Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -38,6 +43,8 @@ public class SingleTeamMenu extends SubMenu {
 	private static final String POWER_RANKING_MESSAGE_SUFFIX = "\nPlease enter in " +
 			"a number between 1-32 to set the team to that ranking\nor -1 to clear " +
 			"this team's ranking:";
+	
+	private static final String PLEASE_ENTER_NATURAL_NUMBER = "\nPlease enter in an integer above 0";
 	
 	private static final int NON_POWER_RANKING = 0;
 	
@@ -63,19 +70,14 @@ public class SingleTeamMenu extends SubMenu {
 		while (selectedOption != SingleTeamMenuOptions.EXIT.optionNumber) {
 			singleTeamMenuMessage = selectedTeam.getName() + "\nPower Ranking: " + 
 					selectedTeam.getPowerRanking() + "\nElo Rating: " + 
-					selectedTeam.getEloRating() + "\n" + singleTeamMenuMessageSuffix;
+					selectedTeam.getEloRating() + "\nHome Field Advantage: " + 
+					selectedTeam.getHomeFieldAdvantage() + "\n" + singleTeamMenuMessageSuffix;
 			singleTeamMenuMessage = singleTeamMenuMessage.replace("" + Team.CLEAR_RANKING, 
 					Team.UNSET_RANKING_DISPLAY); 
 			
 			selectedOption = input.askForInt(singleTeamMenuMessage);
 				
-			if (SingleTeamMenuOptions.SET_POWER_RANKING.optionNumber == selectedOption) {
-				launchSetPowerRankingMenu();
-			} else if (SingleTeamMenuOptions.SET_ELO_RATING.optionNumber == selectedOption) {
-				launchSetEloRatingMenu();
-			} else if (SingleTeamMenuOptions.CHOOSE_MATCHUP.optionNumber == selectedOption) {
-				launchSelectMatchupMenu();
-			}
+			executeSelectedOption(selectedOption);
 		}
 	}
 
@@ -92,6 +94,31 @@ public class SingleTeamMenu extends SubMenu {
 		}
 		return matchupMenu;
 	}
+	
+	private void executeSelectedOption(int selectedOption) {
+		if (SingleTeamMenuOptions.SET_POWER_RANKING.optionNumber == selectedOption) {
+			launchSetPowerRankingMenu();
+		} else if (SingleTeamMenuOptions.SET_ELO_RATING.optionNumber == selectedOption) {
+			launchSetEloRatingMenu();
+		} else if (SingleTeamMenuOptions.SET_HOME_FIELD_ADVANTAGE.optionNumber == 
+				selectedOption) {
+			launchSetHomeFieldAdvantageMenu();
+		} else if (SingleTeamMenuOptions.SET_DEFAULT_POWER_RANKING.optionNumber == 
+				selectedOption) {
+			launchSetDefaultPowerRankingMenu();
+		} else if (SingleTeamMenuOptions.SET_DEFAULT_ELO_RATING.optionNumber == 
+				selectedOption) {
+			selectedTeam.setEloRating(selectedTeam.getDefaultEloRating());
+		} else if (SingleTeamMenuOptions.SET_DEFAULT_HOME_FIELD_ADVANTAGE.optionNumber == 
+				selectedOption) {
+			selectedTeam.setHomeFieldAdvantage(
+					selectedTeam.getDefaultHomeFieldAdvantage());
+		} else if (SingleTeamMenuOptions.SET_ALL_DEFAULTS.optionNumber == selectedOption) {
+			selectedTeam.resetToDefaults();
+		} else if (SingleTeamMenuOptions.CHOOSE_MATCHUP.optionNumber == selectedOption) {
+			launchSelectMatchupMenu();
+		}
+	}
 
 	private void launchSetPowerRankingMenu() {
 		int newPowerRanking = NON_POWER_RANKING;
@@ -102,18 +129,13 @@ public class SingleTeamMenu extends SubMenu {
 					POWER_RANKING_MESSAGE_SUFFIX;
 			newPowerRanking = input.askForInt(powerRankingMessage);
 			
-			Team teamWithThatRanking = null;
-			if (newPowerRanking != Team.CLEAR_RANKING) {
-				teamWithThatRanking = league.getTeamWithPowerRanking(newPowerRanking);
-			}
-			
-			if (teamWithThatRanking == null) {
-				selectedTeam.setPowerRanking(newPowerRanking);
-			} else {
-				newPowerRanking = launchRankingOverwriteMenu(newPowerRanking, 
-						teamWithThatRanking);
-			}
+			newPowerRanking = handleOverwritePowerRankings(newPowerRanking);
 		}
+	}
+	
+	private void launchSetDefaultPowerRankingMenu() {
+		int defaultPowerRanking = selectedTeam.getDefaultPowerRanking();
+		handleOverwritePowerRankings(defaultPowerRanking);
 	}
 	
 	private void launchSetEloRatingMenu() {
@@ -121,14 +143,23 @@ public class SingleTeamMenu extends SubMenu {
 		
 		while (newEloRating <= 0) {
 			String eloRatingMessage = "Current Elo Rating: " + selectedTeam.getEloRating() + 
-					"\nPlease enter in an integer above 0";
+					PLEASE_ENTER_NATURAL_NUMBER;
 			newEloRating = input.askForInt(eloRatingMessage);
 			
 			if (newEloRating > 0) {
 				selectedTeam.setEloRating(newEloRating);
 			}
 		}
+	}
+	
+	private void launchSetHomeFieldAdvantageMenu() {
+		int newHomeFieldAdvantage = -1;
 		
+		String homeFieldMessage = "Current Home Field Advantage: " + 
+				selectedTeam.getHomeFieldAdvantage() + PLEASE_ENTER_NATURAL_NUMBER;
+		newHomeFieldAdvantage = input.askForInt(homeFieldMessage);
+			
+		selectedTeam.setHomeFieldAdvantage(newHomeFieldAdvantage);
 	}
 	
 	private void launchSelectMatchupMenu() {
@@ -147,7 +178,41 @@ public class SingleTeamMenu extends SubMenu {
 			}
 		}
 	}
-
+	
+	private int handleOverwritePowerRankings(int newPowerRanking) {
+		Team teamWithThatRanking = null;
+		if (newPowerRanking != Team.CLEAR_RANKING) {
+			teamWithThatRanking = league.getTeamWithPowerRanking(newPowerRanking);
+		}
+		
+		if (teamWithThatRanking == null) {
+			selectedTeam.setPowerRanking(newPowerRanking);
+		} else {
+			newPowerRanking = launchRankingOverwriteMenu(newPowerRanking, 
+					teamWithThatRanking);
+		}
+		return newPowerRanking;
+	}
+	
+	private String getMatchupMenuMessage() {
+		StringBuilder matchupMenuMessageBuilder = new StringBuilder();
+		matchupMenuMessageBuilder.append(MenuOptionsUtil.MENU_INTRO);
+		int matchupIndex = 1;
+		List<Matchup> teamMatchups = selectedTeam.getMatchups();
+		for (Matchup matchup : teamMatchups) {
+			matchupMenuMessageBuilder.append(matchupIndex + ". ");
+			String opponentName = matchup.getOpponentName(selectedTeam.getName());
+			matchupMenuMessageBuilder.append(opponentName + "\n");
+			
+			matchupIndex++;
+		}
+		int exitMatchup = matchupIndex;
+		matchupMenuMessageBuilder.append(exitMatchup + ". Back to Team Menu");
+		
+		String matchupMenuMessage = matchupMenuMessageBuilder.toString();
+		return matchupMenuMessage;
+	}
+	
 	private int launchRankingOverwriteMenu(int newPowerRanking,
 			Team teamWithThatRanking) {
 		String overwriteAnswer = "";
@@ -170,25 +235,6 @@ public class SingleTeamMenu extends SubMenu {
 		}
 		
 		return newPowerRanking;
-	}
-	
-	private String getMatchupMenuMessage() {
-		StringBuilder matchupMenuMessageBuilder = new StringBuilder();
-		matchupMenuMessageBuilder.append(MenuOptionsUtil.MENU_INTRO);
-		int matchupIndex = 1;
-		List<Matchup> teamMatchups = selectedTeam.getMatchups();
-		for (Matchup matchup : teamMatchups) {
-			matchupMenuMessageBuilder.append(matchupIndex + ". ");
-			String opponentName = matchup.getOpponentName(selectedTeam.getName());
-			matchupMenuMessageBuilder.append(opponentName + "\n");
-			
-			matchupIndex++;
-		}
-		int exitMatchup = matchupIndex;
-		matchupMenuMessageBuilder.append(exitMatchup + ". Back to Team Menu");
-		
-		String matchupMenuMessage = matchupMenuMessageBuilder.toString();
-		return matchupMenuMessage;
 	}
 	
 }
