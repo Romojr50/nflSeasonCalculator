@@ -1,8 +1,11 @@
 package nfl.season.menu;
 
+import java.io.IOException;
 import java.util.List;
 
 import nfl.season.input.NFLSeasonInput;
+import nfl.season.input.NFLTeamSettings;
+import nfl.season.input.NFLTeamSettingsFileWriterFactory;
 import nfl.season.league.League;
 import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
@@ -15,7 +18,8 @@ public class TeamsMenu extends SubMenu {
 		SELECT_TEAM(1, "Select Team"), 
 		SET_ALL_RANKINGS(2, "Set all Team Power Rankings"),
 		RESET_TO_DEFAULTS(3, "Revert All Teams and Matchups to Default Settings"),
-		EXIT(4, "Back to Main Menu");
+		SAVE_CURRENT_TEAM_SETTINGS(4, "Save Current Team and Matchup Settings"),
+		EXIT(5, "Back to Main Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -40,21 +44,31 @@ public class TeamsMenu extends SubMenu {
 	
 	private League nfl;
 	
+	private NFLTeamSettings nflTeamSettings;
+	
+	private NFLTeamSettingsFileWriterFactory fileWriterFactory;
+	
 	private SingleTeamMenu singleTeamMenu;
 	
-	public TeamsMenu(NFLSeasonInput input, League nfl) {
+	public TeamsMenu(NFLSeasonInput input, League nfl, NFLTeamSettings nflTeamSettings, 
+			NFLTeamSettingsFileWriterFactory fileWriterFactory) {
 		this.input = input;
 		this.nfl = nfl;
+		this.nflTeamSettings = nflTeamSettings;
+		this.fileWriterFactory = fileWriterFactory;
 		subMenus = new SubMenu[TeamsMenuOptions.values().length - 1];
 	}
 	
 	@Override
 	public void launchSubMenu() {
 		String teamsMenuMessage = MenuOptionsUtil.createMenuMessage(TeamsMenuOptions.class);
+		String saveFilePrefix = "";
 		
 		int selectedOption = -1;
 		while (selectedOption != TeamsMenuOptions.EXIT.optionNumber) {
+			teamsMenuMessage = saveFilePrefix + teamsMenuMessage;
 			selectedOption = input.askForInt(teamsMenuMessage);
+			saveFilePrefix = "";
 				
 			if (TeamsMenuOptions.SELECT_TEAM.optionNumber == selectedOption) {
 				launchTeamSelect();
@@ -64,6 +78,14 @@ public class TeamsMenu extends SubMenu {
 				List<Team> allTeams = nfl.getTeams();
 				for (Team team : allTeams) {
 					team.resetToDefaults();
+				}
+			} else if (TeamsMenuOptions.SAVE_CURRENT_TEAM_SETTINGS.optionNumber == 
+					selectedOption) {
+				try {
+					nflTeamSettings.saveToSettingsFile(nfl, fileWriterFactory);
+					saveFilePrefix = "Team Settings Saved Successfully\n";
+				} catch (IOException e) {
+					saveFilePrefix = "Team Settings Save FAILED\n";
 				}
 			}
 		}
