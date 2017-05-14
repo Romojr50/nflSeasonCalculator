@@ -152,10 +152,13 @@ public class NFLTeamSettingsTest {
 	private void setUpMatchups() {
 		setUpMatchupWithSettings(coltsEaglesMatchup, COLTS_NAME, EAGLES_NAME, 56, 
 				63, 51, WinChanceModeEnum.POWER_RANKINGS);
+		when(colts.getMatchup(EAGLES_NAME)).thenReturn(coltsEaglesMatchup);
 		setUpMatchupWithSettings(coltsTexansMatchup, COLTS_NAME, texansName, 62, 
 				70, 49, WinChanceModeEnum.ELO_RATINGS);
+		when(colts.getMatchup(texansName)).thenReturn(coltsTexansMatchup);
 		setUpMatchupWithSettings(coltsCardinalsMatchup, COLTS_NAME, cardinalsName, 
 				49, 52, 37, WinChanceModeEnum.CUSTOM_SETTING);
+		when(colts.getMatchup(cardinalsName)).thenReturn(coltsCardinalsMatchup);
 		
 		setUpMatchupWithSettings(eaglesColtsMatchup, EAGLES_NAME, COLTS_NAME, 44, 
 				49, 37, WinChanceModeEnum.POWER_RANKINGS);
@@ -164,6 +167,10 @@ public class NFLTeamSettingsTest {
 		setUpMatchupWithSettings(eaglesCardinalsMatchup, EAGLES_NAME, cardinalsName, 
 				1, 5, 3, WinChanceModeEnum.CUSTOM_SETTING);
 		
+		setUpMatchupLists();
+	}
+
+	private void setUpMatchupLists() {
 		coltsMatchups = new ArrayList<Matchup>();
 		coltsMatchups.add(coltsEaglesMatchup);
 		coltsMatchups.add(coltsTexansMatchup);
@@ -247,6 +254,33 @@ public class NFLTeamSettingsTest {
 		} catch (IOException e) {
 			assertTrue(e.getMessage(), false);
 		}
+	}
+	
+	@Test
+	public void setTeamSettingsFromTeamLineParsesTeamLineToSetTeamSettings() {
+		nflTeamSettings.setTeamSettingsFromTeamLine(colts, COLTS_LINE);
+		
+		verify(colts).setPowerRanking(12);
+		verify(colts).setEloRating(1542);
+		verify(colts).setHomeFieldAdvantage(9);
+	}
+	
+	@Test
+	public void setMatchupSettingsFromMatchupLineParsesMatchupLineToSetMatchupSettings() {
+		nflTeamSettings.setMatchupSettingsFromMatchupLine(colts, COLTS_EAGLES_LINE);
+		verify(coltsEaglesMatchup).calculateTeamWinChancesFromPowerRankings();
+		verify(coltsEaglesMatchup).setTeamHomeWinChance(COLTS_NAME, 63);
+		verify(coltsEaglesMatchup).calculateHomeWinChanceFromHomeFieldAdvantage(EAGLES_NAME);
+		
+		nflTeamSettings.setMatchupSettingsFromMatchupLine(colts, COLTS_TEXANS_LINE);
+		verify(coltsTexansMatchup).calculateTeamWinChancesFromEloRatings();
+		verify(coltsTexansMatchup).setTeamHomeWinChance(COLTS_NAME, 70);
+		verify(coltsTexansMatchup).calculateHomeWinChanceFromHomeFieldAdvantage(texansName);
+		
+		nflTeamSettings.setMatchupSettingsFromMatchupLine(colts, COLTS_CARDINALS_LINE);
+		verify(coltsCardinalsMatchup).setTeamNeutralWinChance(COLTS_NAME, 49);
+		verify(coltsCardinalsMatchup).setTeamHomeWinChance(COLTS_NAME, 52);
+		verify(coltsCardinalsMatchup).calculateHomeWinChanceFromHomeFieldAdvantage(cardinalsName);
 	}
 	
 }
