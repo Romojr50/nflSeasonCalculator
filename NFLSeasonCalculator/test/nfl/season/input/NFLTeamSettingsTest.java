@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -107,6 +108,12 @@ public class NFLTeamSettingsTest {
 	
 	private NFLTeamSettings nflTeamSettings;
 	
+	@Mock
+	private BufferedReader fileReader;
+	
+	@Mock
+	private NFLTeamSettingsFileReaderFactory fileReaderFactory;
+	
 	@Before
 	public void setUp() throws FileNotFoundException {
 		nflTeamSettings = new NFLTeamSettings();
@@ -130,6 +137,7 @@ public class NFLTeamSettingsTest {
 		when(league.getTeam(EAGLES_NAME)).thenReturn(eagles);
 		
 		when(fileWriterFactory.createNFLTeamSettingsWriter()).thenReturn(fileWriter);
+		when(fileReaderFactory.createNFLTeamSettingsReader()).thenReturn(fileReader);
 	}
 
 	private void setUpTeamWithSettings(Team team, int powerRanking, int eloRating, 
@@ -309,6 +317,29 @@ public class NFLTeamSettingsTest {
 		verify(eaglesColtsMatchup).calculateTeamWinChancesFromPowerRankings();
 		verify(eaglesTexansMatchup).setTeamHomeWinChance(EAGLES_NAME, 89);
 		verify(eaglesCardinalsMatchup).calculateHomeWinChanceFromHomeFieldAdvantage(cardinalsName);
+	}
+	
+	@Test
+	public void loadSettingsFileReadsFromSettingsFile() throws IOException {
+		String[] loadedTeamSettingsFileLines = new String[3];
+		loadedTeamSettingsFileLines[0] = "This is the first line";
+		loadedTeamSettingsFileLines[1] = "Another line!";
+		loadedTeamSettingsFileLines[2] = "The final line...";
+		
+		String expectedTeamSettingsFileString = loadedTeamSettingsFileLines[0] + 
+				"\n" + loadedTeamSettingsFileLines[1] + "\n" + 
+				loadedTeamSettingsFileLines[2] + "\n";
+		
+		when(fileReader.readLine()).thenReturn(loadedTeamSettingsFileLines[0], 
+				loadedTeamSettingsFileLines[1], loadedTeamSettingsFileLines[2], null);
+		
+		String returnedTeamSettingsFileString = nflTeamSettings.loadSettingsFile(
+				fileReaderFactory);
+		
+		verify(fileReaderFactory).createNFLTeamSettingsReader();
+		verify(fileReader).close();
+		
+		assertEquals(returnedTeamSettingsFileString, expectedTeamSettingsFileString);
 	}
 	
 	private void verifyColtsSettingsAreSet() {

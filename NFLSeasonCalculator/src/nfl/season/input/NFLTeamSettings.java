@@ -1,5 +1,7 @@
 package nfl.season.input;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -134,6 +136,24 @@ public class NFLTeamSettings {
 			}
 			setAllTeamSettingsFromTeamSection(league, teamSection);
 		}
+	}
+	
+	public String loadSettingsFile(
+			NFLTeamSettingsFileReaderFactory fileReaderFactory) throws IOException {
+		BufferedReader fileReader = fileReaderFactory.createNFLTeamSettingsReader();
+		
+		StringBuilder nflTeamSettingsBuilder = new StringBuilder();
+		
+		String line = fileReader.readLine();
+		while (line != null) {
+			nflTeamSettingsBuilder.append(line);
+			nflTeamSettingsBuilder.append("\n");
+			line = fileReader.readLine();
+		}
+		
+		fileReader.close();
+		
+		return nflTeamSettingsBuilder.toString();
 	}
 
 	private void setNeutralWinChanceFromMatchupLine(String teamName,
