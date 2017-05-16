@@ -108,6 +108,33 @@ public class NFLTeamSettings {
 		setMatchupHomeWinChanceFromMatchupLine(opponentName, matchup, awayModeCode, 
 				awayWinChanceString);
 	}
+	
+	public void setAllTeamSettingsFromTeamSection(League league, String teamSection) {
+		int indexOfEquals = teamSection.indexOf('=');
+		int secondIndexOfEquals = teamSection.lastIndexOf('=');
+		String teamName = teamSection.substring(indexOfEquals + 1, secondIndexOfEquals);
+		Team team = league.getTeam(teamName);
+		
+		String[] teamSectionLines = teamSection.split("\n");
+		String teamLine = teamSectionLines[1];
+		setTeamSettingsFromTeamLine(team, teamLine);
+		
+		for (int i = 2; i < teamSectionLines.length; i++) {
+			String matchupLine = teamSectionLines[i];
+			setMatchupSettingsFromMatchupLine(team, matchupLine);
+		}
+	}
+	
+	public void setTeamsSettingsFromTeamSettingsFileString(League league,
+			String teamSettingsFileString) {
+		String[] teamSections = teamSettingsFileString.split("\n=");
+		for (String teamSection : teamSections) {
+			if (teamSection.charAt(0) != '=') {
+				teamSection = "=" + teamSection;
+			}
+			setAllTeamSettingsFromTeamSection(league, teamSection);
+		}
+	}
 
 	private void setNeutralWinChanceFromMatchupLine(String teamName,
 			Matchup matchup, String matchupLine) {
@@ -140,5 +167,5 @@ public class NFLTeamSettings {
 			matchup.setTeamHomeWinChance(homeTeam, homeWinChance);
 		}
 	}
-	
+
 }

@@ -70,6 +70,8 @@ public class NFLTeamSettingsTest {
 	
 	private String cardinalsName = "Cardinals";
 	
+	private String teamSettingsFileString = COLTS_SECTION + EAGLES_SECTION;
+	
 	@Mock
 	private Matchup coltsEaglesMatchup;
 	
@@ -124,6 +126,8 @@ public class NFLTeamSettingsTest {
 		leagueTeamList.add(colts);
 		leagueTeamList.add(eagles);
 		when(league.getTeams()).thenReturn(leagueTeamList);
+		when(league.getTeam(COLTS_NAME)).thenReturn(colts);
+		when(league.getTeam(EAGLES_NAME)).thenReturn(eagles);
 		
 		when(fileWriterFactory.createNFLTeamSettingsWriter()).thenReturn(fileWriter);
 	}
@@ -162,10 +166,13 @@ public class NFLTeamSettingsTest {
 		
 		setUpMatchupWithSettings(eaglesColtsMatchup, EAGLES_NAME, COLTS_NAME, 44, 
 				49, 37, WinChanceModeEnum.POWER_RANKINGS);
+		when(eagles.getMatchup(COLTS_NAME)).thenReturn(eaglesColtsMatchup);
 		setUpMatchupWithSettings(eaglesTexansMatchup, EAGLES_NAME, texansName, 59, 
 				89, 43, WinChanceModeEnum.ELO_RATINGS);
+		when(eagles.getMatchup(texansName)).thenReturn(eaglesTexansMatchup);
 		setUpMatchupWithSettings(eaglesCardinalsMatchup, EAGLES_NAME, cardinalsName, 
 				1, 5, 3, WinChanceModeEnum.CUSTOM_SETTING);
+		when(eagles.getMatchup(cardinalsName)).thenReturn(eaglesCardinalsMatchup);
 		
 		setUpMatchupLists();
 	}
@@ -235,11 +242,10 @@ public class NFLTeamSettingsTest {
 	
 	@Test
 	public void createTeamSettingsFileStringCombinesSectionsForEveryTeam() {
-		String expectedTeamSettingsFileString = COLTS_SECTION + EAGLES_SECTION;
+		String returnedTeamSettingsFileString = 
+				nflTeamSettings.createTeamSettingsFileString(league);
 		
-		String teamSettingsFileString = nflTeamSettings.createTeamSettingsFileString(league);
-		
-		assertEquals(expectedTeamSettingsFileString, teamSettingsFileString);
+		assertEquals(teamSettingsFileString, returnedTeamSettingsFileString);
 	}
 	
 	@Test
@@ -280,6 +286,37 @@ public class NFLTeamSettingsTest {
 		nflTeamSettings.setMatchupSettingsFromMatchupLine(colts, COLTS_CARDINALS_LINE);
 		verify(coltsCardinalsMatchup).setTeamNeutralWinChance(COLTS_NAME, 49);
 		verify(coltsCardinalsMatchup).setTeamHomeWinChance(COLTS_NAME, 52);
+		verify(coltsCardinalsMatchup).calculateHomeWinChanceFromHomeFieldAdvantage(cardinalsName);
+	}
+	
+	@Test
+	public void setAllTeamSettingsFromTeamSectionParsesTeamSectionToSetAllTeamSettings() {
+		nflTeamSettings.setAllTeamSettingsFromTeamSection(league, COLTS_SECTION);
+		
+		verifyColtsSettingsAreSet();
+	}
+
+	@Test
+	public void setTeamsSettingsFromTeamSettingsFileStringSetsTeamsSettingsFromParsedString() {
+		nflTeamSettings.setTeamsSettingsFromTeamSettingsFileString(league, 
+				teamSettingsFileString);
+		
+		verifyColtsSettingsAreSet();
+		
+		verify(eagles).setPowerRanking(9);
+		verify(eagles).setEloRating(1436);
+		verify(eagles).setHomeFieldAdvantage(12);
+		verify(eaglesColtsMatchup).calculateTeamWinChancesFromPowerRankings();
+		verify(eaglesTexansMatchup).setTeamHomeWinChance(EAGLES_NAME, 89);
+		verify(eaglesCardinalsMatchup).calculateHomeWinChanceFromHomeFieldAdvantage(cardinalsName);
+	}
+	
+	private void verifyColtsSettingsAreSet() {
+		verify(colts).setPowerRanking(12);
+		verify(colts).setEloRating(1542);
+		verify(colts).setHomeFieldAdvantage(9);
+		verify(coltsEaglesMatchup).calculateTeamWinChancesFromPowerRankings();
+		verify(coltsTexansMatchup).setTeamHomeWinChance(COLTS_NAME, 70);
 		verify(coltsCardinalsMatchup).calculateHomeWinChanceFromHomeFieldAdvantage(cardinalsName);
 	}
 	
