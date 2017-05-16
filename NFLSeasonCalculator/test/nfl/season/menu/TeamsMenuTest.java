@@ -1,6 +1,7 @@
 package nfl.season.menu;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.input.NFLTeamSettings;
+import nfl.season.input.NFLTeamSettingsFileReaderFactory;
 import nfl.season.input.NFLTeamSettingsFileWriterFactory;
 import nfl.season.league.League;
 import nfl.season.league.NFLTeamEnum;
@@ -36,9 +38,11 @@ public class TeamsMenuTest {
 	
 	private static final int RESET_TO_DEFAULTS = 3;
 	
-	private static final int SAVE_CURRENT_TEAM_SETTINGS = 4;
+	private static final int LOAD_SAVED_SETTINGS = 4;
+	
+	private static final int SAVE_CURRENT_TEAM_SETTINGS = 5;
 
-	private static final int EXIT_FROM_TEAMS_MENU = 5;
+	private static final int EXIT_FROM_TEAMS_MENU = 6;
 	
 	private static final int EXIT_FROM_TEAM_SELECT = NFLTeamEnum.values().length + 1;
 
@@ -80,21 +84,28 @@ public class TeamsMenuTest {
 	@Mock
 	private NFLTeamSettingsFileWriterFactory fileWriterFactory;
 	
+	@Mock
+	private NFLTeamSettingsFileReaderFactory fileReaderFactory;
+	
+	private String loadedSettingsFileString;
+	
 	private String expectedMenuMessage;
 	
-	String confirmationMessage;
+	private String confirmationMessage;
 	
 	@Before
 	public void setUp() {
-		teamsMenu = new TeamsMenu(input, nfl, nflTeamSettings, fileWriterFactory);
+		teamsMenu = new TeamsMenu(input, nfl, nflTeamSettings, fileWriterFactory, 
+				fileReaderFactory);
 		teamsMenu.setSubMenu(singleTeamMenu, TeamsMenuOptions.SELECT_TEAM.getOptionNumber());
 		
 		expectedMenuMessage = 
 				MenuOptionsUtil.MENU_INTRO + "1. Select Team\n" +
 				"2. Set all Team Power Rankings\n" +
 				"3. Revert All Teams and Matchups to Default Settings\n" +
-				"4. Save Current Team and Matchup Settings\n" +
-				"5. Back to Main Menu";
+				"4. Load Saved Team and Matchup Settings\n" +
+				"5. Save Current Team and Matchup Settings\n" +
+				"6. Back to Main Menu";
 		
 		confirmationMessage = "All rankings will be cleared. Proceed? (Y/N)";
 		
@@ -269,6 +280,8 @@ public class TeamsMenuTest {
 	public void saveTeamSettingsCallsOnTeamSettingsSaver() throws IOException {
 		when(input.askForInt(anyString())).thenReturn(SAVE_CURRENT_TEAM_SETTINGS, 
 				EXIT_FROM_TEAMS_MENU);
+		when(nflTeamSettings.saveToSettingsFile(any(League.class), 
+				any(NFLTeamSettingsFileWriterFactory.class))).thenReturn(true);
 		
 		teamsMenu.launchSubMenu();
 		
@@ -288,11 +301,31 @@ public class TeamsMenuTest {
 		
 		teamsMenu.launchSubMenu();
 		
-		String expectedMessageWithSuccessfulSave = "Team Settings Save FAILED\n" +
-				expectedMenuMessage;
-		verify(input, times(1)).askForInt(expectedMessageWithSuccessfulSave);
+		verifySaveSettingsFailureOccurs();
+	}
+	
+	@Test
+	public void saveTeamSettingsFailsWithFalseBooleanSoUserIsNotified() throws IOException {
+		when(input.askForInt(anyString())).thenReturn(SAVE_CURRENT_TEAM_SETTINGS,
+				EXIT_FROM_TEAMS_MENU);
+		when(nflTeamSettings.saveToSettingsFile(nfl, fileWriterFactory)).thenReturn(false);
 		
-		verify(nflTeamSettings).saveToSettingsFile(nfl, fileWriterFactory);
+		teamsMenu.launchSubMenu();
+		
+		verifySaveSettingsFailureOccurs();
+	}
+	
+	@Test
+	public void loadTeamSettingsPullsInSavedSettings() throws IOException {
+		when(input.askForInt(anyString())).thenReturn(LOAD_SAVED_SETTINGS, 
+				EXIT_FROM_TEAMS_MENU);
+		when(nflTeamSettings.loadSettingsFile(fileReaderFactory)).thenReturn(loadedSettingsFileString);
+		
+		teamsMenu.launchSubMenu();
+		
+		verify(nflTeamSettings).loadSettingsFile(fileReaderFactory);
+		verify(nflTeamSettings).setTeamsSettingsFromTeamSettingsFileString(nfl, 
+				loadedSettingsFileString);
 	}
 
 	private String buildTeamListMessage() {
@@ -342,6 +375,14 @@ public class TeamsMenuTest {
 		verify(falcons, never()).setPowerRanking(anyInt());
 		verify(steelers, never()).setPowerRanking(anyInt());
 		verify(packers, never()).setPowerRanking(anyInt());
+	}
+	
+	private void verifySaveSettingsFailureOccurs() throws IOException {
+		String expectedMessageWithSuccessfulSave = "Team Settings Save FAILED\n" +
+				expectedMenuMessage;
+		verify(input, times(1)).askForInt(expectedMessageWithSuccessfulSave);
+		
+		verify(nflTeamSettings).saveToSettingsFile(nfl, fileWriterFactory);
 	}
 	
 }

@@ -1,7 +1,6 @@
 package nfl.season.input;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -65,12 +64,23 @@ public class NFLTeamSettings {
 		return teamSettingsFileBuilder.toString();
 	}
 
-	public void saveToSettingsFile(League league, 
+	public boolean saveToSettingsFile(League league, 
 			NFLTeamSettingsFileWriterFactory fileWriterFactory) throws IOException {
-		FileOutputStream fileWriter = fileWriterFactory.createNFLTeamSettingsWriter();
-		String teamSettingsFileString = createTeamSettingsFileString(league);
-		fileWriter.write(teamSettingsFileString.getBytes());
-		fileWriter.close();
+		boolean success = true;
+		
+		FileOutputStream fileWriter = null;
+		
+		try {
+			fileWriter = fileWriterFactory.createNFLTeamSettingsWriter();
+			String teamSettingsFileString = createTeamSettingsFileString(league);
+			fileWriter.write(teamSettingsFileString.getBytes());
+		} catch (IOException e) {
+			success = false;
+		} finally {
+			fileWriter.close();
+		}
+		
+		return success;
 	}
 
 	public void setTeamSettingsFromTeamLine(Team team, String teamLine) {
@@ -144,14 +154,18 @@ public class NFLTeamSettings {
 		
 		StringBuilder nflTeamSettingsBuilder = new StringBuilder();
 		
-		String line = fileReader.readLine();
-		while (line != null) {
-			nflTeamSettingsBuilder.append(line);
-			nflTeamSettingsBuilder.append("\n");
+		String line;
+		try {
 			line = fileReader.readLine();
+			while (line != null) {
+				nflTeamSettingsBuilder.append(line);
+				nflTeamSettingsBuilder.append("\n");
+				line = fileReader.readLine();
+			}
+		} finally {
+			fileReader.close();
 		}
 		
-		fileReader.close();
 		
 		return nflTeamSettingsBuilder.toString();
 	}
