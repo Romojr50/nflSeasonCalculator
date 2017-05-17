@@ -14,6 +14,13 @@ public class LeagueTest {
 
 	String tenthTeamName = NFLTeamEnum.values()[9].getTeamName();
 	
+	int tenthTeamDefaultPowerRanking = NFLTeamEnum.values()[9].getDefaultPowerRanking();
+	
+	int tenthTeamDefaultEloRating = NFLTeamEnum.values()[9].getDefaultEloRating();
+	
+	int tenthTeamDefaultHomeFieldAdvantage = 
+			NFLTeamEnum.values()[9].getDefaultHomeFieldAdvantage();
+	
 	@Test
 	public void leagueIsInitializedWithNFLConferencesDivisionsAndTeams() {
 		League nfl = new League(League.NFL);
@@ -45,6 +52,18 @@ public class LeagueTest {
 		
 		Team tenthTeam = nfl.getTeam(10);
 		assertEquals(tenthTeamName, tenthTeam.getName());
+	}
+	
+	@Test
+	public void getTeamInLeagueReturnsTeamWithName() {
+		League nfl = new League(League.NFL);
+		nfl.initializeNFL();
+		
+		Team tenthTeam = nfl.getTeam(tenthTeamName);
+		
+		assertEquals(tenthTeamDefaultPowerRanking, tenthTeam.getDefaultPowerRanking());
+		assertEquals(tenthTeamDefaultEloRating, tenthTeam.getDefaultEloRating());
+		assertEquals(tenthTeamDefaultHomeFieldAdvantage, tenthTeam.getDefaultHomeFieldAdvantage());
 	}
 	
 	@Test

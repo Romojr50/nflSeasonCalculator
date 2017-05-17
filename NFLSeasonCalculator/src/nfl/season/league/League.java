@@ -87,6 +87,21 @@ public class League {
 		
 		return returnTeam;
 	}
+	
+	public Team getTeam(String teamName) {
+		Team returnTeam = null;
+		
+		if (teamName != null) {
+			for (Team team : allTeams) {
+				if (teamName.equalsIgnoreCase(team.getName())) {
+					returnTeam = team;
+					break;
+				}
+			}
+		}
+		
+		return returnTeam;
+	}
 
 	public List<Team> getTeams() {
 		List<Team> returnTeams = new ArrayList<Team>();

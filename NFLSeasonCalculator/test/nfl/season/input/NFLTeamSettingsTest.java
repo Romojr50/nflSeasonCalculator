@@ -1,10 +1,14 @@
 package nfl.season.input;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -70,6 +74,8 @@ public class NFLTeamSettingsTest {
 	
 	private String cardinalsName = "Cardinals";
 	
+	private String teamSettingsFileString = COLTS_SECTION + EAGLES_SECTION;
+	
 	@Mock
 	private Matchup coltsEaglesMatchup;
 	
@@ -105,6 +111,12 @@ public class NFLTeamSettingsTest {
 	
 	private NFLTeamSettings nflTeamSettings;
 	
+	@Mock
+	private BufferedReader fileReader;
+	
+	@Mock
+	private NFLTeamSettingsFileReaderFactory fileReaderFactory;
+	
 	@Before
 	public void setUp() throws FileNotFoundException {
 		nflTeamSettings = new NFLTeamSettings();
@@ -124,8 +136,11 @@ public class NFLTeamSettingsTest {
 		leagueTeamList.add(colts);
 		leagueTeamList.add(eagles);
 		when(league.getTeams()).thenReturn(leagueTeamList);
+		when(league.getTeam(COLTS_NAME)).thenReturn(colts);
+		when(league.getTeam(EAGLES_NAME)).thenReturn(eagles);
 		
 		when(fileWriterFactory.createNFLTeamSettingsWriter()).thenReturn(fileWriter);
+		when(fileReaderFactory.createNFLTeamSettingsReader()).thenReturn(fileReader);
 	}
 
 	private void setUpTeamWithSettings(Team team, int powerRanking, int eloRating, 
@@ -152,18 +167,28 @@ public class NFLTeamSettingsTest {
 	private void setUpMatchups() {
 		setUpMatchupWithSettings(coltsEaglesMatchup, COLTS_NAME, EAGLES_NAME, 56, 
 				63, 51, WinChanceModeEnum.POWER_RANKINGS);
+		when(colts.getMatchup(EAGLES_NAME)).thenReturn(coltsEaglesMatchup);
 		setUpMatchupWithSettings(coltsTexansMatchup, COLTS_NAME, texansName, 62, 
 				70, 49, WinChanceModeEnum.ELO_RATINGS);
+		when(colts.getMatchup(texansName)).thenReturn(coltsTexansMatchup);
 		setUpMatchupWithSettings(coltsCardinalsMatchup, COLTS_NAME, cardinalsName, 
 				49, 52, 37, WinChanceModeEnum.CUSTOM_SETTING);
+		when(colts.getMatchup(cardinalsName)).thenReturn(coltsCardinalsMatchup);
 		
 		setUpMatchupWithSettings(eaglesColtsMatchup, EAGLES_NAME, COLTS_NAME, 44, 
 				49, 37, WinChanceModeEnum.POWER_RANKINGS);
+		when(eagles.getMatchup(COLTS_NAME)).thenReturn(eaglesColtsMatchup);
 		setUpMatchupWithSettings(eaglesTexansMatchup, EAGLES_NAME, texansName, 59, 
 				89, 43, WinChanceModeEnum.ELO_RATINGS);
+		when(eagles.getMatchup(texansName)).thenReturn(eaglesTexansMatchup);
 		setUpMatchupWithSettings(eaglesCardinalsMatchup, EAGLES_NAME, cardinalsName, 
 				1, 5, 3, WinChanceModeEnum.CUSTOM_SETTING);
+		when(eagles.getMatchup(cardinalsName)).thenReturn(eaglesCardinalsMatchup);
 		
+		setUpMatchupLists();
+	}
+
+	private void setUpMatchupLists() {
 		coltsMatchups = new ArrayList<Matchup>();
 		coltsMatchups.add(coltsEaglesMatchup);
 		coltsMatchups.add(coltsTexansMatchup);
@@ -228,25 +253,128 @@ public class NFLTeamSettingsTest {
 	
 	@Test
 	public void createTeamSettingsFileStringCombinesSectionsForEveryTeam() {
-		String expectedTeamSettingsFileString = COLTS_SECTION + EAGLES_SECTION;
+		String returnedTeamSettingsFileString = 
+				nflTeamSettings.createTeamSettingsFileString(league);
 		
-		String teamSettingsFileString = nflTeamSettings.createTeamSettingsFileString(league);
-		
-		assertEquals(expectedTeamSettingsFileString, teamSettingsFileString);
+		assertEquals(teamSettingsFileString, returnedTeamSettingsFileString);
 	}
 	
 	@Test
-	public void saveToSettingsFileWritesAllSettingsToFile() {
+	public void saveToSettingsFileWritesAllSettingsToFile() throws IOException {
 		String teamSettingsFileString = nflTeamSettings.createTeamSettingsFileString(league);
 		
+		boolean success = nflTeamSettings.saveToSettingsFile(league, fileWriterFactory);
+		verify(fileWriterFactory).createNFLTeamSettingsWriter();
+		verify(fileWriter).write(teamSettingsFileString.getBytes());
+		verify(fileWriter).close();
+			
+		assertTrue(success);
+	}
+	
+	@Test
+	public void saveToSettingsFileFailsButFileWriterIsStillClosed() throws IOException {
+		boolean success = true;
+		
+		doThrow(new IOException()).when(fileWriter).write(any(byte[].class));
+			
+		success = nflTeamSettings.saveToSettingsFile(league, fileWriterFactory);
+		verify(fileWriter).close();
+		assertFalse(success);
+	}
+	
+	@Test
+	public void setTeamSettingsFromTeamLineParsesTeamLineToSetTeamSettings() {
+		nflTeamSettings.setTeamSettingsFromTeamLine(colts, COLTS_LINE);
+		
+		verify(colts).setPowerRanking(12);
+		verify(colts).setEloRating(1542);
+		verify(colts).setHomeFieldAdvantage(9);
+	}
+	
+	@Test
+	public void setMatchupSettingsFromMatchupLineParsesMatchupLineToSetMatchupSettings() {
+		nflTeamSettings.setMatchupSettingsFromMatchupLine(colts, COLTS_EAGLES_LINE);
+		verify(coltsEaglesMatchup).calculateTeamWinChancesFromPowerRankings();
+		verify(coltsEaglesMatchup).setTeamHomeWinChance(COLTS_NAME, 63);
+		verify(coltsEaglesMatchup).calculateHomeWinChanceFromHomeFieldAdvantage(EAGLES_NAME);
+		
+		nflTeamSettings.setMatchupSettingsFromMatchupLine(colts, COLTS_TEXANS_LINE);
+		verify(coltsTexansMatchup).calculateTeamWinChancesFromEloRatings();
+		verify(coltsTexansMatchup).setTeamHomeWinChance(COLTS_NAME, 70);
+		verify(coltsTexansMatchup).calculateHomeWinChanceFromHomeFieldAdvantage(texansName);
+		
+		nflTeamSettings.setMatchupSettingsFromMatchupLine(colts, COLTS_CARDINALS_LINE);
+		verify(coltsCardinalsMatchup).setTeamNeutralWinChance(COLTS_NAME, 49);
+		verify(coltsCardinalsMatchup).setTeamHomeWinChance(COLTS_NAME, 52);
+		verify(coltsCardinalsMatchup).calculateHomeWinChanceFromHomeFieldAdvantage(cardinalsName);
+	}
+	
+	@Test
+	public void setAllTeamSettingsFromTeamSectionParsesTeamSectionToSetAllTeamSettings() {
+		nflTeamSettings.setAllTeamSettingsFromTeamSection(league, COLTS_SECTION);
+		
+		verifyColtsSettingsAreSet();
+	}
+
+	@Test
+	public void setTeamsSettingsFromTeamSettingsFileStringSetsTeamsSettingsFromParsedString() {
+		nflTeamSettings.setTeamsSettingsFromTeamSettingsFileString(league, 
+				teamSettingsFileString);
+		
+		verifyColtsSettingsAreSet();
+		
+		verify(eagles).setPowerRanking(9);
+		verify(eagles).setEloRating(1436);
+		verify(eagles).setHomeFieldAdvantage(12);
+		verify(eaglesColtsMatchup).calculateTeamWinChancesFromPowerRankings();
+		verify(eaglesTexansMatchup).setTeamHomeWinChance(EAGLES_NAME, 89);
+		verify(eaglesCardinalsMatchup).calculateHomeWinChanceFromHomeFieldAdvantage(cardinalsName);
+	}
+	
+	@Test
+	public void loadSettingsFileReadsFromSettingsFile() {
+		String[] loadedTeamSettingsFileLines = new String[3];
+		loadedTeamSettingsFileLines[0] = "This is the first line";
+		loadedTeamSettingsFileLines[1] = "Another line!";
+		loadedTeamSettingsFileLines[2] = "The final line...";
+		
+		String expectedTeamSettingsFileString = loadedTeamSettingsFileLines[0] + 
+				"\n" + loadedTeamSettingsFileLines[1] + "\n" + 
+				loadedTeamSettingsFileLines[2] + "\n";
+		
 		try {
-			nflTeamSettings.saveToSettingsFile(league, fileWriterFactory);
-			verify(fileWriterFactory).createNFLTeamSettingsWriter();
-			verify(fileWriter).write(teamSettingsFileString.getBytes());
-			verify(fileWriter).close();
+			when(fileReader.readLine()).thenReturn(loadedTeamSettingsFileLines[0], 
+					loadedTeamSettingsFileLines[1], loadedTeamSettingsFileLines[2], null);
+			String returnedTeamSettingsFileString = nflTeamSettings.loadSettingsFile(
+					fileReaderFactory);
+			
+			verify(fileReaderFactory).createNFLTeamSettingsReader();
+			verify(fileReader).close();
+			assertEquals(returnedTeamSettingsFileString, expectedTeamSettingsFileString);
 		} catch (IOException e) {
 			assertTrue(e.getMessage(), false);
 		}
+	}
+	
+	@Test
+	public void loadSettingsFileFailsButFileReaderIsStillClosed() throws IOException {
+		try {
+			when(fileReader.readLine()).thenThrow(new IOException());
+			
+			nflTeamSettings.loadSettingsFile(fileReaderFactory);
+			
+		} catch (IOException e) {
+			verify(fileReader).close();
+		}
+	}
+	
+	private void verifyColtsSettingsAreSet() {
+		verify(colts).setPowerRanking(12);
+		verify(colts).setEloRating(1542);
+		verify(colts).setHomeFieldAdvantage(9);
+		verify(coltsEaglesMatchup).calculateTeamWinChancesFromPowerRankings();
+		verify(coltsTexansMatchup).setTeamHomeWinChance(COLTS_NAME, 70);
+		verify(coltsCardinalsMatchup).calculateHomeWinChanceFromHomeFieldAdvantage(cardinalsName);
 	}
 	
 }
