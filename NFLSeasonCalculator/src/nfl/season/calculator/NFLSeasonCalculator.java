@@ -1,15 +1,17 @@
 package nfl.season.calculator;
 
+import java.io.IOException;
+
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.input.NFLTeamSettings;
 import nfl.season.input.NFLTeamSettingsFileReaderFactory;
 import nfl.season.input.NFLTeamSettingsFileWriterFactory;
 import nfl.season.league.League;
 import nfl.season.menu.MainMenu;
+import nfl.season.menu.MainMenu.MainMenuOptions;
 import nfl.season.menu.MatchupMenu;
 import nfl.season.menu.SingleTeamMenu;
 import nfl.season.menu.TeamsMenu;
-import nfl.season.menu.MainMenu.MainMenuOptions;
 import nfl.season.menu.TeamsMenu.TeamsMenuOptions;
 
 public class NFLSeasonCalculator {
@@ -20,6 +22,8 @@ public class NFLSeasonCalculator {
 		nfl.initializeNFL();
 		
 		MainMenu mainMenu = createMainMenu(input, nfl);
+		
+		loadTeamSettings(nfl);
 		
 		mainMenu.launchMainMenu();
 	}
@@ -46,7 +50,24 @@ public class NFLSeasonCalculator {
 		singleTeamMenu.setSubMenu(matchupMenu, 1);
 		
 		teamsMenu.setSubMenu(singleTeamMenu, TeamsMenuOptions.SELECT_TEAM.getOptionNumber());
+		
 		return teamsMenu;
+	}
+	
+	public static void loadTeamSettings(League nfl) {
+		NFLTeamSettings nflTeamSettings = new NFLTeamSettings();
+		NFLTeamSettingsFileReaderFactory teamSettingsFileReaderFactory = 
+				new NFLTeamSettingsFileReaderFactory();
+		
+		try {
+			String loadSettingsFileString = nflTeamSettings.loadSettingsFile(
+					teamSettingsFileReaderFactory);
+			if (loadSettingsFileString != null && !"".equals(loadSettingsFileString)) {
+				nflTeamSettings.setTeamsSettingsFromTeamSettingsFileString(nfl, 
+						loadSettingsFileString);
+			}
+		} catch (IOException e) {
+		}
 	}
 	
 }

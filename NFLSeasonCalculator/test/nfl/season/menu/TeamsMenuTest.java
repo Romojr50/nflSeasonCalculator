@@ -87,7 +87,7 @@ public class TeamsMenuTest {
 	@Mock
 	private NFLTeamSettingsFileReaderFactory fileReaderFactory;
 	
-	private String loadedSettingsFileString;
+	private String loadedSettingsFileString = "Load Settings File";
 	
 	private String expectedMenuMessage;
 	
@@ -319,13 +319,40 @@ public class TeamsMenuTest {
 	public void loadTeamSettingsPullsInSavedSettings() throws IOException {
 		when(input.askForInt(anyString())).thenReturn(LOAD_SAVED_SETTINGS, 
 				EXIT_FROM_TEAMS_MENU);
-		when(nflTeamSettings.loadSettingsFile(fileReaderFactory)).thenReturn(loadedSettingsFileString);
+		when(nflTeamSettings.loadSettingsFile(fileReaderFactory)).thenReturn(
+				loadedSettingsFileString);
 		
 		teamsMenu.launchSubMenu();
 		
 		verify(nflTeamSettings).loadSettingsFile(fileReaderFactory);
 		verify(nflTeamSettings).setTeamsSettingsFromTeamSettingsFileString(nfl, 
 				loadedSettingsFileString);
+		
+		String expectedMessageWithSuccessfulLoad = "Team Settings Loaded Successfully\n" +
+				expectedMenuMessage;
+		verify(input, times(1)).askForInt(expectedMessageWithSuccessfulLoad);
+	}
+	
+	@Test
+	public void loadTeamSettingsFailsWithExceptionSoFailMessageIsDisplayed() throws IOException {
+		when(input.askForInt(anyString())).thenReturn(LOAD_SAVED_SETTINGS, 
+				EXIT_FROM_TEAMS_MENU);
+		when(nflTeamSettings.loadSettingsFile(fileReaderFactory)).thenThrow(new IOException());
+		
+		teamsMenu.launchSubMenu();
+		
+		verifyLoadSettingsFailureOccurs();
+	}
+	
+	@Test
+	public void loadTeamSettingsFailsWithEmptyResponseSoFailMessageIsDisplayed() throws IOException {
+		when(input.askForInt(anyString())).thenReturn(LOAD_SAVED_SETTINGS, 
+				EXIT_FROM_TEAMS_MENU);
+		when(nflTeamSettings.loadSettingsFile(fileReaderFactory)).thenReturn("");
+		
+		teamsMenu.launchSubMenu();
+		
+		verifyLoadSettingsFailureOccurs();
 	}
 
 	private String buildTeamListMessage() {
@@ -383,6 +410,14 @@ public class TeamsMenuTest {
 		verify(input, times(1)).askForInt(expectedMessageWithSuccessfulSave);
 		
 		verify(nflTeamSettings).saveToSettingsFile(nfl, fileWriterFactory);
+	}
+
+	private void verifyLoadSettingsFailureOccurs() throws IOException {
+		String expectedMessageWithFailedLoad = "Team Settings Load FAILED\n" +
+				expectedMenuMessage;
+		verify(input, times(1)).askForInt(expectedMessageWithFailedLoad);
+		
+		verify(nflTeamSettings).loadSettingsFile(fileReaderFactory);
 	}
 	
 }

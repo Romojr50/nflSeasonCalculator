@@ -12,12 +12,16 @@ import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
 
 public class TeamsMenu extends SubMenu {
-	
+
 	private static final int EXIT_FROM_TEAM_SELECT = NFLTeamEnum.values().length + 1;
 	
 	private static final String SAVE_FILE_SUCCEEDED = "Team Settings Saved Successfully\n";
 
 	private static final String SAVE_FILE_FAILED = "Team Settings Save FAILED\n";
+	
+	private static final String LOAD_FILE_SUCCEEDED = "Team Settings Loaded Successfully\n";
+	
+	private static final String LOAD_FILE_FAILED = "Team Settings Load FAILED\n";
 
 	public enum TeamsMenuOptions implements MenuOptions {
 		SELECT_TEAM(1, "Select Team"), 
@@ -72,13 +76,13 @@ public class TeamsMenu extends SubMenu {
 	@Override
 	public void launchSubMenu() {
 		String teamsMenuMessage = MenuOptionsUtil.createMenuMessage(TeamsMenuOptions.class);
-		String saveFilePrefix = "";
+		String saveLoadFilePrefix = "";
 		
 		int selectedOption = -1;
 		while (selectedOption != TeamsMenuOptions.EXIT.optionNumber) {
-			teamsMenuMessage = saveFilePrefix + teamsMenuMessage;
+			teamsMenuMessage = saveLoadFilePrefix + teamsMenuMessage;
 			selectedOption = input.askForInt(teamsMenuMessage);
-			saveFilePrefix = "";
+			saveLoadFilePrefix = "";
 				
 			if (TeamsMenuOptions.SELECT_TEAM.optionNumber == selectedOption) {
 				launchTeamSelect();
@@ -86,13 +90,7 @@ public class TeamsMenu extends SubMenu {
 				launchSetAllRankings();
 			} else if (TeamsMenuOptions.LOAD_SAVED_TEAM_SETTINGS.optionNumber == 
 					selectedOption) {
-				String nflTeamSettingsFileString = null;
-				try {
-					nflTeamSettingsFileString = nflTeamSettings.loadSettingsFile(fileReaderFactory);
-				} catch (IOException e) {
-				}
-				nflTeamSettings.setTeamsSettingsFromTeamSettingsFileString(nfl, 
-						nflTeamSettingsFileString);
+				saveLoadFilePrefix = loadSettingsFile();
 			} else if (TeamsMenuOptions.RESET_TO_DEFAULTS.optionNumber == selectedOption) {
 				List<Team> allTeams = nfl.getTeams();
 				for (Team team : allTeams) {
@@ -100,7 +98,7 @@ public class TeamsMenu extends SubMenu {
 				}
 			} else if (TeamsMenuOptions.SAVE_CURRENT_TEAM_SETTINGS.optionNumber == 
 					selectedOption) {
-				saveFilePrefix = saveToSettingsFile();
+				saveLoadFilePrefix = saveToSettingsFile();
 			}
 		}
 	}
@@ -184,6 +182,25 @@ public class TeamsMenu extends SubMenu {
 			saveFilePrefix = SAVE_FILE_FAILED;
 		}
 		return saveFilePrefix;
+	}
+
+	private String loadSettingsFile() {
+		String saveLoadFilePrefix;
+		String nflTeamSettingsFileString = null;
+		try {
+			nflTeamSettingsFileString = nflTeamSettings.loadSettingsFile(fileReaderFactory);
+			
+			if (nflTeamSettingsFileString != null && !"".equals(nflTeamSettingsFileString)) {
+				nflTeamSettings.setTeamsSettingsFromTeamSettingsFileString(nfl, 
+						nflTeamSettingsFileString);
+				saveLoadFilePrefix = LOAD_FILE_SUCCEEDED;
+			} else {
+				saveLoadFilePrefix = LOAD_FILE_FAILED;
+			}
+		} catch (IOException e) {
+			saveLoadFilePrefix = LOAD_FILE_FAILED;
+		}
+		return saveLoadFilePrefix;
 	}
 
 	private String createTeamListMessage() {
