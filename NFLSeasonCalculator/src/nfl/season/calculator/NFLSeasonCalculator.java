@@ -14,6 +14,7 @@ import nfl.season.menu.PlayoffsMenu;
 import nfl.season.menu.SingleTeamMenu;
 import nfl.season.menu.TeamsMenu;
 import nfl.season.menu.TeamsMenu.TeamsMenuOptions;
+import nfl.season.playoffs.NFLPlayoffs;
 
 public class NFLSeasonCalculator {
 
@@ -61,7 +62,8 @@ public class NFLSeasonCalculator {
 	
 	public static PlayoffsMenu createPlayoffsMenu(NFLSeasonInput input,
 			League nfl) {
-		PlayoffsMenu playoffsMenu = new PlayoffsMenu();
+		NFLPlayoffs playoffs = new NFLPlayoffs(nfl);
+		PlayoffsMenu playoffsMenu = new PlayoffsMenu(input, playoffs);
 		
 		return playoffsMenu;
 	}
