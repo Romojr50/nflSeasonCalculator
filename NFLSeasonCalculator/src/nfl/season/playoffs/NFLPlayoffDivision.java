@@ -23,5 +23,5 @@ public class NFLPlayoffDivision {
 	public void setDivisionWinner(NFLPlayoffTeam divisionWinner) {
 		this.divisionWinner = divisionWinner;
 	}
-	
+
 }

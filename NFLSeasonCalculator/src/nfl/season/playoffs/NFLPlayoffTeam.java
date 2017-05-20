@@ -11,6 +11,10 @@ public class NFLPlayoffTeam {
 	public NFLPlayoffTeam(Team team) {
 		this.team = team;
 	}
+	
+	public Object getTeam() {
+		return team;
+	}
 
 	public int getConferenceSeed() {
 		return conferenceSeed;

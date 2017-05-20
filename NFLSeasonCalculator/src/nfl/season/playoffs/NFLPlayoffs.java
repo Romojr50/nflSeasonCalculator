@@ -6,6 +6,7 @@ import java.util.List;
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
 import nfl.season.league.League;
+import nfl.season.league.Team;
 
 public class NFLPlayoffs {
 
@@ -144,6 +145,11 @@ public class NFLPlayoffs {
 		}
 		
 		return returnConference;
+	}
+
+	public NFLPlayoffTeam createPlayoffTeam(Team leagueTeam) {
+		NFLPlayoffTeam playoffTeam = new NFLPlayoffTeam(leagueTeam);
+		return playoffTeam;
 	}
 	
 }
