@@ -8,6 +8,8 @@ import nfl.season.league.Division;
 
 public class NFLPlayoffConference {
 
+	public static final int CLEAR_SEED = -1;
+
 	private Conference conference;
 	
 	private List<NFLPlayoffDivision> divisions;
@@ -46,7 +48,7 @@ public class NFLPlayoffConference {
 	}
 
 	public int getOpenDivisionWinnerSeed() {
-		int openSeed = -1;
+		int openSeed = CLEAR_SEED;
 		for (int i = 1; i <= 4; i++) {
 			NFLPlayoffTeam teamWithSeed = getTeamWithSeed(i);
 			if (teamWithSeed == null) {
@@ -54,6 +56,20 @@ public class NFLPlayoffConference {
 				break;
 			}
 		}
+		return openSeed;
+	}
+	
+	public int getOpenWildcardSeed() {
+		int openSeed = CLEAR_SEED;
+		
+		for (int i = 5; i <= 6; i++) {
+			NFLPlayoffTeam teamWithSeed = getTeamWithSeed(i);
+			if (teamWithSeed == null) {
+				openSeed = i;
+				break;
+			}
+		}
+		
 		return openSeed;
 	}
 
@@ -68,9 +84,17 @@ public class NFLPlayoffConference {
 		
 		return returnTeam;
 	}
+	
+	public List<NFLPlayoffTeam> getTeams() {
+		return teams;
+	}
 
 	public void addTeam(NFLPlayoffTeam playoffTeam) {
 		teams.add(playoffTeam);
+	}
+	
+	public void removeTeam(NFLPlayoffTeam playoffTeam) {
+		teams.remove(playoffTeam);
 	}
 
 	public NFLPlayoffDivision getDivision(String divisionName) {

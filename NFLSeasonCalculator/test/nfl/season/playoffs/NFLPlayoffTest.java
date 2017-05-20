@@ -1,8 +1,11 @@
 package nfl.season.playoffs;
 
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.anyInt;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -63,6 +66,9 @@ public class NFLPlayoffTest {
 	
 	@Mock
 	private NFLPlayoffTeam playoffTeam2;
+	
+	@Mock
+	private NFLPlayoffTeam playoffTeam3;
 	
 	private List<Division> conference2Divisions;
 	
@@ -140,17 +146,91 @@ public class NFLPlayoffTest {
 	
 	@Test
 	public void setDivisionWinnerOverDivisionThatAlreadyHadWinnerSoWinnerIsOverwritten() {
+		when(playoffTeam1.getConferenceSeed()).thenReturn(1);
+		when(playoffTeam2.getConferenceSeed()).thenReturn(1);
 		
+		playoffs.initializeNFLPlayoffs();
+		playoffs.setDivisionWinner(conference1.getName(), division1_2.getName(), playoffTeam1);
+		playoffs.setDivisionWinner(conference1.getName(), division1_2.getName(), playoffTeam2);
+		
+		verify(playoffTeam2).setConferenceSeed(1);
+		assertEquals(playoffTeam2, playoffs.getDivisionWinner(conference1.getName(), division1_2.getName()));
+		assertEquals(playoffTeam2, playoffs.getTeamByConferenceSeed(conference1.getName(), 1));
 	}
 	
 	@Test
 	public void setDivisionWinnerOnMismatchedDivisionAndConferenceSoNoWinnerIsSet() {
+		playoffs.initializeNFLPlayoffs();
+		playoffs.setDivisionWinner(conference1.getName(), division2_2.getName(), playoffTeam1);
 		
+		verify(playoffTeam1, never()).setConferenceSeed(anyInt());
+		assertEquals(null, playoffs.getDivisionWinner(conference1.getName(), division2_2.getName()));
+		assertEquals(null, playoffs.getTeamByConferenceSeed(conference1.getName(), 1));
+		assertEquals(null, playoffs.getTeamByConferenceSeed(conference2.getName(), 1));
 	}
 	
 	@Test
 	public void setConferenceSeedWithAnotherTeamAlreadyHavingSeedSoSeedsAreSwitched() {
+		when(playoffTeam1.getConferenceSeed()).thenReturn(1);
+		when(playoffTeam2.getConferenceSeed()).thenReturn(2);
 		
+		playoffs.initializeNFLPlayoffs();
+		
+		playoffs.setDivisionWinner(conference1.getName(), division1_2.getName(), playoffTeam1);
+		playoffs.setDivisionWinner(conference1.getName(), division1_1.getName(), playoffTeam2);
+		playoffs.setTeamConferenceSeed(playoffTeam2, 1);
+		
+		verify(playoffTeam1).setConferenceSeed(2);
+		verify(playoffTeam2).setConferenceSeed(1);
+		when(playoffTeam1.getConferenceSeed()).thenReturn(2);
+		when(playoffTeam2.getConferenceSeed()).thenReturn(1);
+		
+		assertEquals(playoffTeam1, playoffs.getDivisionWinner(conference1.getName(), division1_2.getName()));
+		assertEquals(playoffTeam2, playoffs.getDivisionWinner(conference1.getName(), division1_1.getName()));
+		assertEquals(playoffTeam1, playoffs.getTeamByConferenceSeed(conference1.getName(), 2));
+		assertEquals(playoffTeam2, playoffs.getTeamByConferenceSeed(conference1.getName(), 1));
+	}
+	
+	@Test
+	public void setConferenceSeedOnTeamThatDoesNotAlreadyHaveSeedSoSeedIsNotSet() {
+		when(playoffTeam1.getConferenceSeed()).thenReturn(1);
+		
+		playoffs.initializeNFLPlayoffs();
+		
+		playoffs.setDivisionWinner(conference1.getName(), division1_2.getName(), playoffTeam1);
+		playoffs.setTeamConferenceSeed(playoffTeam2, 1);
+		
+		verify(playoffTeam1, never()).setConferenceSeed(NFLPlayoffConference.CLEAR_SEED);
+		verify(playoffTeam2, never()).setConferenceSeed(anyInt());
+		
+		assertEquals(playoffTeam1, playoffs.getTeamByConferenceSeed(conference1.getName(), 1));
+	}
+	
+	@Test
+	public void addWildcardTeamToConferenceAddsWildcardTeamsToConferenceUpToTwo() {
+		when(playoffTeam1.getConferenceSeed()).thenReturn(5);
+		when(playoffTeam2.getConferenceSeed()).thenReturn(6);
+		when(playoffTeam3.getConferenceSeed()).thenReturn(NFLPlayoffConference.CLEAR_SEED);
+		
+		playoffs.initializeNFLPlayoffs();
+		
+		playoffs.addWildcardTeam(conference1.getName(), playoffTeam1);
+		playoffs.addWildcardTeam(conference1.getName(), playoffTeam2);
+		playoffs.addWildcardTeam(conference1.getName(), playoffTeam3);
+		
+		verify(playoffTeam1).setConferenceSeed(5);
+		verify(playoffTeam2).setConferenceSeed(6);
+		verify(playoffTeam3).setConferenceSeed(6);
+		when(playoffTeam3.getConferenceSeed()).thenReturn(6);
+		
+		assertEquals(playoffTeam1, playoffs.getTeamByConferenceSeed(conference1.getName(), 5));
+		assertEquals(playoffTeam3, playoffs.getTeamByConferenceSeed(conference1.getName(), 6));
+		
+		NFLPlayoffConference playoffConference = playoffs.getConference(conference1.getName());
+		List<NFLPlayoffTeam> playoffTeams = playoffConference.getTeams();
+		assertTrue(playoffTeams.contains(playoffTeam1));
+		assertTrue(playoffTeams.contains(playoffTeam3));
+		assertFalse(playoffTeams.contains(playoffTeam2));
 	}
 	
 }

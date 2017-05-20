@@ -47,15 +47,18 @@ public class NFLPlayoffs {
 		if (playoffConference != null) {
 			NFLPlayoffDivision playoffDivision = playoffConference.getDivision(divisionName);
 			
-			NFLPlayoffTeam oldWinner = playoffConference.getDivisionWinner(divisionName);
-			if (oldWinner == null) {
-				int openSeed = playoffConference.getOpenDivisionWinnerSeed();
-				divisionWinner.setConferenceSeed(openSeed);
-			} else {
-				divisionWinner.setConferenceSeed(oldWinner.getConferenceSeed());
+			if (playoffDivision != null) {
+				NFLPlayoffTeam oldWinner = playoffConference.getDivisionWinner(divisionName);
+				if (oldWinner == null) {
+					int openSeed = playoffConference.getOpenDivisionWinnerSeed();
+					divisionWinner.setConferenceSeed(openSeed);
+				} else {
+					divisionWinner.setConferenceSeed(oldWinner.getConferenceSeed());
+					playoffConference.removeTeam(oldWinner);
+				}
+				playoffConference.addTeam(divisionWinner);
+				playoffDivision.setDivisionWinner(divisionWinner);
 			}
-			playoffConference.addTeam(divisionWinner);
-			playoffDivision.setDivisionWinner(divisionWinner);
 		}
 	}
 
@@ -69,6 +72,26 @@ public class NFLPlayoffs {
 		
 		return divisionWinner;
 	}
+	
+	public void addWildcardTeam(String conferenceName, NFLPlayoffTeam playoffTeam) {
+		NFLPlayoffConference playoffConference = getConference(conferenceName);
+		
+		if (playoffConference != null) {
+			int openWildcardSeed = playoffConference.getOpenWildcardSeed();
+			
+			if (openWildcardSeed == NFLPlayoffConference.CLEAR_SEED) {
+				NFLPlayoffTeam sixSeed = playoffConference.getTeamWithSeed(6);
+				int oldSeed = playoffTeam.getConferenceSeed();
+				sixSeed.setConferenceSeed(oldSeed);
+				playoffConference.removeTeam(sixSeed);
+				playoffTeam.setConferenceSeed(6);
+				playoffConference.addTeam(playoffTeam);
+			} else {
+				playoffTeam.setConferenceSeed(openWildcardSeed);
+				playoffConference.addTeam(playoffTeam);
+			}
+		}
+	}
 
 	public NFLPlayoffTeam getTeamByConferenceSeed(String conferenceName, int conferenceSeed) {
 		NFLPlayoffTeam returnTeam = null;
@@ -81,6 +104,19 @@ public class NFLPlayoffs {
 		return returnTeam;
 	}
 	
+	public void setTeamConferenceSeed(NFLPlayoffTeam playoffTeam, int conferenceSeed) {
+		NFLPlayoffConference playoffConference = getConference(playoffTeam);
+		
+		if (playoffConference != null) {
+			int oldConferenceSeed = playoffTeam.getConferenceSeed();
+			playoffTeam.setConferenceSeed(conferenceSeed);
+			
+			NFLPlayoffTeam teamThatUsedToHaveSeed = 
+					playoffConference.getTeamWithSeed(conferenceSeed);
+			teamThatUsedToHaveSeed.setConferenceSeed(oldConferenceSeed);
+		}
+	}
+	
 	public NFLPlayoffConference getConference(String conferenceName) {
 		NFLPlayoffConference returnConference = null;
 		
@@ -88,6 +124,20 @@ public class NFLPlayoffs {
 			Conference leagueConference = playoffConference.getConference();
 			String leagueConferenceName = leagueConference.getName();
 			if (leagueConferenceName.equalsIgnoreCase(conferenceName)) {
+				returnConference = playoffConference;
+				break;
+			}
+		}
+		
+		return returnConference;
+	}
+	
+	public NFLPlayoffConference getConference(NFLPlayoffTeam playoffTeam) {
+		NFLPlayoffConference returnConference = null;
+		
+		for (NFLPlayoffConference playoffConference : conferences) {
+			List<NFLPlayoffTeam> playoffTeams = playoffConference.getTeams();
+			if (playoffTeams.contains(playoffTeam)) {
 				returnConference = playoffConference;
 				break;
 			}
