@@ -48,6 +48,8 @@ public class PlayoffsMenuTest {
 	
 	private List<NFLPlayoffDivision> conference1Divisions;
 	
+	private List<Team> conference1Teams;
+	
 	@Mock
 	private NFLPlayoffConference playoffConference2;
 	
@@ -55,6 +57,8 @@ public class PlayoffsMenuTest {
 	private Conference leagueConference2;
 	
 	private List<NFLPlayoffDivision> conference2Divisions;
+	
+	private List<Team> conference2Teams;
 	
 	@Mock
 	private NFLPlayoffDivision playoffDivision1_1;
@@ -174,12 +178,27 @@ public class PlayoffsMenuTest {
 		playoffConferences.add(playoffConference2);
 		when(playoffs.getConferences()).thenReturn(playoffConferences);
 		
+		setUpConferences();
+		setUpDivisions();
+		setUpTeams();
+	}
+
+	private void setUpConferences() {
 		conference1Divisions = new ArrayList<NFLPlayoffDivision>();
 		conference1Divisions.add(playoffDivision1_1);
 		conference1Divisions.add(playoffDivision1_2);
 		when(playoffConference1.getDivisions()).thenReturn(conference1Divisions);
 		when(playoffConference1.getConference()).thenReturn(leagueConference1);
 		when(leagueConference1.getName()).thenReturn("Conf 1");
+		
+		conference1Teams = new ArrayList<Team>();
+		conference1Teams.add(leagueTeam1_1_1);
+		conference1Teams.add(leagueTeam1_1_2);
+		conference1Teams.add(leagueTeam1_1_3);
+		conference1Teams.add(leagueTeam1_2_1);
+		conference1Teams.add(leagueTeam1_2_2);
+		conference1Teams.add(leagueTeam1_2_3);
+		when(leagueConference1.getTeams()).thenReturn(conference1Teams);
 		
 		conference2Divisions = new ArrayList<NFLPlayoffDivision>();
 		conference2Divisions.add(playoffDivision2_1);
@@ -188,6 +207,17 @@ public class PlayoffsMenuTest {
 		when(playoffConference2.getConference()).thenReturn(leagueConference2);
 		when(leagueConference2.getName()).thenReturn("Conf 2");
 		
+		conference2Teams = new ArrayList<Team>();
+		conference2Teams.add(leagueTeam2_1_1);
+		conference2Teams.add(leagueTeam2_1_2);
+		conference2Teams.add(leagueTeam2_1_3);
+		conference2Teams.add(leagueTeam2_2_1);
+		conference2Teams.add(leagueTeam2_2_2);
+		conference2Teams.add(leagueTeam2_2_3);
+		when(leagueConference2.getTeams()).thenReturn(conference2Teams);
+	}
+
+	private void setUpDivisions() {
 		division1_1Teams = new ArrayList<Team>();
 		division1_1Teams.add(leagueTeam1_1_1);
 		division1_1Teams.add(leagueTeam1_1_2);
@@ -219,7 +249,9 @@ public class PlayoffsMenuTest {
 		when(leagueDivision2_2.getTeams()).thenReturn(division2_2Teams);
 		when(playoffDivision2_2.getDivision()).thenReturn(leagueDivision2_2);
 		when(leagueDivision2_2.getName()).thenReturn("Div 2 - 2");
-		
+	}
+
+	private void setUpTeams() {
 		when(playoffs.createPlayoffTeam(leagueTeam1_1_1)).thenReturn(playoffTeam1_1_1);
 		when(playoffTeam1_1_1.getTeam()).thenReturn(leagueTeam1_1_1);
 		when(leagueTeam1_1_1.getName()).thenReturn("Team 1 - 1 - 1");
@@ -280,24 +312,23 @@ public class PlayoffsMenuTest {
 	
 	@Test
 	public void selectTeamsForPlayoffsHasUserPutInTeamsForPlayoffs() {
+		List<NFLPlayoffTeam> conference1DivisionWinners = new ArrayList<NFLPlayoffTeam>();
+		conference1DivisionWinners.add(playoffTeam1_1_2);
+		conference1DivisionWinners.add(playoffTeam1_2_3);
+		when(playoffConference1.getDivisionWinners()).thenReturn(conference1DivisionWinners);
+		
+		List<NFLPlayoffTeam> conference2DivisionWinners = new ArrayList<NFLPlayoffTeam>();
+		conference2DivisionWinners.add(playoffTeam2_1_2);
+		conference2DivisionWinners.add(playoffTeam2_2_1);
+		when(playoffConference2.getDivisionWinners()).thenReturn(conference2DivisionWinners);
+		
 		when(input.askForInt(anyString())).thenReturn(SELECT_TEAMS_FOR_PLAYOFFS, 
-				2, 3, 2, 1, 3, 1, 1, 2, BACK_TO_MAIN_MENU);
+				2, 3, 3, 1, 2, 1, 1, 2, BACK_TO_MAIN_MENU);
 		
 		playoffsMenu.launchSubMenu();
 		
 		verify(input, times(2)).askForInt(expectedMenuMessage);
-		verify(input, times(1)).askForInt(getChooseDivisionWinnerMessage(leagueDivision1_1));
-		verify(input, times(1)).askForInt(getChooseDivisionWinnerMessage(leagueDivision1_2));
-		verify(input, times(1)).askForInt(getChooseDivisionWinnerMessage(leagueDivision1_1));
-		verify(input, times(1)).askForInt(getChooseDivisionWinnerMessage(leagueDivision2_2));
-		verify(input, times(1)).askForInt(getChooseWildcardMessage(leagueConference1, 
-				leagueTeam1_1_2.getName(), leagueTeam1_2_3.getName(), ""));
-		verify(input, times(1)).askForInt(getChooseWildcardMessage(leagueConference1, 
-				leagueTeam1_1_2.getName(), leagueTeam1_2_3.getName(), leagueTeam1_1_3.getName()));
-		verify(input, times(1)).askForInt(getChooseWildcardMessage(leagueConference1, 
-				leagueTeam2_1_2.getName(), leagueTeam2_2_1.getName(), ""));
-		verify(input, times(1)).askForInt(getChooseWildcardMessage(leagueConference1, 
-				leagueTeam2_1_2.getName(), leagueTeam2_2_1.getName(), leagueTeam2_1_1.getName()));
+		verifyChooseDivisionWinnersMessages();
 		
 		verify(playoffs).setDivisionWinner(leagueConference1.getName(), leagueDivision1_1.getName(), playoffTeam1_1_2);
 		verify(playoffs).setDivisionWinner(leagueConference1.getName(), leagueDivision1_2.getName(), playoffTeam1_2_3);
@@ -309,11 +340,12 @@ public class PlayoffsMenuTest {
 		verify(playoffs).addWildcardTeam(leagueConference2.getName(), playoffTeam2_2_2);
 	}
 	
-	private String getChooseDivisionWinnerMessage(Division division) {
+	private String getChooseDivisionWinnerMessage(Conference conference, Division division) {
 		StringBuilder divisionWinnerMessageBuilder = new StringBuilder();
-		divisionWinnerMessageBuilder.append(division.getName()); 
+		divisionWinnerMessageBuilder.append(conference.getName() + " " + 
+				division.getName() + " Champion\n"); 
 		divisionWinnerMessageBuilder.append(
-				"\nPlease enter in an integer corresponding to one of the following:\n");
+				"Please enter in an integer corresponding to one of the following:\n");
 		
 		List<Team> divisionTeams = division.getTeams();
 		int teamIndex = 1;
@@ -325,6 +357,25 @@ public class PlayoffsMenuTest {
 		}
 		
 		return divisionWinnerMessageBuilder.toString();
+	}
+	
+	private void verifyChooseDivisionWinnersMessages() {
+		verify(input, times(1)).askForInt(getChooseDivisionWinnerMessage(leagueConference1, 
+				leagueDivision1_1));
+		verify(input, times(1)).askForInt(getChooseDivisionWinnerMessage(leagueConference1, 
+				leagueDivision1_2));
+		verify(input, times(1)).askForInt(getChooseDivisionWinnerMessage(leagueConference2, 
+				leagueDivision2_1));
+		verify(input, times(1)).askForInt(getChooseDivisionWinnerMessage(leagueConference2, 
+				leagueDivision2_2));
+		verify(input, times(1)).askForInt(getChooseWildcardMessage(leagueConference1, 
+				leagueTeam1_1_2.getName(), leagueTeam1_2_3.getName(), ""));
+		verify(input, times(1)).askForInt(getChooseWildcardMessage(leagueConference1, 
+				leagueTeam1_1_2.getName(), leagueTeam1_2_3.getName(), leagueTeam1_1_3.getName()));
+		verify(input, times(1)).askForInt(getChooseWildcardMessage(leagueConference1, 
+				leagueTeam2_1_2.getName(), leagueTeam2_2_1.getName(), ""));
+		verify(input, times(1)).askForInt(getChooseWildcardMessage(leagueConference1, 
+				leagueTeam2_1_2.getName(), leagueTeam2_2_1.getName(), leagueTeam2_1_1.getName()));
 	}
 	
 	private String getChooseWildcardMessage(Conference conference, String divisionWinner1, 

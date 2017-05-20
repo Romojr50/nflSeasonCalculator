@@ -5,6 +5,7 @@ import java.util.List;
 
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
+import nfl.season.league.NFLDivisionEnum;
 
 public class NFLPlayoffConference {
 
@@ -30,6 +31,17 @@ public class NFLPlayoffConference {
 		List<NFLPlayoffDivision> returnDivisions = new ArrayList<NFLPlayoffDivision>();
 		returnDivisions.addAll(divisions);
 		return returnDivisions;
+	}
+	
+	public List<NFLPlayoffTeam> getDivisionWinners() {
+		List<NFLPlayoffTeam> divisionWinners = new ArrayList<NFLPlayoffTeam>();
+		
+		for (NFLPlayoffDivision playoffDivision : divisions) {
+			NFLPlayoffTeam divisionWinner = playoffDivision.getDivisionWinner();
+			divisionWinners.add(divisionWinner);
+		}
+		
+		return divisionWinners;
 	}
 
 	public void addDivision(NFLPlayoffDivision playoffDivision) {

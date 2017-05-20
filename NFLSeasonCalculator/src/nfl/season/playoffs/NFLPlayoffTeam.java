@@ -12,7 +12,7 @@ public class NFLPlayoffTeam {
 		this.team = team;
 	}
 	
-	public Object getTeam() {
+	public Team getTeam() {
 		return team;
 	}
 
