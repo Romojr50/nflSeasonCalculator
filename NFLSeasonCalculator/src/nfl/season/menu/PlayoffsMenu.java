@@ -76,8 +76,7 @@ public class PlayoffsMenu extends SubMenu {
 			
 			List<String> divisionWinnerNames = getDivisionWinnerNames(playoffConference);
 			
-			getWildcardTeams(leagueConference, conferenceName,
-					divisionWinnerNames);
+			getWildcardTeams(leagueConference, divisionWinnerNames);
 		}
 	}
 
@@ -94,7 +93,8 @@ public class PlayoffsMenu extends SubMenu {
 			Team divisionWinner = divisionTeams.get(divisionWinnerIndex - 1);
 			NFLPlayoffTeam playoffDivisionWinner = playoffs.createPlayoffTeam(
 					divisionWinner);
-			playoffDivision.setDivisionWinner(playoffDivisionWinner);
+			playoffs.setDivisionWinner(conferenceName, leagueDivision.getName(), 
+					playoffDivisionWinner);;
 		}
 	}
 	
@@ -110,8 +110,12 @@ public class PlayoffsMenu extends SubMenu {
 	}
 	
 	private void getWildcardTeams(Conference leagueConference,
-			String conferenceName, List<String> divisionWinnerNames) {
-		List<Team> conferenceTeams = leagueConference.getTeams();
+			List<String> divisionWinnerNames) {
+		String conferenceName = leagueConference.getName();
+		
+		List<Team> conferenceTeams = removeDivisionWinnersFromConferenceList(
+				leagueConference, divisionWinnerNames);
+		
 		for (int i = 0; i < NUMBER_OF_WILDCARDS_IN_CONFERENCE; i++) {
 			StringBuilder chooseWildcardBuilder = new StringBuilder();
 			chooseWildcardBuilder.append(conferenceName + " Wildcard\n");
@@ -120,13 +124,15 @@ public class PlayoffsMenu extends SubMenu {
 			int teamIndex = 1;
 			for (Team conferenceTeam : conferenceTeams) {
 				String conferenceTeamName = conferenceTeam.getName();
-				if (!divisionWinnerNames.contains(conferenceTeamName)) {
-					chooseWildcardBuilder.append(teamIndex + ". " + 
-							conferenceTeamName + "\n");
-					teamIndex++;
-				}
+				chooseWildcardBuilder.append(teamIndex + ". " + 
+						conferenceTeamName + "\n");
+				teamIndex++;
 			}
-			input.askForInt(chooseWildcardBuilder.toString());
+			int newWildcardIndex = input.askForInt(chooseWildcardBuilder.toString());
+			Team leagueNewWildcard = conferenceTeams.get(newWildcardIndex - 1);
+			NFLPlayoffTeam newWildcardTeam = playoffs.createPlayoffTeam(leagueNewWildcard);
+			playoffs.addWildcardTeam(conferenceName, newWildcardTeam);
+			conferenceTeams.remove(leagueNewWildcard);
 		}
 	}
 	
@@ -149,6 +155,20 @@ public class PlayoffsMenu extends SubMenu {
 		
 		String selectTeamsMessage = selectTeamsMessageBuilder.toString();
 		return selectTeamsMessage;
+	}
+
+	private List<Team> removeDivisionWinnersFromConferenceList(
+			Conference leagueConference, List<String> divisionWinnerNames) {
+		List<Team> conferenceTeams = leagueConference.getTeams();
+		for (int i = 0; i < conferenceTeams.size(); i++) {
+			Team conferenceTeam = conferenceTeams.get(i);
+			String conferenceTeamName = conferenceTeam.getName();
+			if (divisionWinnerNames.contains(conferenceTeamName)) {
+				conferenceTeams.remove(conferenceTeam);
+				i--;
+			}
+		}
+		return conferenceTeams;
 	}
 	
 }

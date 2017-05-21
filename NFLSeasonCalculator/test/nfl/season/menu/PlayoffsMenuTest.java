@@ -198,7 +198,9 @@ public class PlayoffsMenuTest {
 		conference1Teams.add(leagueTeam1_2_1);
 		conference1Teams.add(leagueTeam1_2_2);
 		conference1Teams.add(leagueTeam1_2_3);
-		when(leagueConference1.getTeams()).thenReturn(conference1Teams);
+		List<Team> conference1TeamsCopy = new ArrayList<Team>();
+		conference1TeamsCopy.addAll(conference1Teams);
+		when(leagueConference1.getTeams()).thenReturn(conference1TeamsCopy);
 		
 		conference2Divisions = new ArrayList<NFLPlayoffDivision>();
 		conference2Divisions.add(playoffDivision2_1);
@@ -214,7 +216,9 @@ public class PlayoffsMenuTest {
 		conference2Teams.add(leagueTeam2_2_1);
 		conference2Teams.add(leagueTeam2_2_2);
 		conference2Teams.add(leagueTeam2_2_3);
-		when(leagueConference2.getTeams()).thenReturn(conference2Teams);
+		List<Team> conference2TeamsCopy = new ArrayList<Team>();
+		conference2TeamsCopy.addAll(conference2Teams);
+		when(leagueConference2.getTeams()).thenReturn(conference2TeamsCopy);
 	}
 
 	private void setUpDivisions() {
@@ -328,14 +332,14 @@ public class PlayoffsMenuTest {
 		playoffsMenu.launchSubMenu();
 		
 		verify(input, times(2)).askForInt(expectedMenuMessage);
-		verifyChooseDivisionWinnersMessages();
+		verifyChoosePlayoffTeamsMessages();
 		
 		verify(playoffs).setDivisionWinner(leagueConference1.getName(), leagueDivision1_1.getName(), playoffTeam1_1_2);
 		verify(playoffs).setDivisionWinner(leagueConference1.getName(), leagueDivision1_2.getName(), playoffTeam1_2_3);
 		verify(playoffs).setDivisionWinner(leagueConference2.getName(), leagueDivision2_1.getName(), playoffTeam2_1_2);
 		verify(playoffs).setDivisionWinner(leagueConference2.getName(), leagueDivision2_2.getName(), playoffTeam2_2_1);
-		verify(playoffs).addWildcardTeam(leagueConference1.getName(), playoffTeam1_1_3);
 		verify(playoffs).addWildcardTeam(leagueConference1.getName(), playoffTeam1_2_1);
+		verify(playoffs).addWildcardTeam(leagueConference1.getName(), playoffTeam1_1_1);
 		verify(playoffs).addWildcardTeam(leagueConference2.getName(), playoffTeam2_1_1);
 		verify(playoffs).addWildcardTeam(leagueConference2.getName(), playoffTeam2_2_2);
 	}
@@ -359,7 +363,10 @@ public class PlayoffsMenuTest {
 		return divisionWinnerMessageBuilder.toString();
 	}
 	
-	private void verifyChooseDivisionWinnersMessages() {
+	private void verifyChoosePlayoffTeamsMessages() {
+		when(leagueConference1.getTeams()).thenReturn(conference1Teams);
+		when(leagueConference2.getTeams()).thenReturn(conference2Teams);
+		
 		verify(input, times(1)).askForInt(getChooseDivisionWinnerMessage(leagueConference1, 
 				leagueDivision1_1));
 		verify(input, times(1)).askForInt(getChooseDivisionWinnerMessage(leagueConference1, 
@@ -371,10 +378,10 @@ public class PlayoffsMenuTest {
 		verify(input, times(1)).askForInt(getChooseWildcardMessage(leagueConference1, 
 				leagueTeam1_1_2.getName(), leagueTeam1_2_3.getName(), ""));
 		verify(input, times(1)).askForInt(getChooseWildcardMessage(leagueConference1, 
-				leagueTeam1_1_2.getName(), leagueTeam1_2_3.getName(), leagueTeam1_1_3.getName()));
-		verify(input, times(1)).askForInt(getChooseWildcardMessage(leagueConference1, 
+				leagueTeam1_1_2.getName(), leagueTeam1_2_3.getName(), leagueTeam1_2_1.getName()));
+		verify(input, times(1)).askForInt(getChooseWildcardMessage(leagueConference2, 
 				leagueTeam2_1_2.getName(), leagueTeam2_2_1.getName(), ""));
-		verify(input, times(1)).askForInt(getChooseWildcardMessage(leagueConference1, 
+		verify(input, times(1)).askForInt(getChooseWildcardMessage(leagueConference2, 
 				leagueTeam2_1_2.getName(), leagueTeam2_2_1.getName(), leagueTeam2_1_1.getName()));
 	}
 	
