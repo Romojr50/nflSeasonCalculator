@@ -63,6 +63,7 @@ public class NFLSeasonCalculator {
 	public static PlayoffsMenu createPlayoffsMenu(NFLSeasonInput input,
 			League nfl) {
 		NFLPlayoffs playoffs = new NFLPlayoffs(nfl);
+		playoffs.initializeNFLPlayoffs();
 		PlayoffsMenu playoffsMenu = new PlayoffsMenu(input, playoffs);
 		
 		return playoffsMenu;
