@@ -5,7 +5,6 @@ import java.util.List;
 
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
-import nfl.season.league.NFLDivisionEnum;
 
 public class NFLPlayoffConference {
 

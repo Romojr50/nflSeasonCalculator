@@ -233,4 +233,11 @@ public class NFLPlayoffTest {
 		assertFalse(playoffTeams.contains(playoffTeam2));
 	}
 	
+	@Test
+	public void clearPlayoffTeamsClearsAllPlayoffTeamLists() {
+		playoffs.initializeNFLPlayoffs();
+		
+		
+	}
+	
 }

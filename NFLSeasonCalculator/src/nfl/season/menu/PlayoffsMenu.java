@@ -64,6 +64,7 @@ public class PlayoffsMenu extends SubMenu {
 	}
 
 	private void launchSelectPlayoffTeamsMenu() {
+		playoffs.clearPlayoffTeams();
 		List<NFLPlayoffConference> playoffConferences = playoffs.getConferences();
 		
 		for (NFLPlayoffConference playoffConference : playoffConferences) {
@@ -88,8 +89,11 @@ public class PlayoffsMenu extends SubMenu {
 			String selectTeamsMessage = getSelectDivisionWinnerMessage(
 					conferenceName, leagueDivision);
 			
-			int divisionWinnerIndex = input.askForInt(selectTeamsMessage);
+			int divisionWinnerIndex = -1;
 			List<Team> divisionTeams = leagueDivision.getTeams();
+			while (divisionWinnerIndex < 0 || divisionWinnerIndex > divisionTeams.size()) {
+				divisionWinnerIndex = input.askForInt(selectTeamsMessage);
+			}
 			Team divisionWinner = divisionTeams.get(divisionWinnerIndex - 1);
 			NFLPlayoffTeam playoffDivisionWinner = playoffs.createPlayoffTeam(
 					divisionWinner);
@@ -128,7 +132,12 @@ public class PlayoffsMenu extends SubMenu {
 						conferenceTeamName + "\n");
 				teamIndex++;
 			}
-			int newWildcardIndex = input.askForInt(chooseWildcardBuilder.toString());
+			
+			int newWildcardIndex = -1;
+			while (newWildcardIndex < 0 || newWildcardIndex > conferenceTeams.size()) {
+				newWildcardIndex = input.askForInt(chooseWildcardBuilder.toString());
+			}
+			
 			Team leagueNewWildcard = conferenceTeams.get(newWildcardIndex - 1);
 			NFLPlayoffTeam newWildcardTeam = playoffs.createPlayoffTeam(leagueNewWildcard);
 			playoffs.addWildcardTeam(conferenceName, newWildcardTeam);

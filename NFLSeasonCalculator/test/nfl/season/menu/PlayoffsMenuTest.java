@@ -334,6 +334,7 @@ public class PlayoffsMenuTest {
 		verify(input, times(2)).askForInt(expectedMenuMessage);
 		verifyChoosePlayoffTeamsMessages();
 		
+		verify(playoffs).clearPlayoffTeams();
 		verify(playoffs).setDivisionWinner(leagueConference1.getName(), leagueDivision1_1.getName(), playoffTeam1_1_2);
 		verify(playoffs).setDivisionWinner(leagueConference1.getName(), leagueDivision1_2.getName(), playoffTeam1_2_3);
 		verify(playoffs).setDivisionWinner(leagueConference2.getName(), leagueDivision2_1.getName(), playoffTeam2_1_2);
@@ -342,6 +343,33 @@ public class PlayoffsMenuTest {
 		verify(playoffs).addWildcardTeam(leagueConference1.getName(), playoffTeam1_1_1);
 		verify(playoffs).addWildcardTeam(leagueConference2.getName(), playoffTeam2_1_1);
 		verify(playoffs).addWildcardTeam(leagueConference2.getName(), playoffTeam2_2_2);
+	}
+	
+	@Test
+	public void selectTeamsForPlayoffsUserPutsInInvalidInputWhichIsIgnored() {
+		List<NFLPlayoffTeam> conference1DivisionWinners = new ArrayList<NFLPlayoffTeam>();
+		conference1DivisionWinners.add(playoffTeam1_1_2);
+		conference1DivisionWinners.add(playoffTeam1_2_3);
+		when(playoffConference1.getDivisionWinners()).thenReturn(conference1DivisionWinners);
+		
+		List<NFLPlayoffTeam> conference2DivisionWinners = new ArrayList<NFLPlayoffTeam>();
+		conference2DivisionWinners.add(playoffTeam2_1_2);
+		conference2DivisionWinners.add(playoffTeam2_2_1);
+		when(playoffConference2.getDivisionWinners()).thenReturn(conference2DivisionWinners);
+		
+		when(input.askForInt(anyString())).thenReturn(SELECT_TEAMS_FOR_PLAYOFFS, 
+				5, -1, 2, 3, 5, -1, 3, 1, 2, 1, 1, 2, BACK_TO_MAIN_MENU);
+		
+		playoffsMenu.launchSubMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		
+		when(leagueConference1.getTeams()).thenReturn(conference1Teams);
+		when(leagueConference2.getTeams()).thenReturn(conference2Teams);
+		verify(input, times(3)).askForInt(getChooseDivisionWinnerMessage(leagueConference1, 
+				leagueDivision1_1));
+		verify(input, times(3)).askForInt(getChooseWildcardMessage(leagueConference1, 
+				leagueTeam1_1_2.getName(), leagueTeam1_2_3.getName(), ""));
 	}
 	
 	private String getChooseDivisionWinnerMessage(Conference conference, Division division) {

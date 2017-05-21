@@ -151,5 +151,9 @@ public class NFLPlayoffs {
 		NFLPlayoffTeam playoffTeam = new NFLPlayoffTeam(leagueTeam);
 		return playoffTeam;
 	}
+
+	public void clearPlayoffTeams() {
+		
+	}
 	
 }
