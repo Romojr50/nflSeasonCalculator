@@ -37,7 +37,9 @@ public class NFLPlayoffConference {
 		
 		for (NFLPlayoffDivision playoffDivision : divisions) {
 			NFLPlayoffTeam divisionWinner = playoffDivision.getDivisionWinner();
-			divisionWinners.add(divisionWinner);
+			if (divisionWinner != null) {
+				divisionWinners.add(divisionWinner);
+			}
 		}
 		
 		return divisionWinners;
@@ -121,6 +123,13 @@ public class NFLPlayoffConference {
 		}
 		
 		return returnDivision;
+	}
+
+	public void clearPlayoffTeams() {
+		teams = new ArrayList<NFLPlayoffTeam>();
+		for (NFLPlayoffDivision playoffDivision : divisions) {
+			playoffDivision.setDivisionWinner(null);
+		}
 	}
 	
 }

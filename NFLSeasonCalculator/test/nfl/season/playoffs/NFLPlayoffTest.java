@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Matchers.anyInt;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -236,8 +237,28 @@ public class NFLPlayoffTest {
 	@Test
 	public void clearPlayoffTeamsClearsAllPlayoffTeamLists() {
 		playoffs.initializeNFLPlayoffs();
+		playoffs.setDivisionWinner(conference1Name, division1_2Name, playoffTeam1);
+		playoffs.setDivisionWinner(conference2Name, division2_1Name, playoffTeam2);
+		playoffs.addWildcardTeam(conference1Name, playoffTeam3);
 		
+		playoffs.clearPlayoffTeams();
 		
+		List<NFLPlayoffConference> playoffConferences = playoffs.getConferences();
+		for (NFLPlayoffConference playoffConference : playoffConferences) {
+			Conference leagueConference = playoffConference.getConference();
+			String conferenceName = leagueConference.getName();
+			for (int i = 1; i <= 6; i++) {
+				assertNull(playoffs.getTeamByConferenceSeed(conferenceName, i));
+			}
+			
+			assertEquals(0, playoffConference.getDivisionWinners().size());
+			assertEquals(0, playoffConference.getTeams().size());
+			
+			List<NFLPlayoffDivision> playoffDivisions = playoffConference.getDivisions();
+			for (NFLPlayoffDivision playoffDivision : playoffDivisions) {
+				assertNull(playoffDivision.getDivisionWinner());
+			}
+		}
 	}
 	
 }

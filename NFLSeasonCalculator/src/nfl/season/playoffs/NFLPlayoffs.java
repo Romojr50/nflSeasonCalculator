@@ -153,7 +153,9 @@ public class NFLPlayoffs {
 	}
 
 	public void clearPlayoffTeams() {
-		
+		for (NFLPlayoffConference playoffConference : conferences) {
+			playoffConference.clearPlayoffTeams();
+		}
 	}
 	
 }
