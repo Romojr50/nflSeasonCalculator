@@ -10,9 +10,11 @@ import nfl.season.league.League;
 import nfl.season.menu.MainMenu;
 import nfl.season.menu.MainMenu.MainMenuOptions;
 import nfl.season.menu.MatchupMenu;
+import nfl.season.menu.PlayoffsMenu;
 import nfl.season.menu.SingleTeamMenu;
 import nfl.season.menu.TeamsMenu;
 import nfl.season.menu.TeamsMenu.TeamsMenuOptions;
+import nfl.season.playoffs.NFLPlayoffs;
 
 public class NFLSeasonCalculator {
 
@@ -30,8 +32,12 @@ public class NFLSeasonCalculator {
 
 	public static MainMenu createMainMenu(NFLSeasonInput input, League nfl) {
 		MainMenu mainMenu = new MainMenu(input);
+		
 		TeamsMenu teamsMenu = createTeamsMenu(input, nfl);
 		mainMenu.setSubMenu(teamsMenu, MainMenuOptions.TEAMS.getOptionNumber());
+		
+		PlayoffsMenu playoffsMenu = createPlayoffsMenu(input, nfl);
+		mainMenu.setSubMenu(playoffsMenu, MainMenuOptions.PLAYOFFS.getOptionNumber());
 		
 		return mainMenu;
 	}
@@ -52,6 +58,15 @@ public class NFLSeasonCalculator {
 		teamsMenu.setSubMenu(singleTeamMenu, TeamsMenuOptions.SELECT_TEAM.getOptionNumber());
 		
 		return teamsMenu;
+	}
+	
+	public static PlayoffsMenu createPlayoffsMenu(NFLSeasonInput input,
+			League nfl) {
+		NFLPlayoffs playoffs = new NFLPlayoffs(nfl);
+		playoffs.initializeNFLPlayoffs();
+		PlayoffsMenu playoffsMenu = new PlayoffsMenu(input, playoffs);
+		
+		return playoffsMenu;
 	}
 	
 	public static void loadTeamSettings(League nfl) {

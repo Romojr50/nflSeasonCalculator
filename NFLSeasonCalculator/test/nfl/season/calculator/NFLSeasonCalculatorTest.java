@@ -5,11 +5,11 @@ import static org.junit.Assert.assertNotNull;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
 import nfl.season.menu.MainMenu;
+import nfl.season.menu.MainMenu.MainMenuOptions;
 import nfl.season.menu.MatchupMenu;
 import nfl.season.menu.SingleTeamMenu;
 import nfl.season.menu.SubMenu;
 import nfl.season.menu.TeamsMenu;
-import nfl.season.menu.MainMenu.MainMenuOptions;
 import nfl.season.menu.TeamsMenu.TeamsMenuOptions;
 
 import org.junit.Test;
@@ -30,8 +30,10 @@ public class NFLSeasonCalculatorTest {
 	public void mainMethodSetsUpMenusAndLaunchesMainMenu() {
 		MainMenu mainMenu = NFLSeasonCalculator.createMainMenu(input, nfl);
 		TeamsMenu teamsMenu = NFLSeasonCalculator.createTeamsMenu(input, nfl);
+		NFLSeasonCalculator.createPlayoffsMenu(input, nfl);
 		
 		assertNotNull(mainMenu.getSubMenu(MainMenuOptions.TEAMS.getOptionNumber()));
+		assertNotNull(mainMenu.getSubMenu(MainMenuOptions.PLAYOFFS.getOptionNumber()));
 		
 		SubMenu singleTeamMenu = teamsMenu.getSubMenu(
 				TeamsMenuOptions.SELECT_TEAM.getOptionNumber());

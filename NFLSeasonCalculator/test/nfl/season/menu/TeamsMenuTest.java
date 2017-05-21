@@ -73,7 +73,7 @@ public class TeamsMenuTest {
 	
 	private List<Team> mockTeams;
 	
-	int[] indexesChosenForPowerRankingsInOrder = {2, 2, 1, 1};
+	private int[] indexesChosenForPowerRankingsInOrder = {2, 2, 1, 1};
 	
 	@Mock
 	private SingleTeamMenu singleTeamMenu;
