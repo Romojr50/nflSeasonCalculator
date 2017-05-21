@@ -132,6 +132,7 @@ public class PlayoffsMenu extends SubMenu {
 						conferenceTeamName + "\n");
 				teamIndex++;
 			}
+			chooseWildcardBuilder.deleteCharAt(chooseWildcardBuilder.lastIndexOf("\n"));
 			
 			int newWildcardIndex = -1;
 			while (newWildcardIndex < 0 || newWildcardIndex > conferenceTeams.size()) {
@@ -161,6 +162,8 @@ public class PlayoffsMenu extends SubMenu {
 					leagueTeam.getName() + "\n");
 			teamIndex++;
 		}
+		selectTeamsMessageBuilder.deleteCharAt(
+				selectTeamsMessageBuilder.lastIndexOf("\n"));
 		
 		String selectTeamsMessage = selectTeamsMessageBuilder.toString();
 		return selectTeamsMessage;

@@ -387,6 +387,9 @@ public class PlayoffsMenuTest {
 			divisionWinnerMessageBuilder.append("\n");
 			teamIndex++;
 		}
+		divisionWinnerMessageBuilder.deleteCharAt(
+				divisionWinnerMessageBuilder.lastIndexOf("\n"));
+		
 		
 		return divisionWinnerMessageBuilder.toString();
 	}
@@ -434,6 +437,7 @@ public class PlayoffsMenuTest {
 				teamIndex++;
 			}
 		}
+		wildcardMessageBuilder.deleteCharAt(wildcardMessageBuilder.lastIndexOf("\n"));
 		
 		return wildcardMessageBuilder.toString();
 	}
