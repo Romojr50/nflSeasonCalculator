@@ -6,6 +6,7 @@ import java.util.List;
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
 import nfl.season.league.League;
+import nfl.season.league.Matchup;
 import nfl.season.league.Team;
 
 public class NFLPlayoffs {
@@ -114,7 +115,9 @@ public class NFLPlayoffs {
 			
 			NFLPlayoffTeam teamThatUsedToHaveSeed = 
 					playoffConference.getTeamWithSeed(conferenceSeed);
-			teamThatUsedToHaveSeed.setConferenceSeed(oldConferenceSeed);
+			if (teamThatUsedToHaveSeed != null) {
+				teamThatUsedToHaveSeed.setConferenceSeed(oldConferenceSeed);
+			}
 		}
 	}
 	
@@ -156,6 +159,34 @@ public class NFLPlayoffs {
 		for (NFLPlayoffConference playoffConference : conferences) {
 			playoffConference.clearPlayoffTeams();
 		}
+	}
+
+	public List<Matchup> getWildcardMatchups(String conferenceName) {
+		List<Matchup> wildcardMatchups = new ArrayList<Matchup>();
+		
+		NFLPlayoffConference playoffConference = getConference(conferenceName);
+		if (playoffConference != null) {
+			NFLPlayoffTeam threeSeed = playoffConference.getTeamWithSeed(3);
+			NFLPlayoffTeam fourSeed = playoffConference.getTeamWithSeed(4);
+			NFLPlayoffTeam fiveSeed = playoffConference.getTeamWithSeed(5);
+			NFLPlayoffTeam sixSeed = playoffConference.getTeamWithSeed(6);
+			
+			if (threeSeed != null && fourSeed != null && fiveSeed != null &&
+					sixSeed != null) {
+				Team team3 = threeSeed.getTeam();
+				Team team4 = fourSeed.getTeam();
+				Team team5 = fiveSeed.getTeam();
+				Team team6 = sixSeed.getTeam();
+				
+				Matchup threeSixMatchup = team3.getMatchup(team6.getName());
+				Matchup fourFiveMatchup = team4.getMatchup(team5.getName());
+				
+				wildcardMatchups.add(threeSixMatchup);
+				wildcardMatchups.add(fourFiveMatchup);
+			}
+		}
+		
+		return wildcardMatchups;
 	}
 	
 }
