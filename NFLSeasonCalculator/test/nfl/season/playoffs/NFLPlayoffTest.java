@@ -89,10 +89,16 @@ public class NFLPlayoffTest {
 	private Team leagueTeam4;
 	
 	@Mock
-	private Matchup matchup2_3;
+	private Matchup matchup1_3;
 	
 	@Mock
 	private Matchup matchup1_4;
+	
+	@Mock
+	private Matchup matchup2_3;
+	
+	@Mock
+	private Matchup matchup2_4;
 	
 	private List<Division> conference2Divisions;
 	
@@ -138,8 +144,10 @@ public class NFLPlayoffTest {
 		when(leagueTeam3.getName()).thenReturn("Team 3");
 		when(leagueTeam4.getName()).thenReturn("Team 4");
 		
+		when(leagueTeam1.getMatchup(leagueTeam3.getName())).thenReturn(matchup1_3);
 		when(leagueTeam1.getMatchup(leagueTeam4.getName())).thenReturn(matchup1_4);
 		when(leagueTeam2.getMatchup(leagueTeam3.getName())).thenReturn(matchup2_3);
+		when(leagueTeam2.getMatchup(leagueTeam4.getName())).thenReturn(matchup2_4);
 	}
 	
 	@Test
@@ -320,6 +328,78 @@ public class NFLPlayoffTest {
 		
 		assertTrue(wildcardMatchups.contains(matchup2_3));
 		assertTrue(wildcardMatchups.contains(matchup1_4));
+	}
+	
+	@Test
+	public void generateWildcardMatchupsButNotAllTeamsAreSetSoEmptyListIsReturned() {
+		playoffs.initializeNFLPlayoffs();
+		playoffs.setDivisionWinner(conference1Name, division1_1Name, playoffTeam2);
+		playoffs.setDivisionWinner(conference1Name, division1_2Name, playoffTeam1);
+		playoffs.setTeamConferenceSeed(playoffTeam2, 3);
+		playoffs.setTeamConferenceSeed(playoffTeam1, 4);
+		playoffs.addWildcardTeam(conference1Name, playoffTeam4);
+		
+		when(playoffTeam2.getConferenceSeed()).thenReturn(3);
+		when(playoffTeam1.getConferenceSeed()).thenReturn(4);
+		when(playoffTeam4.getConferenceSeed()).thenReturn(5);
+		
+		List<Matchup> wildcardMatchups = playoffs.getWildcardMatchups(conference1Name);
+		
+		assertEquals(0, wildcardMatchups.size());
+	}
+	
+	@Test
+	public void generateDivisionalMatchupsSoWildcardWinnersAreUsedToGetMatchups() {
+		playoffs.initializeNFLPlayoffs();
+		playoffs.setDivisionWinner(conference1Name, division1_1Name, playoffTeam1);
+		playoffs.setDivisionWinner(conference1Name, division1_2Name, playoffTeam2);
+		playoffs.addWildcardTeam(conference1Name, playoffTeam3);
+		playoffs.addWildcardTeam(conference1Name, playoffTeam4);
+		
+		when(playoffTeam1.getConferenceSeed()).thenReturn(1);
+		when(playoffTeam2.getConferenceSeed()).thenReturn(2);
+		when(playoffTeam3.getConferenceSeed()).thenReturn(3);
+		when(playoffTeam4.getConferenceSeed()).thenReturn(4);
+		
+		playoffs.setWildcardWinners(playoffTeam3, playoffTeam4);
+		
+		List<Matchup> divisionalMatchups = playoffs.getDivisionalMatchups(conference1Name);
+		
+		assertTrue(divisionalMatchups.contains(matchup1_4));
+		assertTrue(divisionalMatchups.contains(matchup2_3));
+		
+		when(playoffTeam3.getConferenceSeed()).thenReturn(6);
+		when(playoffTeam4.getConferenceSeed()).thenReturn(4);
+		
+		divisionalMatchups = playoffs.getDivisionalMatchups(conference1Name);
+		
+		assertTrue(divisionalMatchups.contains(matchup1_3));
+		assertTrue(divisionalMatchups.contains(matchup2_4));
+	}
+	
+	@Test
+	public void generateDivisionalMatchupsButNotAllTeamsSetSoEmptyListIsReturned() {
+		playoffs.initializeNFLPlayoffs();
+		playoffs.setDivisionWinner(conference1Name, division1_1Name, playoffTeam1);
+		playoffs.setDivisionWinner(conference1Name, division1_2Name, playoffTeam2);
+		playoffs.addWildcardTeam(conference1Name, playoffTeam3);
+		playoffs.addWildcardTeam(conference1Name, playoffTeam4);
+		
+		when(playoffTeam1.getConferenceSeed()).thenReturn(1);
+		when(playoffTeam2.getConferenceSeed()).thenReturn(2);
+		when(playoffTeam3.getConferenceSeed()).thenReturn(3);
+		when(playoffTeam4.getConferenceSeed()).thenReturn(4);
+		
+		List<Matchup> divisionalMatchups = playoffs.getDivisionalMatchups(conference1Name);
+		
+		assertEquals(0, divisionalMatchups.size());
+		
+		playoffs.setWildcardWinners(playoffTeam3, playoffTeam4);
+		when(playoffTeam1.getConferenceSeed()).thenReturn(5);
+		
+		divisionalMatchups = playoffs.getDivisionalMatchups(conference1Name);
+		
+		assertEquals(0, divisionalMatchups.size());
 	}
 	
 }

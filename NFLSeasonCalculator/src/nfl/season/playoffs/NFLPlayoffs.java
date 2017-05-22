@@ -15,6 +15,8 @@ public class NFLPlayoffs {
 	
 	private List<NFLPlayoffConference> conferences;
 	
+	private List<NFLPlayoffTeam> wildcardWinners;
+	
 	public NFLPlayoffs(League nfl) {
 		this.nfl = nfl;
 		conferences = new ArrayList<NFLPlayoffConference>();
@@ -187,6 +189,51 @@ public class NFLPlayoffs {
 		}
 		
 		return wildcardMatchups;
+	}
+
+	public void setWildcardWinners(NFLPlayoffTeam wildcardWinner1,
+			NFLPlayoffTeam wildcardWinner2) {
+		wildcardWinners = new ArrayList<NFLPlayoffTeam>();
+		wildcardWinners.add(wildcardWinner1);
+		wildcardWinners.add(wildcardWinner2);
+	}
+
+	public List<Matchup> getDivisionalMatchups(String conferenceName) {
+		List<Matchup> divisionalMatchups = new ArrayList<Matchup>();
+		
+		NFLPlayoffConference playoffConference = getConference(conferenceName);
+		if (playoffConference != null && wildcardWinners != null && wildcardWinners.size() == 2) {
+			NFLPlayoffTeam firstWildcardWinner = wildcardWinners.get(0);
+			int firstWildcardSeed = firstWildcardWinner.getConferenceSeed();
+			NFLPlayoffTeam secondWildcardWinner = wildcardWinners.get(1);
+			int secondWildcardSeed = secondWildcardWinner.getConferenceSeed();
+			
+			NFLPlayoffTeam topWildcardWinner = firstWildcardWinner;
+			NFLPlayoffTeam bottomWildcardWinner = secondWildcardWinner;
+			if (firstWildcardSeed > secondWildcardSeed) {
+				topWildcardWinner = secondWildcardWinner;
+				bottomWildcardWinner = firstWildcardWinner;
+			}
+			
+			NFLPlayoffTeam oneSeed = playoffConference.getTeamWithSeed(1);
+			NFLPlayoffTeam twoSeed = playoffConference.getTeamWithSeed(2);
+			
+			if (oneSeed != null && twoSeed != null && topWildcardWinner != null && bottomWildcardWinner != null) {
+				Team teamWildcardTop = topWildcardWinner.getTeam();
+				Team teamWildcardBottom = bottomWildcardWinner.getTeam();
+				
+				Team team1 = oneSeed.getTeam();
+				Matchup oneSeedMatchup = team1.getMatchup(teamWildcardBottom.getName());
+				
+				Team team2 = twoSeed.getTeam();
+				Matchup twoSeedMatchup = team2.getMatchup(teamWildcardTop.getName());
+				
+				divisionalMatchups.add(oneSeedMatchup);
+				divisionalMatchups.add(twoSeedMatchup);
+			}
+		}
+		
+		return divisionalMatchups;
 	}
 	
 }
