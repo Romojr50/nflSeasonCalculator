@@ -361,7 +361,7 @@ public class NFLPlayoffTest {
 		when(playoffTeam3.getConferenceSeed()).thenReturn(3);
 		when(playoffTeam4.getConferenceSeed()).thenReturn(4);
 		
-		playoffs.setWildcardWinners(playoffTeam3, playoffTeam4);
+		playoffs.setWildcardWinners(conference1Name, playoffTeam3, playoffTeam4);
 		
 		List<Matchup> divisionalMatchups = playoffs.getDivisionalMatchups(conference1Name);
 		
@@ -394,12 +394,63 @@ public class NFLPlayoffTest {
 		
 		assertEquals(0, divisionalMatchups.size());
 		
-		playoffs.setWildcardWinners(playoffTeam3, playoffTeam4);
+		playoffs.setWildcardWinners(conference1Name, playoffTeam3, playoffTeam4);
 		when(playoffTeam1.getConferenceSeed()).thenReturn(5);
 		
 		divisionalMatchups = playoffs.getDivisionalMatchups(conference1Name);
 		
 		assertEquals(0, divisionalMatchups.size());
+	}
+	
+	@Test
+	public void generateConferenceMatchupsTakesDivisionalWinnersAndGetsTheirMatchup() {
+		playoffs.initializeNFLPlayoffs();
+		playoffs.setDivisionWinner(conference1Name, division1_1Name, playoffTeam1);
+		playoffs.setDivisionWinner(conference1Name, division1_2Name, playoffTeam4);
+		
+		playoffs.setDivisionalRoundWinners(conference1Name, playoffTeam1, playoffTeam4);
+		
+		Matchup conferenceMatchup = playoffs.getConferenceMatchup(conference1Name);
+		
+		assertEquals(matchup1_4, conferenceMatchup);
+	}
+	
+	@Test
+	public void generateConferenceMatchupsButDivisionalRoundWinnersNotSetSoNullIsReturned() {
+		playoffs.initializeNFLPlayoffs();
+		playoffs.setDivisionWinner(conference1Name, division1_1Name, playoffTeam1);
+		playoffs.setDivisionWinner(conference1Name, division1_2Name, playoffTeam4);
+		
+		Matchup conferenceMatchup = playoffs.getConferenceMatchup(conference1Name);
+		
+		assertNull(conferenceMatchup);
+	}
+	
+	@Test
+	public void getSuperBowlMatchupPitsTwoConferenceWinners() {
+		playoffs.initializeNFLPlayoffs();
+		playoffs.setDivisionWinner(conference1Name, division1_1Name, playoffTeam1);
+		playoffs.setDivisionWinner(conference2Name, division2_1Name, playoffTeam4);
+		
+		playoffs.setConferenceWinner(conference1Name, playoffTeam1);
+		playoffs.setConferenceWinner(conference2Name, playoffTeam4);
+		
+		Matchup superBowlMatchup = playoffs.getSuperBowlMatchup();
+		
+		assertEquals(matchup1_4, superBowlMatchup);
+	}
+	
+	@Test
+	public void getSuperBowlMatchupButConferenceWinnersNotSetSoNullIsReturned() {
+		playoffs.initializeNFLPlayoffs();
+		playoffs.setDivisionWinner(conference1Name, division1_1Name, playoffTeam1);
+		playoffs.setDivisionWinner(conference2Name, division2_1Name, playoffTeam4);
+		
+		playoffs.setConferenceWinner(conference1Name, playoffTeam1);
+		
+		Matchup superBowlMatchup = playoffs.getSuperBowlMatchup();
+		
+		assertNull(superBowlMatchup);
 	}
 	
 }

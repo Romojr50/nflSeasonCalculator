@@ -15,8 +15,6 @@ public class NFLPlayoffs {
 	
 	private List<NFLPlayoffConference> conferences;
 	
-	private List<NFLPlayoffTeam> wildcardWinners;
-	
 	public NFLPlayoffs(League nfl) {
 		this.nfl = nfl;
 		conferences = new ArrayList<NFLPlayoffConference>();
@@ -190,50 +188,115 @@ public class NFLPlayoffs {
 		
 		return wildcardMatchups;
 	}
-
-	public void setWildcardWinners(NFLPlayoffTeam wildcardWinner1,
-			NFLPlayoffTeam wildcardWinner2) {
-		wildcardWinners = new ArrayList<NFLPlayoffTeam>();
-		wildcardWinners.add(wildcardWinner1);
-		wildcardWinners.add(wildcardWinner2);
+	
+	public void setWildcardWinners(String conferenceName,
+			NFLPlayoffTeam wildcardWinner1, NFLPlayoffTeam wildcardWinner2) {
+		NFLPlayoffConference conference = getConference(conferenceName);
+		
+		if (conference != null) {
+			conference.setWildcardWinners(wildcardWinner1, wildcardWinner2);
+		}
 	}
 
 	public List<Matchup> getDivisionalMatchups(String conferenceName) {
 		List<Matchup> divisionalMatchups = new ArrayList<Matchup>();
 		
 		NFLPlayoffConference playoffConference = getConference(conferenceName);
-		if (playoffConference != null && wildcardWinners != null && wildcardWinners.size() == 2) {
-			NFLPlayoffTeam firstWildcardWinner = wildcardWinners.get(0);
-			int firstWildcardSeed = firstWildcardWinner.getConferenceSeed();
-			NFLPlayoffTeam secondWildcardWinner = wildcardWinners.get(1);
-			int secondWildcardSeed = secondWildcardWinner.getConferenceSeed();
+		if (playoffConference != null) {
+			List<NFLPlayoffTeam> wildcardWinners = playoffConference.getWildcardWinners();
 			
-			NFLPlayoffTeam topWildcardWinner = firstWildcardWinner;
-			NFLPlayoffTeam bottomWildcardWinner = secondWildcardWinner;
-			if (firstWildcardSeed > secondWildcardSeed) {
-				topWildcardWinner = secondWildcardWinner;
-				bottomWildcardWinner = firstWildcardWinner;
-			}
-			
-			NFLPlayoffTeam oneSeed = playoffConference.getTeamWithSeed(1);
-			NFLPlayoffTeam twoSeed = playoffConference.getTeamWithSeed(2);
-			
-			if (oneSeed != null && twoSeed != null && topWildcardWinner != null && bottomWildcardWinner != null) {
-				Team teamWildcardTop = topWildcardWinner.getTeam();
-				Team teamWildcardBottom = bottomWildcardWinner.getTeam();
+			if (wildcardWinners != null && wildcardWinners.size() == 2) {
+				NFLPlayoffTeam firstWildcardWinner = wildcardWinners.get(0);
+				int firstWildcardSeed = firstWildcardWinner.getConferenceSeed();
+				NFLPlayoffTeam secondWildcardWinner = wildcardWinners.get(1);
+				int secondWildcardSeed = secondWildcardWinner.getConferenceSeed();
 				
-				Team team1 = oneSeed.getTeam();
-				Matchup oneSeedMatchup = team1.getMatchup(teamWildcardBottom.getName());
+				NFLPlayoffTeam topWildcardWinner = firstWildcardWinner;
+				NFLPlayoffTeam bottomWildcardWinner = secondWildcardWinner;
+				if (firstWildcardSeed > secondWildcardSeed) {
+					topWildcardWinner = secondWildcardWinner;
+					bottomWildcardWinner = firstWildcardWinner;
+				}
 				
-				Team team2 = twoSeed.getTeam();
-				Matchup twoSeedMatchup = team2.getMatchup(teamWildcardTop.getName());
+				NFLPlayoffTeam oneSeed = playoffConference.getTeamWithSeed(1);
+				NFLPlayoffTeam twoSeed = playoffConference.getTeamWithSeed(2);
 				
-				divisionalMatchups.add(oneSeedMatchup);
-				divisionalMatchups.add(twoSeedMatchup);
+				if (oneSeed != null && twoSeed != null && topWildcardWinner != null && bottomWildcardWinner != null) {
+					Team teamWildcardTop = topWildcardWinner.getTeam();
+					Team teamWildcardBottom = bottomWildcardWinner.getTeam();
+					
+					Team team1 = oneSeed.getTeam();
+					Matchup oneSeedMatchup = team1.getMatchup(teamWildcardBottom.getName());
+					
+					Team team2 = twoSeed.getTeam();
+					Matchup twoSeedMatchup = team2.getMatchup(teamWildcardTop.getName());
+					
+					divisionalMatchups.add(oneSeedMatchup);
+					divisionalMatchups.add(twoSeedMatchup);
+				}
 			}
 		}
 		
 		return divisionalMatchups;
 	}
 	
+	public void setDivisionalRoundWinners(String conferenceName,
+			NFLPlayoffTeam divisionalRoundWinner1, NFLPlayoffTeam divisionalRoundWinner2) {
+		NFLPlayoffConference conference = getConference(conferenceName);
+		
+		if (conference != null) {
+			conference.setDivisionalRoundWinners(divisionalRoundWinner1, divisionalRoundWinner2);
+		}
+	}
+
+	public Matchup getConferenceMatchup(String conferenceName) {
+		Matchup conferenceMatchup = null;
+		
+		NFLPlayoffConference conference = getConference(conferenceName);
+		if (conference != null) {
+			List<NFLPlayoffTeam> divisionalRoundWinners = 
+					conference.getDivisionalRoundWinners();
+			if (divisionalRoundWinners != null && divisionalRoundWinners.size() == 2) {
+				NFLPlayoffTeam divisionalRoundWinner1 = divisionalRoundWinners.get(0);
+				NFLPlayoffTeam divisionalRoundWinner2 = divisionalRoundWinners.get(1);
+				
+				Team leagueDivisionalRound1 = divisionalRoundWinner1.getTeam();
+				Team leagueDivisionalRound2 = divisionalRoundWinner2.getTeam();
+				String leagueDivisionalRound2Name = leagueDivisionalRound2.getName();
+				
+				conferenceMatchup = leagueDivisionalRound1.getMatchup(leagueDivisionalRound2Name);
+			}
+		}
+		
+		return conferenceMatchup;
+	}
+
+	public void setConferenceWinner(String conferenceName,
+			NFLPlayoffTeam conferenceWinner) {
+		NFLPlayoffConference conference = getConference(conferenceName);
+		
+		if (conference != null) {
+			conference.setConferenceWinner(conferenceWinner);
+		}
+	}
+
+	public Matchup getSuperBowlMatchup() {
+		Matchup superBowlMatchup = null;
+		
+		NFLPlayoffConference conference1 = conferences.get(0);
+		NFLPlayoffConference conference2 = conferences.get(1);
+		
+		NFLPlayoffTeam conference1Winner = conference1.getConferenceWinner();
+		NFLPlayoffTeam conference2Winner = conference2.getConferenceWinner();
+
+		if (conference1Winner != null && conference2Winner != null) {
+			Team leagueConference1Winner = conference1Winner.getTeam();
+			Team leagueConference2Winner = conference2Winner.getTeam();
+			String leagueConference2WinnerName = leagueConference2Winner.getName();
+			
+			superBowlMatchup = leagueConference1Winner.getMatchup(leagueConference2WinnerName);
+		}
+		
+		return superBowlMatchup;
+	}
 }
