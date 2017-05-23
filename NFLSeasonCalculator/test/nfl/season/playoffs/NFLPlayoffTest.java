@@ -482,7 +482,8 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		when(leagueTeam2_2_3.getPowerRanking()).thenReturn(18);
 		
 		playoffs.initializeNFLPlayoffs();
-		playoffs.populateTeamsByPowerRankings();
+		boolean success = playoffs.populateTeamsByPowerRankings();
+		assertTrue(success);
 		
 		assertEquals(leagueTeam1_1_1, playoffs.getDivisionWinner(leagueConference1.getName(), leagueDivision1_1.getName()).getTeam());
 		assertEquals(leagueTeam1_2_2, playoffs.getDivisionWinner(leagueConference1.getName(), leagueDivision1_2.getName()).getTeam());
@@ -498,6 +499,44 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		assertEquals(leagueTeam2_2_1, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 2).getTeam());
 		assertEquals(leagueTeam2_1_1, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 5).getTeam());
 		assertEquals(leagueTeam2_1_2, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 6).getTeam());
+	}
+	
+	@Test
+	public void populateTeamsByPowerRankingsFailsIfNotAllPowerRankingsAreSet() {
+		List<Conference> leagueConferences = new ArrayList<Conference>();
+		leagueConferences.add(leagueConference1);
+		leagueConferences.add(leagueConference2);
+		when(nfl.getConferences()).thenReturn(leagueConferences);
+		
+		when(leagueTeam1_1_1.getPowerRanking()).thenReturn(4);
+		when(leagueTeam1_1_2.getPowerRanking()).thenReturn(9);
+		when(leagueTeam1_1_3.getPowerRanking()).thenReturn(29);
+		
+		when(leagueTeam1_2_1.getPowerRanking()).thenReturn(2);
+		when(leagueTeam1_2_2.getPowerRanking()).thenReturn(1);
+		when(leagueTeam1_2_3.getPowerRanking()).thenReturn(30);
+		
+		when(leagueTeam2_1_1.getPowerRanking()).thenReturn(7);
+		when(leagueTeam2_1_2.getPowerRanking()).thenReturn(8);
+		when(leagueTeam2_1_3.getPowerRanking()).thenReturn(6);
+		
+		when(leagueTeam2_2_1.getPowerRanking()).thenReturn(12);
+		when(leagueTeam2_2_2.getPowerRanking()).thenReturn(15);
+		when(leagueTeam2_2_3.getPowerRanking()).thenReturn(Team.CLEAR_RANKING);
+		
+		playoffs.initializeNFLPlayoffs();
+		boolean success = playoffs.populateTeamsByPowerRankings();
+		assertFalse(success);
+		
+		assertNull(playoffs.getDivisionWinner(leagueConference1.getName(), leagueDivision1_1.getName()));
+		assertNull(playoffs.getDivisionWinner(leagueConference1.getName(), leagueDivision1_2.getName()));
+		assertNull(playoffs.getDivisionWinner(leagueConference2.getName(), leagueDivision2_1.getName()));
+		assertNull(playoffs.getDivisionWinner(leagueConference2.getName(), leagueDivision2_2.getName()));
+		
+		assertNull(playoffs.getTeamByConferenceSeed(leagueConference1.getName(), 1));
+		assertNull(playoffs.getTeamByConferenceSeed(leagueConference1.getName(), 2));
+		assertNull(playoffs.getTeamByConferenceSeed(leagueConference1.getName(), 5));
+		assertNull(playoffs.getTeamByConferenceSeed(leagueConference1.getName(), 6));
 	}
 	
 	private void assertGameListHasCorrectMatchupsAndHomeTeams(

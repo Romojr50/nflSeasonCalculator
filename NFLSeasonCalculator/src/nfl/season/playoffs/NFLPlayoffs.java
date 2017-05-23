@@ -295,24 +295,30 @@ public class NFLPlayoffs {
 		return superBowlGame;
 	}
 	
-	public void populateTeamsByPowerRankings() {
-		for (NFLPlayoffConference conference : conferences) {
-			Conference leagueConference = conference.getConference();
-			String conferenceName = leagueConference.getName();
-			
-			List<Team> divisionWinners = new ArrayList<Team>();
-			List<NFLPlayoffDivision> divisions = conference.getDivisions();
-			addDivisionWinnersByPowerRanking(conferenceName, divisionWinners,
-					divisions);
-			
-			List<Team> wildcards = new ArrayList<Team>();
-			addNextWildcardByPowerRanking(leagueConference,
-					divisionWinners, wildcards);
-			addNextWildcardByPowerRanking(leagueConference, divisionWinners, 
-					wildcards);
-			
-			setDivisionWinnerSeedsByPowerRankings(conference);
+	public boolean populateTeamsByPowerRankings() {
+		boolean success = allTeamPowerRankingsAreSet();
+		
+		if (success) {
+			for (NFLPlayoffConference conference : conferences) {
+				Conference leagueConference = conference.getConference();
+				String conferenceName = leagueConference.getName();
+				
+				List<Team> divisionWinners = new ArrayList<Team>();
+				List<NFLPlayoffDivision> divisions = conference.getDivisions();
+				addDivisionWinnersByPowerRanking(conferenceName, divisionWinners,
+						divisions);
+				
+				List<Team> wildcards = new ArrayList<Team>();
+				addNextWildcardByPowerRanking(leagueConference,
+						divisionWinners, wildcards);
+				addNextWildcardByPowerRanking(leagueConference, divisionWinners, 
+						wildcards);
+				
+				setDivisionWinnerSeedsByPowerRankings(conference);
+			}
 		}
+		
+		return success;
 	}
 	
 	private Game createGameWithTeams(NFLPlayoffTeam homeTeam,
@@ -321,6 +327,23 @@ public class NFLPlayoffs {
 		Team leagueAwayTeam = awayTeam.getTeam();
 		Game game = new Game(leagueHomeTeam, leagueAwayTeam);
 		return game;
+	}
+	
+	private boolean allTeamPowerRankingsAreSet() {
+		boolean success = true;
+		
+		for (NFLPlayoffConference conference : conferences) {
+			Conference leagueConference = conference.getConference();
+			List<Team> teams = leagueConference.getTeams();
+			for (Team team : teams) {
+				if (team.getPowerRanking() == Team.CLEAR_RANKING) {
+					success = false;
+					break;
+				}
+			}
+		}
+		
+		return success;
 	}
 
 	private void addDivisionWinnersByPowerRanking(String conferenceName,
