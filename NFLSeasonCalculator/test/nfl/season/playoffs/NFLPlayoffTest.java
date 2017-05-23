@@ -1,19 +1,20 @@
 package nfl.season.playoffs;
 
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Matchers.anyInt;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
+import nfl.season.league.Game;
 import nfl.season.league.League;
 import nfl.season.league.Matchup;
 import nfl.season.league.Team;
@@ -324,10 +325,9 @@ public class NFLPlayoffTest {
 		when(playoffTeam4.getConferenceSeed()).thenReturn(5);
 		when(playoffTeam3.getConferenceSeed()).thenReturn(6);
 		
-		List<Matchup> wildcardMatchups = playoffs.getWildcardMatchups(conference1Name);
+		List<Game> wildcardGames = playoffs.getWildcardGames(conference1Name);
 		
-		assertTrue(wildcardMatchups.contains(matchup2_3));
-		assertTrue(wildcardMatchups.contains(matchup1_4));
+		assertGameListHasCorrectMatchupsAndHomeTeams(wildcardGames, matchup1_4, matchup2_3);
 	}
 	
 	@Test
@@ -343,9 +343,9 @@ public class NFLPlayoffTest {
 		when(playoffTeam1.getConferenceSeed()).thenReturn(4);
 		when(playoffTeam4.getConferenceSeed()).thenReturn(5);
 		
-		List<Matchup> wildcardMatchups = playoffs.getWildcardMatchups(conference1Name);
+		List<Game> wildcardGames = playoffs.getWildcardGames(conference1Name);
 		
-		assertEquals(0, wildcardMatchups.size());
+		assertEquals(0, wildcardGames.size());
 	}
 	
 	@Test
@@ -363,18 +363,16 @@ public class NFLPlayoffTest {
 		
 		playoffs.setWildcardWinners(conference1Name, playoffTeam3, playoffTeam4);
 		
-		List<Matchup> divisionalMatchups = playoffs.getDivisionalMatchups(conference1Name);
+		List<Game> divisionalGames = playoffs.getDivisionalGames(conference1Name);
 		
-		assertTrue(divisionalMatchups.contains(matchup1_4));
-		assertTrue(divisionalMatchups.contains(matchup2_3));
+		assertGameListHasCorrectMatchupsAndHomeTeams(divisionalGames, matchup1_4, matchup2_3);
 		
 		when(playoffTeam3.getConferenceSeed()).thenReturn(6);
 		when(playoffTeam4.getConferenceSeed()).thenReturn(4);
 		
-		divisionalMatchups = playoffs.getDivisionalMatchups(conference1Name);
+		divisionalGames = playoffs.getDivisionalGames(conference1Name);
 		
-		assertTrue(divisionalMatchups.contains(matchup1_3));
-		assertTrue(divisionalMatchups.contains(matchup2_4));
+		assertGameListHasCorrectMatchupsAndHomeTeams(divisionalGames, matchup1_3, matchup2_4);
 	}
 	
 	@Test
@@ -390,29 +388,33 @@ public class NFLPlayoffTest {
 		when(playoffTeam3.getConferenceSeed()).thenReturn(3);
 		when(playoffTeam4.getConferenceSeed()).thenReturn(4);
 		
-		List<Matchup> divisionalMatchups = playoffs.getDivisionalMatchups(conference1Name);
+		List<Game> divisionalGames = playoffs.getDivisionalGames(conference1Name);
 		
-		assertEquals(0, divisionalMatchups.size());
+		assertEquals(0, divisionalGames.size());
 		
 		playoffs.setWildcardWinners(conference1Name, playoffTeam3, playoffTeam4);
 		when(playoffTeam1.getConferenceSeed()).thenReturn(5);
 		
-		divisionalMatchups = playoffs.getDivisionalMatchups(conference1Name);
+		divisionalGames = playoffs.getDivisionalGames(conference1Name);
 		
-		assertEquals(0, divisionalMatchups.size());
+		assertEquals(0, divisionalGames.size());
 	}
 	
 	@Test
 	public void generateConferenceMatchupsTakesDivisionalWinnersAndGetsTheirMatchup() {
+		when(playoffTeam1.getConferenceSeed()).thenReturn(3);
+		when(playoffTeam4.getConferenceSeed()).thenReturn(5);
+		
 		playoffs.initializeNFLPlayoffs();
 		playoffs.setDivisionWinner(conference1Name, division1_1Name, playoffTeam1);
 		playoffs.setDivisionWinner(conference1Name, division1_2Name, playoffTeam4);
 		
 		playoffs.setDivisionalRoundWinners(conference1Name, playoffTeam1, playoffTeam4);
 		
-		Matchup conferenceMatchup = playoffs.getConferenceMatchup(conference1Name);
+		Game conferenceGame = playoffs.getConferenceGame(conference1Name);
 		
-		assertEquals(matchup1_4, conferenceMatchup);
+		assertEquals(matchup1_4, conferenceGame.getMatchup());
+		assertEquals(leagueTeam1, conferenceGame.getHomeTeam());
 	}
 	
 	@Test
@@ -421,9 +423,9 @@ public class NFLPlayoffTest {
 		playoffs.setDivisionWinner(conference1Name, division1_1Name, playoffTeam1);
 		playoffs.setDivisionWinner(conference1Name, division1_2Name, playoffTeam4);
 		
-		Matchup conferenceMatchup = playoffs.getConferenceMatchup(conference1Name);
+		Game conferenceGame = playoffs.getConferenceGame(conference1Name);
 		
-		assertNull(conferenceMatchup);
+		assertNull(conferenceGame);
 	}
 	
 	@Test
@@ -435,9 +437,10 @@ public class NFLPlayoffTest {
 		playoffs.setConferenceWinner(conference1Name, playoffTeam1);
 		playoffs.setConferenceWinner(conference2Name, playoffTeam4);
 		
-		Matchup superBowlMatchup = playoffs.getSuperBowlMatchup();
+		Game superBowlGame = playoffs.getSuperBowlGame();
 		
-		assertEquals(matchup1_4, superBowlMatchup);
+		assertEquals(matchup1_4, superBowlGame.getMatchup());
+		assertNull(superBowlGame.getHomeTeam());
 	}
 	
 	@Test
@@ -448,9 +451,23 @@ public class NFLPlayoffTest {
 		
 		playoffs.setConferenceWinner(conference1Name, playoffTeam1);
 		
-		Matchup superBowlMatchup = playoffs.getSuperBowlMatchup();
+		Game superBowlGame = playoffs.getSuperBowlGame();
 		
-		assertNull(superBowlMatchup);
+		assertNull(superBowlGame);
+	}
+	
+	private void assertGameListHasCorrectMatchupsAndHomeTeams(
+			List<Game> divisionalGames, Matchup matchup1, Matchup matchup2) {
+		List<Matchup> divisionalMatchups = new ArrayList<Matchup>();
+		List<Team> homeTeams = new ArrayList<Team>();
+		for (Game divisionalGame : divisionalGames) {
+			divisionalMatchups.add(divisionalGame.getMatchup());
+			homeTeams.add(divisionalGame.getHomeTeam());
+		}
+		assertTrue(divisionalMatchups.contains(matchup1));
+		assertTrue(divisionalMatchups.contains(matchup2));
+		assertTrue(homeTeams.contains(leagueTeam1));
+		assertTrue(homeTeams.contains(leagueTeam2));
 	}
 	
 }

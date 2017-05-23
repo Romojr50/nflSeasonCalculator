@@ -5,6 +5,7 @@ import java.util.List;
 
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
+import nfl.season.league.Game;
 import nfl.season.league.League;
 import nfl.season.league.Matchup;
 import nfl.season.league.Team;
@@ -161,8 +162,8 @@ public class NFLPlayoffs {
 		}
 	}
 
-	public List<Matchup> getWildcardMatchups(String conferenceName) {
-		List<Matchup> wildcardMatchups = new ArrayList<Matchup>();
+	public List<Game> getWildcardGames(String conferenceName) {
+		List<Game> wildcardGames = new ArrayList<Game>();
 		
 		NFLPlayoffConference playoffConference = getConference(conferenceName);
 		if (playoffConference != null) {
@@ -173,20 +174,15 @@ public class NFLPlayoffs {
 			
 			if (threeSeed != null && fourSeed != null && fiveSeed != null &&
 					sixSeed != null) {
-				Team team3 = threeSeed.getTeam();
-				Team team4 = fourSeed.getTeam();
-				Team team5 = fiveSeed.getTeam();
-				Team team6 = sixSeed.getTeam();
+				Game threeSixGame = createGameWithTeams(threeSeed, sixSeed);
+				wildcardGames.add(threeSixGame);
 				
-				Matchup threeSixMatchup = team3.getMatchup(team6.getName());
-				Matchup fourFiveMatchup = team4.getMatchup(team5.getName());
-				
-				wildcardMatchups.add(threeSixMatchup);
-				wildcardMatchups.add(fourFiveMatchup);
+				Game fourFiveGame = createGameWithTeams(fourSeed, fiveSeed);
+				wildcardGames.add(fourFiveGame);
 			}
 		}
 		
-		return wildcardMatchups;
+		return wildcardGames;
 	}
 	
 	public void setWildcardWinners(String conferenceName,
@@ -198,8 +194,8 @@ public class NFLPlayoffs {
 		}
 	}
 
-	public List<Matchup> getDivisionalMatchups(String conferenceName) {
-		List<Matchup> divisionalMatchups = new ArrayList<Matchup>();
+	public List<Game> getDivisionalGames(String conferenceName) {
+		List<Game> divisionalGame = new ArrayList<Game>();
 		
 		NFLPlayoffConference playoffConference = getConference(conferenceName);
 		if (playoffConference != null) {
@@ -222,22 +218,15 @@ public class NFLPlayoffs {
 				NFLPlayoffTeam twoSeed = playoffConference.getTeamWithSeed(2);
 				
 				if (oneSeed != null && twoSeed != null && topWildcardWinner != null && bottomWildcardWinner != null) {
-					Team teamWildcardTop = topWildcardWinner.getTeam();
-					Team teamWildcardBottom = bottomWildcardWinner.getTeam();
-					
-					Team team1 = oneSeed.getTeam();
-					Matchup oneSeedMatchup = team1.getMatchup(teamWildcardBottom.getName());
-					
-					Team team2 = twoSeed.getTeam();
-					Matchup twoSeedMatchup = team2.getMatchup(teamWildcardTop.getName());
-					
-					divisionalMatchups.add(oneSeedMatchup);
-					divisionalMatchups.add(twoSeedMatchup);
+					Game oneSeedGame = createGameWithTeams(oneSeed, bottomWildcardWinner);
+					Game twoSeedGame = createGameWithTeams(twoSeed, topWildcardWinner);
+					divisionalGame.add(oneSeedGame);
+					divisionalGame.add(twoSeedGame);
 				}
 			}
 		}
 		
-		return divisionalMatchups;
+		return divisionalGame;
 	}
 	
 	public void setDivisionalRoundWinners(String conferenceName,
@@ -249,8 +238,8 @@ public class NFLPlayoffs {
 		}
 	}
 
-	public Matchup getConferenceMatchup(String conferenceName) {
-		Matchup conferenceMatchup = null;
+	public Game getConferenceGame(String conferenceName) {
+		Game conferenceGame = null;
 		
 		NFLPlayoffConference conference = getConference(conferenceName);
 		if (conference != null) {
@@ -260,15 +249,17 @@ public class NFLPlayoffs {
 				NFLPlayoffTeam divisionalRoundWinner1 = divisionalRoundWinners.get(0);
 				NFLPlayoffTeam divisionalRoundWinner2 = divisionalRoundWinners.get(1);
 				
-				Team leagueDivisionalRound1 = divisionalRoundWinner1.getTeam();
-				Team leagueDivisionalRound2 = divisionalRoundWinner2.getTeam();
-				String leagueDivisionalRound2Name = leagueDivisionalRound2.getName();
-				
-				conferenceMatchup = leagueDivisionalRound1.getMatchup(leagueDivisionalRound2Name);
+				int divisionalRoundWinner1Seed = divisionalRoundWinner1.getConferenceSeed();
+				int divisionalRoundWinner2Seed = divisionalRoundWinner2.getConferenceSeed();
+				if (divisionalRoundWinner1Seed < divisionalRoundWinner2Seed) {
+					conferenceGame = createGameWithTeams(divisionalRoundWinner1, divisionalRoundWinner2);
+				} else {
+					conferenceGame = createGameWithTeams(divisionalRoundWinner2, divisionalRoundWinner1);
+				}
 			}
 		}
 		
-		return conferenceMatchup;
+		return conferenceGame;
 	}
 
 	public void setConferenceWinner(String conferenceName,
@@ -280,8 +271,8 @@ public class NFLPlayoffs {
 		}
 	}
 
-	public Matchup getSuperBowlMatchup() {
-		Matchup superBowlMatchup = null;
+	public Game getSuperBowlGame() {
+		Game superBowlGame = null;
 		
 		NFLPlayoffConference conference1 = conferences.get(0);
 		NFLPlayoffConference conference2 = conferences.get(1);
@@ -294,9 +285,19 @@ public class NFLPlayoffs {
 			Team leagueConference2Winner = conference2Winner.getTeam();
 			String leagueConference2WinnerName = leagueConference2Winner.getName();
 			
-			superBowlMatchup = leagueConference1Winner.getMatchup(leagueConference2WinnerName);
+			Matchup superBowlMatchup = leagueConference1Winner.getMatchup(
+					leagueConference2WinnerName);
+			superBowlGame = new Game(superBowlMatchup);
 		}
 		
-		return superBowlMatchup;
+		return superBowlGame;
+	}
+	
+	private Game createGameWithTeams(NFLPlayoffTeam homeTeam,
+			NFLPlayoffTeam awayTeam) {
+		Team leagueHomeTeam = homeTeam.getTeam();
+		Team leagueAwayTeam = awayTeam.getTeam();
+		Game game = new Game(leagueHomeTeam, leagueAwayTeam);
+		return game;
 	}
 }
