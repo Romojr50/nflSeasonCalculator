@@ -9,13 +9,12 @@ import nfl.season.league.Conference;
 import nfl.season.league.Division;
 import nfl.season.league.Team;
 
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 
-@RunWith(MockitoJUnitRunner.class)
 public class TestWithMockPlayoffObjects {
 	public List<NFLPlayoffConference> playoffConferences;
+	
+	public List<Conference> leagueConferences;
 	
 	@Mock
 	public NFLPlayoffConference playoffConference1;
@@ -24,6 +23,8 @@ public class TestWithMockPlayoffObjects {
 	public Conference leagueConference1;
 	
 	public List<NFLPlayoffDivision> conference1Divisions;
+	
+	public List<Division> conference1LeagueDivisions;
 	
 	public List<Team> conference1Teams;
 	
@@ -34,6 +35,8 @@ public class TestWithMockPlayoffObjects {
 	public Conference leagueConference2;
 	
 	public List<NFLPlayoffDivision> conference2Divisions;
+	
+	public List<Division> conference2LeagueDivisions;
 	
 	public List<Team> conference2Teams;
 	
@@ -169,9 +172,13 @@ public class TestWithMockPlayoffObjects {
 	
 	private void setUpConferences() {
 		conference1Divisions = new ArrayList<NFLPlayoffDivision>();
+		conference1LeagueDivisions = new ArrayList<Division>();
 		conference1Divisions.add(playoffDivision1_1);
+		conference1LeagueDivisions.add(leagueDivision1_1);
 		conference1Divisions.add(playoffDivision1_2);
+		conference1LeagueDivisions.add(leagueDivision1_2);
 		when(playoffConference1.getDivisions()).thenReturn(conference1Divisions);
+		when(leagueConference1.getDivisions()).thenReturn(conference1LeagueDivisions);
 		when(playoffConference1.getConference()).thenReturn(leagueConference1);
 		when(leagueConference1.getName()).thenReturn("Conf 1");
 		
@@ -187,9 +194,13 @@ public class TestWithMockPlayoffObjects {
 		when(leagueConference1.getTeams()).thenReturn(conference1TeamsCopy);
 		
 		conference2Divisions = new ArrayList<NFLPlayoffDivision>();
+		conference2LeagueDivisions = new ArrayList<Division>();
 		conference2Divisions.add(playoffDivision2_1);
+		conference2LeagueDivisions.add(leagueDivision2_1);
 		conference2Divisions.add(playoffDivision2_2);
+		conference2LeagueDivisions.add(leagueDivision2_2);
 		when(playoffConference2.getDivisions()).thenReturn(conference2Divisions);
+		when(leagueConference2.getDivisions()).thenReturn(conference2LeagueDivisions);
 		when(playoffConference2.getConference()).thenReturn(leagueConference2);
 		when(leagueConference2.getName()).thenReturn("Conf 2");
 		

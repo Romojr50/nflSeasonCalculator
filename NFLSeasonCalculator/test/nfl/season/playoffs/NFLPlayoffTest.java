@@ -460,6 +460,11 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 	
 	@Test
 	public void populateTeamsByPowerRankingsUsesTeamPowerRankingsToChoosePlayoffTeams() {
+		List<Conference> leagueConferences = new ArrayList<Conference>();
+		leagueConferences.add(leagueConference1);
+		leagueConferences.add(leagueConference2);
+		when(nfl.getConferences()).thenReturn(leagueConferences);
+		
 		when(leagueTeam1_1_1.getPowerRanking()).thenReturn(4);
 		when(leagueTeam1_1_2.getPowerRanking()).thenReturn(9);
 		when(leagueTeam1_1_3.getPowerRanking()).thenReturn(29);
@@ -479,20 +484,20 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		playoffs.initializeNFLPlayoffs();
 		playoffs.populateTeamsByPowerRankings();
 		
-		assertEquals(playoffTeam1_1_1, playoffs.getDivisionWinner(leagueConference1.getName(), leagueDivision1_1.getName()));
-		assertEquals(playoffTeam1_2_2, playoffs.getDivisionWinner(leagueConference1.getName(), leagueDivision1_2.getName()));
-		assertEquals(playoffTeam2_1_3, playoffs.getDivisionWinner(leagueConference2.getName(), leagueDivision2_1.getName()));
-		assertEquals(playoffTeam2_2_1, playoffs.getDivisionWinner(leagueConference2.getName(), leagueDivision2_2.getName()));
+		assertEquals(leagueTeam1_1_1, playoffs.getDivisionWinner(leagueConference1.getName(), leagueDivision1_1.getName()).getTeam());
+		assertEquals(leagueTeam1_2_2, playoffs.getDivisionWinner(leagueConference1.getName(), leagueDivision1_2.getName()).getTeam());
+		assertEquals(leagueTeam2_1_3, playoffs.getDivisionWinner(leagueConference2.getName(), leagueDivision2_1.getName()).getTeam());
+		assertEquals(leagueTeam2_2_1, playoffs.getDivisionWinner(leagueConference2.getName(), leagueDivision2_2.getName()).getTeam());
 		
-		assertEquals(playoffTeam1_2_2, playoffs.getTeamByConferenceSeed(leagueConference1.getName(), 1));
-		assertEquals(playoffTeam1_1_1, playoffs.getTeamByConferenceSeed(leagueConference1.getName(), 2));
-		assertEquals(playoffTeam1_2_1, playoffs.getTeamByConferenceSeed(leagueConference1.getName(), 5));
-		assertEquals(playoffTeam1_1_2, playoffs.getTeamByConferenceSeed(leagueConference1.getName(), 6));
+		assertEquals(leagueTeam1_2_2, playoffs.getTeamByConferenceSeed(leagueConference1.getName(), 1).getTeam());
+		assertEquals(leagueTeam1_1_1, playoffs.getTeamByConferenceSeed(leagueConference1.getName(), 2).getTeam());
+		assertEquals(leagueTeam1_2_1, playoffs.getTeamByConferenceSeed(leagueConference1.getName(), 5).getTeam());
+		assertEquals(leagueTeam1_1_2, playoffs.getTeamByConferenceSeed(leagueConference1.getName(), 6).getTeam());
 		
-		assertEquals(playoffTeam2_1_3, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 1));
-		assertEquals(playoffTeam2_2_1, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 2));
-		assertEquals(playoffTeam2_1_1, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 5));
-		assertEquals(playoffTeam2_1_2, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 6));
+		assertEquals(leagueTeam2_1_3, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 1).getTeam());
+		assertEquals(leagueTeam2_2_1, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 2).getTeam());
+		assertEquals(leagueTeam2_1_1, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 5).getTeam());
+		assertEquals(leagueTeam2_1_2, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 6).getTeam());
 	}
 	
 	private void assertGameListHasCorrectMatchupsAndHomeTeams(

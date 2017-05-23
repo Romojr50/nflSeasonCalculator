@@ -1,6 +1,7 @@
 package nfl.season.playoffs;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import nfl.season.league.Conference;
@@ -8,6 +9,7 @@ import nfl.season.league.Division;
 import nfl.season.league.Game;
 import nfl.season.league.League;
 import nfl.season.league.Matchup;
+import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
 
 public class NFLPlayoffs {
@@ -293,6 +295,26 @@ public class NFLPlayoffs {
 		return superBowlGame;
 	}
 	
+	public void populateTeamsByPowerRankings() {
+		for (NFLPlayoffConference conference : conferences) {
+			Conference leagueConference = conference.getConference();
+			String conferenceName = leagueConference.getName();
+			
+			List<Team> divisionWinners = new ArrayList<Team>();
+			List<NFLPlayoffDivision> divisions = conference.getDivisions();
+			addDivisionWinnersByPowerRanking(conferenceName, divisionWinners,
+					divisions);
+			
+			List<Team> wildcards = new ArrayList<Team>();
+			addNextWildcardByPowerRanking(leagueConference,
+					divisionWinners, wildcards);
+			addNextWildcardByPowerRanking(leagueConference, divisionWinners, 
+					wildcards);
+			
+			setDivisionWinnerSeedsByPowerRankings(conference);
+		}
+	}
+	
 	private Game createGameWithTeams(NFLPlayoffTeam homeTeam,
 			NFLPlayoffTeam awayTeam) {
 		Team leagueHomeTeam = homeTeam.getTeam();
@@ -301,7 +323,75 @@ public class NFLPlayoffs {
 		return game;
 	}
 
-	public void populateTeamsByPowerRankings() {
+	private void addDivisionWinnersByPowerRanking(String conferenceName,
+			List<Team> divisionWinners, List<NFLPlayoffDivision> divisions) {
+		for (NFLPlayoffDivision division : divisions) {
+			Division leagueDivision = division.getDivision();
+			String divisionName = leagueDivision.getName();
+			
+			int bestPowerRanking = NFLTeamEnum.values().length + 1;
+			List<Team> teams = leagueDivision.getTeams();
+			Team divisionWinner = null;
+			for (Team team : teams) {
+				int teamPowerRanking = team.getPowerRanking();
+				if (teamPowerRanking != Team.CLEAR_RANKING && 
+						teamPowerRanking < bestPowerRanking) {
+					bestPowerRanking = teamPowerRanking;
+					divisionWinner = team;
+				}
+			}
+			
+			NFLPlayoffTeam playoffDivisionWinner = createPlayoffTeam(divisionWinner);
+			setDivisionWinner(conferenceName, divisionName, playoffDivisionWinner);
+			divisionWinners.add(divisionWinner);
+		}
+	}
+
+	private void addNextWildcardByPowerRanking(Conference leagueConference,
+			List<Team> divisionWinners, List<Team> wildcards) {
+		String conferenceName = leagueConference.getName();
 		
+		int bestPowerRanking = NFLTeamEnum.values().length + 1;
+		Team wildcard = null;
+		List<Team> conferenceTeams = leagueConference.getTeams();
+		for (Team conferenceTeam : conferenceTeams) {
+			if (!divisionWinners.contains(conferenceTeam) && 
+					!wildcards.contains(conferenceTeam)) {
+				int teamPowerRanking = conferenceTeam.getPowerRanking();
+				if (teamPowerRanking != Team.CLEAR_RANKING && teamPowerRanking < bestPowerRanking) {
+					bestPowerRanking = teamPowerRanking;
+					wildcard = conferenceTeam;
+				}
+			}
+		}
+		
+		NFLPlayoffTeam playoffWildcard = createPlayoffTeam(wildcard);
+		addWildcardTeam(conferenceName, playoffWildcard);
+		wildcards.add(wildcard);
+	}
+	
+	private void setDivisionWinnerSeedsByPowerRankings(
+			NFLPlayoffConference conference) {
+		List<NFLPlayoffTeam> playoffDivisionWinners = conference.getDivisionWinners();
+		playoffDivisionWinners.sort(new Comparator<NFLPlayoffTeam>() {
+			@Override
+			public int compare(NFLPlayoffTeam team1, NFLPlayoffTeam team2) {
+				Team leagueTeam1 = team1.getTeam();
+				Team leagueTeam2 = team2.getTeam();
+				int returnCompare = 0;
+				if (leagueTeam1.getPowerRanking() < leagueTeam2.getPowerRanking()) {
+					returnCompare = -1;
+				} else if (leagueTeam2.getPowerRanking() < leagueTeam1.getPowerRanking()) {
+					returnCompare = 1;
+				}
+				return returnCompare;
+			}
+		});
+		
+		int playoffDivisionWinnerIndex = 1;
+		for (NFLPlayoffTeam playoffDivisionWinner : playoffDivisionWinners) {
+			setTeamConferenceSeed(playoffDivisionWinner, playoffDivisionWinnerIndex);
+			playoffDivisionWinnerIndex++;
+		}
 	}
 }
