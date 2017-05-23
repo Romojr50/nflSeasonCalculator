@@ -16,6 +16,12 @@ public class NFLPlayoffConference {
 	
 	private List<NFLPlayoffTeam> teams;
 	
+	private List<NFLPlayoffTeam> wildcardWinners;
+	
+	private List<NFLPlayoffTeam> divisionalRoundWinners;
+	
+	private NFLPlayoffTeam conferenceWinner;
+	
 	public NFLPlayoffConference(Conference conference) {
 		this.conference = conference;
 		divisions = new ArrayList<NFLPlayoffDivision>();
@@ -124,12 +130,42 @@ public class NFLPlayoffConference {
 		
 		return returnDivision;
 	}
+	
+	public List<NFLPlayoffTeam> getWildcardWinners() {
+		return wildcardWinners;
+	}
+	
+	public void setWildcardWinners(NFLPlayoffTeam wildcardWinner1,
+			NFLPlayoffTeam wildcardWinner2) {
+		wildcardWinners = new ArrayList<NFLPlayoffTeam>();
+		wildcardWinners.add(wildcardWinner1);
+		wildcardWinners.add(wildcardWinner2);
+	}
+	
+	public List<NFLPlayoffTeam> getDivisionalRoundWinners() {
+		return divisionalRoundWinners;
+	}
+	
+	public void setDivisionalRoundWinners(NFLPlayoffTeam divisionalRoundWinner1,
+			NFLPlayoffTeam divisionalRoundWinner2) {
+		divisionalRoundWinners = new ArrayList<NFLPlayoffTeam>();
+		divisionalRoundWinners.add(divisionalRoundWinner1);
+		divisionalRoundWinners.add(divisionalRoundWinner2);
+	}
 
 	public void clearPlayoffTeams() {
 		teams = new ArrayList<NFLPlayoffTeam>();
 		for (NFLPlayoffDivision playoffDivision : divisions) {
 			playoffDivision.setDivisionWinner(null);
 		}
+	}
+
+	public NFLPlayoffTeam getConferenceWinner() {
+		return conferenceWinner;
+	}
+
+	public void setConferenceWinner(NFLPlayoffTeam conferenceWinner) {
+		this.conferenceWinner = conferenceWinner;
 	}
 	
 }
