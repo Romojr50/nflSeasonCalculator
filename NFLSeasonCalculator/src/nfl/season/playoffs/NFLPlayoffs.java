@@ -300,4 +300,8 @@ public class NFLPlayoffs {
 		Game game = new Game(leagueHomeTeam, leagueAwayTeam);
 		return game;
 	}
+
+	public void populateTeamsByPowerRankings() {
+		
+	}
 }
