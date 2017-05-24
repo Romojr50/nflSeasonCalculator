@@ -18,7 +18,9 @@ public class PlayoffsMenu extends SubMenu {
 	
 	public enum PlayoffsMenuOptions implements MenuOptions {
 		SELECT_TEAMS(1, "Select Teams for Playoffs"), 
-		EXIT(2, "Back to Main Menu");
+		SELECT_TEAMS_ON_POWER_RANKINGS(2, "Select Playoff Teams Based on Power Rankings"),
+		SELECT_TEAMS_ON_ELO_RATINGS(3, "Select Playoff Teams Based on Elo Ratings"),
+		EXIT(4, "Back to Main Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -50,17 +52,60 @@ public class PlayoffsMenu extends SubMenu {
 
 	@Override
 	public void launchSubMenu() {
-		String playoffsMenuMessage = MenuOptionsUtil.createMenuMessage(PlayoffsMenuOptions.class);
 		
 		int selectedOption = -1;
 		
+		String playoffsPrefixMessage = "";
 		while (selectedOption != PlayoffsMenuOptions.EXIT.optionNumber) {
-			selectedOption = input.askForInt(playoffsMenuMessage);
+			String playoffsMenuMessage = getPlayoffsMenuMessage(); 
+			
+			selectedOption = input.askForInt(playoffsPrefixMessage + playoffsMenuMessage);
 			
 			if (PlayoffsMenuOptions.SELECT_TEAMS.optionNumber == selectedOption) {
 				launchSelectPlayoffTeamsMenu();
+			} else if (PlayoffsMenuOptions.SELECT_TEAMS_ON_POWER_RANKINGS.optionNumber == 
+					selectedOption) {
+				boolean success = playoffs.populateTeamsByPowerRankings();
+				if (success) {
+					playoffsPrefixMessage = "Teams set based on Power Rankings\n";
+				} else {
+					playoffsPrefixMessage = "Need to set Power Rankings on all teams first\n";
+				}
+			} else if (PlayoffsMenuOptions.SELECT_TEAMS_ON_ELO_RATINGS.optionNumber == 
+					selectedOption) {
+				playoffs.populateTeamsByEloRatings();
+				playoffsPrefixMessage = "Teams set based on Elo Ratings\n";
 			}
 		}
+	}
+
+	private String getPlayoffsMenuMessage() {
+		StringBuilder playoffsMenuBuilder = new StringBuilder();
+		playoffsMenuBuilder.append("Current Playoff Teams\n");
+		List<NFLPlayoffConference> playoffConferences = playoffs.getConferences();
+		for (NFLPlayoffConference playoffConference : playoffConferences) {
+			Conference leagueConference = playoffConference.getConference();
+			String conferenceName = leagueConference.getName();
+			playoffsMenuBuilder.append(conferenceName + "\n");
+			
+			for (int i = 1; i <= 6; i++) {
+				NFLPlayoffTeam playoffTeam = playoffConference.getTeamWithSeed(i);
+				if (playoffTeam == null) {
+					playoffsMenuBuilder.append(i + ". Unset\n");
+				} else {
+					Team leagueTeam = playoffTeam.getTeam();
+					String teamName = leagueTeam.getName();
+					
+					playoffsMenuBuilder.append(i + ". " + teamName + "\n");
+				}
+			}
+			playoffsMenuBuilder.append("\n");
+		}
+		
+		String playoffsMenuMessage = playoffsMenuBuilder.toString() + 
+				MenuOptionsUtil.createMenuMessage(PlayoffsMenuOptions.class);
+		
+		return playoffsMenuMessage;
 	}
 
 	private void launchSelectPlayoffTeamsMenu() {
