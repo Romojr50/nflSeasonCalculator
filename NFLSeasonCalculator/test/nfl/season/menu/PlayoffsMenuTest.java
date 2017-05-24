@@ -12,9 +12,10 @@ import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
 import nfl.season.league.Team;
+import nfl.season.playoffs.NFLPlayoffConference;
 import nfl.season.playoffs.NFLPlayoffTeam;
-import nfl.season.playoffs.TestWithMockPlayoffObjects;
 import nfl.season.playoffs.NFLPlayoffs;
+import nfl.season.playoffs.TestWithMockPlayoffObjects;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +28,11 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 
 	private static final int SELECT_TEAMS_FOR_PLAYOFFS = 1;
 	
-	private static final int BACK_TO_MAIN_MENU = 2;
+	private static final int SELECT_TEAMS_BY_POWER_RANKINGS = 2;
+	
+	private static final int SELECT_TEAMS_BY_ELO_RATINGS = 3;
+	
+	private static final int BACK_TO_MAIN_MENU = 4;
 	
 	private String expectedMenuMessage;
 	
@@ -43,11 +48,9 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 	public void setUp() {
 		playoffsMenu = new PlayoffsMenu(input, playoffs);
 		
-		expectedMenuMessage = "Please enter in an integer corresponding to one of the following:\n" +
-				"1. Select Teams for Playoffs\n2. Back to Main Menu";
-		
 		super.setUpMockObjects();
 		super.setUpMockPlayoffsWithTeamsAndConferences(playoffs);
+		setExpectedMenuMessage();
 	}
 
 	@Test
@@ -115,6 +118,82 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 				leagueDivision1_1));
 		verify(input, times(3)).askForInt(getChooseWildcardMessage(leagueConference1, 
 				leagueTeam1_1_2.getName(), leagueTeam1_2_3.getName(), ""));
+	}
+	
+	@Test
+	public void choosePlayoffTeamsBasedOnPowerRankingsCallsPlayoffsToGetTeamsByPowerRankings() {
+		when(playoffs.populateTeamsByPowerRankings()).thenReturn(true);
+		
+		when(input.askForInt(anyString())).thenReturn(SELECT_TEAMS_BY_POWER_RANKINGS, 
+				BACK_TO_MAIN_MENU);
+		
+		playoffsMenu.launchSubMenu();
+		
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+		verify(input, times(1)).askForInt("Teams set based on Power Rankings\n" + expectedMenuMessage);
+		verify(playoffs, times(1)).populateTeamsByPowerRankings();
+	}
+	
+	@Test
+	public void choosePlayoffTeamsOnPowerRankingsButNotAllRankingsSetSoPlayoffTeamsNotSet() {
+		when(playoffs.populateTeamsByPowerRankings()).thenReturn(false);
+		
+		when(input.askForInt(anyString())).thenReturn(SELECT_TEAMS_BY_POWER_RANKINGS, 
+				BACK_TO_MAIN_MENU);
+		
+		playoffsMenu.launchSubMenu();
+		
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+		verify(input, times(1)).askForInt("Need to set Power Rankings on all teams first\n" + 
+				expectedMenuMessage);
+		verify(playoffs, times(1)).populateTeamsByPowerRankings();
+	}
+	
+	@Test
+	public void choosePlayoffTeamsOnEloRatingsHasPlayoffsPopulateTeamsByEloRatings() {
+when(playoffs.populateTeamsByPowerRankings()).thenReturn(true);
+		
+		when(input.askForInt(anyString())).thenReturn(SELECT_TEAMS_BY_ELO_RATINGS, 
+				BACK_TO_MAIN_MENU);
+		
+		playoffsMenu.launchSubMenu();
+		
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+		verify(input, times(1)).askForInt("Teams set based on Elo Ratings\n" + expectedMenuMessage);
+		verify(playoffs, times(1)).populateTeamsByEloRatings();
+	}
+	
+	private void setExpectedMenuMessage() {
+		StringBuilder expectedMenuBuilder = new StringBuilder();
+		
+		expectedMenuBuilder.append("Current Playoff Teams\n");
+		List<NFLPlayoffConference> playoffConferences = playoffs.getConferences();
+		for (NFLPlayoffConference playoffConference : playoffConferences) {
+			Conference leagueConference = playoffConference.getConference();
+			String conferenceName = leagueConference.getName();
+			expectedMenuBuilder.append(conferenceName + "\n");
+			
+			for (int i = 1; i <= 6; i++) {
+				NFLPlayoffTeam playoffTeam = playoffConference.getTeamWithSeed(i);
+				if (playoffTeam == null) {
+					expectedMenuBuilder.append(i + ". Unset\n");
+				} else {
+					Team leagueTeam = playoffTeam.getTeam();
+					String teamName = leagueTeam.getName();
+					
+					expectedMenuBuilder.append(i + ". " + teamName + "\n");
+				}
+			}
+			expectedMenuBuilder.append("\n");
+		}
+		
+		expectedMenuBuilder.append("Please enter in an integer corresponding to one of the following:\n");
+		expectedMenuBuilder.append("1. Select Teams for Playoffs\n");
+		expectedMenuBuilder.append("2. Select Playoff Teams Based on Power Rankings\n");
+		expectedMenuBuilder.append("3. Select Playoff Teams Based on Elo Ratings\n");
+		expectedMenuBuilder.append("4. Back to Main Menu");
+		
+		expectedMenuMessage = expectedMenuBuilder.toString();
 	}
 	
 	private String getChooseDivisionWinnerMessage(Conference conference, Division division) {
