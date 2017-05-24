@@ -473,6 +473,9 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		when(leagueTeam1_2_2.getPowerRanking()).thenReturn(1);
 		when(leagueTeam1_2_3.getPowerRanking()).thenReturn(30);
 		
+		when(leagueTeam1_3_1.getPowerRanking()).thenReturn(27);
+		when(leagueTeam1_4_1.getPowerRanking()).thenReturn(28);
+		
 		when(leagueTeam2_1_1.getPowerRanking()).thenReturn(7);
 		when(leagueTeam2_1_2.getPowerRanking()).thenReturn(8);
 		when(leagueTeam2_1_3.getPowerRanking()).thenReturn(6);
@@ -481,6 +484,9 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		when(leagueTeam2_2_2.getPowerRanking()).thenReturn(15);
 		when(leagueTeam2_2_3.getPowerRanking()).thenReturn(18);
 		
+		when(leagueTeam2_3_1.getPowerRanking()).thenReturn(25);
+		when(leagueTeam2_4_1.getPowerRanking()).thenReturn(26);
+		
 		playoffs.initializeNFLPlayoffs();
 		playoffs.addWildcardTeam(leagueConference1.getName(), playoffTeam1_1_1);
 		boolean success = playoffs.populateTeamsByPowerRankings();
@@ -488,7 +494,7 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		
 		List<NFLPlayoffConference> playoffConferences = playoffs.getConferences();
 		for (NFLPlayoffConference playoffConference : playoffConferences) {
-			assertEquals(4, playoffConference.getTeams().size());
+			assertEquals(6, playoffConference.getTeams().size());
 		}
 		
 		assertExpectedPlayoffTeamsArePopulated();
@@ -547,6 +553,9 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		when(leagueTeam1_2_2.getEloRating()).thenReturn(1596);
 		when(leagueTeam1_2_3.getEloRating()).thenReturn(1464);
 		
+		when(leagueTeam1_3_1.getEloRating()).thenReturn(1400);
+		when(leagueTeam1_4_1.getEloRating()).thenReturn(1389);
+		
 		when(leagueTeam2_1_1.getEloRating()).thenReturn(1548);
 		when(leagueTeam2_1_2.getEloRating()).thenReturn(1536);
 		when(leagueTeam2_1_3.getEloRating()).thenReturn(1560);
@@ -555,13 +564,16 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		when(leagueTeam2_2_2.getEloRating()).thenReturn(1500);
 		when(leagueTeam2_2_3.getEloRating()).thenReturn(1488);
 		
+		when(leagueTeam2_3_1.getEloRating()).thenReturn(1400);
+		when(leagueTeam2_4_1.getEloRating()).thenReturn(1389);
+		
 		playoffs.initializeNFLPlayoffs();
 		playoffs.addWildcardTeam(leagueConference1.getName(), playoffTeam1_1_1);
 		playoffs.populateTeamsByEloRatings();
 		
 		List<NFLPlayoffConference> playoffConferences = playoffs.getConferences();
 		for (NFLPlayoffConference playoffConference : playoffConferences) {
-			assertEquals(4, playoffConference.getTeams().size());
+			assertEquals(6, playoffConference.getTeams().size());
 		}
 		
 		assertExpectedPlayoffTeamsArePopulated();
