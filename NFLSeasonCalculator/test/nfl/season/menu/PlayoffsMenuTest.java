@@ -32,7 +32,9 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 	
 	private static final int SELECT_TEAMS_BY_ELO_RATINGS = 3;
 	
-	private static final int BACK_TO_MAIN_MENU = 4;
+	private static final int CALCULATE_TEAM_CHANCES_BY_ROUND = 4;
+	
+	private static final int BACK_TO_MAIN_MENU = 5;
 	
 	private String expectedMenuMessage;
 	
@@ -160,7 +162,7 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 	
 	@Test
 	public void choosePlayoffTeamsOnEloRatingsHasPlayoffsPopulateTeamsByEloRatings() {
-when(playoffs.populateTeamsByPowerRankings()).thenReturn(true);
+		when(playoffs.populateTeamsByPowerRankings()).thenReturn(true);
 		
 		when(input.askForInt(anyString())).thenReturn(SELECT_TEAMS_BY_ELO_RATINGS, 
 				BACK_TO_MAIN_MENU);
@@ -172,6 +174,35 @@ when(playoffs.populateTeamsByPowerRankings()).thenReturn(true);
 		verify(playoffs, times(1)).populateTeamsByEloRatings();
 	}
 	
+	@Test
+	public void calculateTeamChancesByRoundOutputsAllTeamsAndRoundsChances() {
+		when(playoffConference1.getTeamWithSeed(1)).thenReturn(playoffTeam1_1_1);
+		when(playoffConference1.getTeamWithSeed(2)).thenReturn(playoffTeam1_2_1);
+		when(playoffConference1.getTeamWithSeed(3)).thenReturn(playoffTeam1_3_1);
+		when(playoffConference1.getTeamWithSeed(4)).thenReturn(playoffTeam1_4_1);
+		when(playoffConference1.getTeamWithSeed(5)).thenReturn(playoffTeam1_1_2);
+		when(playoffConference1.getTeamWithSeed(6)).thenReturn(playoffTeam1_2_2);
+		
+		when(playoffConference2.getTeamWithSeed(1)).thenReturn(playoffTeam2_1_1);
+		when(playoffConference2.getTeamWithSeed(2)).thenReturn(playoffTeam2_2_1);
+		when(playoffConference2.getTeamWithSeed(3)).thenReturn(playoffTeam2_3_1);
+		when(playoffConference2.getTeamWithSeed(4)).thenReturn(playoffTeam2_4_1);
+		when(playoffConference2.getTeamWithSeed(5)).thenReturn(playoffTeam2_1_2);
+		when(playoffConference2.getTeamWithSeed(6)).thenReturn(playoffTeam2_2_2);
+		
+		when(input.askForInt(anyString())).thenReturn(CALCULATE_TEAM_CHANCES_BY_ROUND,
+				BACK_TO_MAIN_MENU);
+		
+		playoffsMenu.launchSubMenu();
+		
+		setExpectedMenuMessage();
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+		String allTeamAndRoundChancesMessage = getAllTeamAndRoundChancesMessage();
+		verify(input, times(1)).askForInt(allTeamAndRoundChancesMessage + expectedMenuMessage);
+		
+		verify(playoffs, times(1)).calculateChancesByRoundForAllPlayoffTeams();
+	}
+
 	private void setExpectedMenuMessage() {
 		StringBuilder expectedMenuBuilder = new StringBuilder();
 		
@@ -200,7 +231,8 @@ when(playoffs.populateTeamsByPowerRankings()).thenReturn(true);
 		expectedMenuBuilder.append("1. Select Teams for Playoffs\n");
 		expectedMenuBuilder.append("2. Select Playoff Teams Based on Power Rankings\n");
 		expectedMenuBuilder.append("3. Select Playoff Teams Based on Elo Ratings\n");
-		expectedMenuBuilder.append("4. Back to Main Menu");
+		expectedMenuBuilder.append("4. Calculate and Print Team Chances By Playoff Round\n");
+		expectedMenuBuilder.append("5. Back to Main Menu");
 		
 		expectedMenuMessage = expectedMenuBuilder.toString();
 	}
@@ -280,6 +312,37 @@ when(playoffs.populateTeamsByPowerRankings()).thenReturn(true);
 		wildcardMessageBuilder.deleteCharAt(wildcardMessageBuilder.lastIndexOf("\n"));
 		
 		return wildcardMessageBuilder.toString();
+	}
+
+	private String getAllTeamAndRoundChancesMessage() {
+		StringBuilder teamAndRoundsMessageBuilder = new StringBuilder();
+		
+		List<NFLPlayoffConference> playoffConferences = playoffs.getConferences();
+		for (NFLPlayoffConference playoffConference : playoffConferences) {
+			Conference leagueConference = playoffConference.getConference();
+			String conferenceName = leagueConference.getName();
+			teamAndRoundsMessageBuilder.append(conferenceName + "\n");
+			
+			for (int i = 1; i <= 6; i++) {
+				NFLPlayoffTeam playoffTeam = playoffConference.getTeamWithSeed(i);
+				Team leagueTeam = playoffTeam.getTeam();
+				String teamName = leagueTeam.getName();
+					
+				teamAndRoundsMessageBuilder.append(i + ". " + teamName + "\n");
+				teamAndRoundsMessageBuilder.append("Make Divisional Round: " + 
+						playoffTeam.getChanceOfMakingDivisionalRound() + "%\n");
+				teamAndRoundsMessageBuilder.append("Make Conference Round: " + 
+						playoffTeam.getChanceOfMakingConferenceRound() + "%\n");
+				teamAndRoundsMessageBuilder.append("Win Conference: " + 
+						playoffTeam.getChanceOfMakingSuperBowl() + "%\n");
+				teamAndRoundsMessageBuilder.append("Win Super Bowl: " + 
+						playoffTeam.getChanceOfWinningSuperBowl() + "%\n");
+				teamAndRoundsMessageBuilder.append("\n");
+			}
+			teamAndRoundsMessageBuilder.append("\n");
+		}
+		
+		return teamAndRoundsMessageBuilder.toString();
 	}
 	
 }

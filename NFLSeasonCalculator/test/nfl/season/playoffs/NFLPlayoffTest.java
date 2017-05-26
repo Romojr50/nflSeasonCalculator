@@ -466,23 +466,23 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		when(leagueTeam1_1_2.getPowerRanking()).thenReturn(9);
 		when(leagueTeam1_1_3.getPowerRanking()).thenReturn(29);
 		
-		when(leagueTeam1_2_1.getPowerRanking()).thenReturn(2);
+		when(leagueTeam1_2_1.getPowerRanking()).thenReturn(3);
 		when(leagueTeam1_2_2.getPowerRanking()).thenReturn(1);
 		when(leagueTeam1_2_3.getPowerRanking()).thenReturn(30);
 		
 		when(leagueTeam1_3_1.getPowerRanking()).thenReturn(27);
 		when(leagueTeam1_4_1.getPowerRanking()).thenReturn(28);
 		
-		when(leagueTeam2_1_1.getPowerRanking()).thenReturn(7);
-		when(leagueTeam2_1_2.getPowerRanking()).thenReturn(8);
-		when(leagueTeam2_1_3.getPowerRanking()).thenReturn(6);
+		when(leagueTeam2_1_1.getPowerRanking()).thenReturn(8);
+		when(leagueTeam2_1_2.getPowerRanking()).thenReturn(9);
+		when(leagueTeam2_1_3.getPowerRanking()).thenReturn(7);
 		
-		when(leagueTeam2_2_1.getPowerRanking()).thenReturn(12);
+		when(leagueTeam2_2_1.getPowerRanking()).thenReturn(5);
 		when(leagueTeam2_2_2.getPowerRanking()).thenReturn(15);
 		when(leagueTeam2_2_3.getPowerRanking()).thenReturn(18);
 		
-		when(leagueTeam2_3_1.getPowerRanking()).thenReturn(25);
-		when(leagueTeam2_4_1.getPowerRanking()).thenReturn(26);
+		when(leagueTeam2_3_1.getPowerRanking()).thenReturn(2);
+		when(leagueTeam2_4_1.getPowerRanking()).thenReturn(6);
 		
 		playoffs.initializeNFLPlayoffs();
 		playoffs.addWildcardTeam(leagueConference1.getName(), playoffTeam1_1_1);
@@ -549,14 +549,14 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		
 		when(leagueTeam2_1_1.getEloRating()).thenReturn(1548);
 		when(leagueTeam2_1_2.getEloRating()).thenReturn(1536);
-		when(leagueTeam2_1_3.getEloRating()).thenReturn(1560);
+		when(leagueTeam2_1_3.getEloRating()).thenReturn(1568);
 		
-		when(leagueTeam2_2_1.getEloRating()).thenReturn(1512);
+		when(leagueTeam2_2_1.getEloRating()).thenReturn(1585);
 		when(leagueTeam2_2_2.getEloRating()).thenReturn(1500);
 		when(leagueTeam2_2_3.getEloRating()).thenReturn(1488);
 		
-		when(leagueTeam2_3_1.getEloRating()).thenReturn(1400);
-		when(leagueTeam2_4_1.getEloRating()).thenReturn(1389);
+		when(leagueTeam2_3_1.getEloRating()).thenReturn(1615);
+		when(leagueTeam2_4_1.getEloRating()).thenReturn(1569);
 		
 		playoffs.initializeNFLPlayoffs();
 		playoffs.addWildcardTeam(leagueConference1.getName(), playoffTeam1_1_1);
@@ -623,8 +623,10 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		assertEquals(leagueTeam1_2_1, playoffs.getTeamByConferenceSeed(leagueConference1.getName(), 5).getTeam());
 		assertEquals(leagueTeam1_1_2, playoffs.getTeamByConferenceSeed(leagueConference1.getName(), 6).getTeam());
 		
-		assertEquals(leagueTeam2_1_3, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 1).getTeam());
+		assertEquals(leagueTeam2_3_1, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 1).getTeam());
 		assertEquals(leagueTeam2_2_1, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 2).getTeam());
+		assertEquals(leagueTeam2_4_1, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 3).getTeam());
+		assertEquals(leagueTeam2_1_3, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 4).getTeam());
 		assertEquals(leagueTeam2_1_1, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 5).getTeam());
 		assertEquals(leagueTeam2_1_2, playoffs.getTeamByConferenceSeed(leagueConference2.getName(), 6).getTeam());
 	}

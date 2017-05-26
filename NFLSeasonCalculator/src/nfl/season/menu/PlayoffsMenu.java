@@ -20,7 +20,8 @@ public class PlayoffsMenu extends SubMenu {
 		SELECT_TEAMS(1, "Select Teams for Playoffs"), 
 		SELECT_TEAMS_ON_POWER_RANKINGS(2, "Select Playoff Teams Based on Power Rankings"),
 		SELECT_TEAMS_ON_ELO_RATINGS(3, "Select Playoff Teams Based on Elo Ratings"),
-		EXIT(4, "Back to Main Menu");
+		CALCULATE_TEAM_CHANCES_BY_ROUND(4, "Calculate and Print Team Chances By Playoff Round"),
+		EXIT(5, "Back to Main Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -75,6 +76,9 @@ public class PlayoffsMenu extends SubMenu {
 					selectedOption) {
 				playoffs.populateTeamsByEloRatings();
 				playoffsPrefixMessage = "Teams set based on Elo Ratings\n";
+			} else if (PlayoffsMenuOptions.CALCULATE_TEAM_CHANCES_BY_ROUND.optionNumber == 
+					selectedOption) {
+				playoffsPrefixMessage = calculatePlayoffRoundChancesAndReturnResultPrintout();
 			}
 		}
 	}
@@ -124,6 +128,38 @@ public class PlayoffsMenu extends SubMenu {
 			
 			getWildcardTeams(leagueConference, divisionWinnerNames);
 		}
+	}
+
+	private String calculatePlayoffRoundChancesAndReturnResultPrintout() {
+		playoffs.calculateChancesByRoundForAllPlayoffTeams();
+		
+		StringBuilder playoffRoundChancesBuilder = new StringBuilder();
+		List<NFLPlayoffConference> playoffConferences = playoffs.getConferences();
+		for (NFLPlayoffConference playoffConference : playoffConferences) {
+			Conference leagueConference = playoffConference.getConference();
+			String conferenceName = leagueConference.getName();
+			playoffRoundChancesBuilder.append(conferenceName + "\n");
+			
+			for (int i = 1; i <= 6; i++) {
+				NFLPlayoffTeam playoffTeam = playoffConference.getTeamWithSeed(i);
+				Team leagueTeam = playoffTeam.getTeam();
+				String teamName = leagueTeam.getName();
+					
+				playoffRoundChancesBuilder.append(i + ". " + teamName + "\n");
+				playoffRoundChancesBuilder.append("Make Divisional Round: " + 
+						playoffTeam.getChanceOfMakingDivisionalRound() + "%\n");
+				playoffRoundChancesBuilder.append("Make Conference Round: " + 
+						playoffTeam.getChanceOfMakingConferenceRound() + "%\n");
+				playoffRoundChancesBuilder.append("Win Conference: " + 
+						playoffTeam.getChanceOfMakingSuperBowl() + "%\n");
+				playoffRoundChancesBuilder.append("Win Super Bowl: " + 
+						playoffTeam.getChanceOfWinningSuperBowl() + "%\n");
+				playoffRoundChancesBuilder.append("\n");
+			}
+			playoffRoundChancesBuilder.append("\n");
+		}
+		
+		return playoffRoundChancesBuilder.toString();
 	}
 
 	private void getDivisionWinners(String conferenceName,

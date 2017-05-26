@@ -114,10 +114,10 @@ public class NFLPlayoffs {
 		
 		if (playoffConference != null) {
 			int oldConferenceSeed = playoffTeam.getConferenceSeed();
-			playoffTeam.setConferenceSeed(conferenceSeed);
-			
 			NFLPlayoffTeam teamThatUsedToHaveSeed = 
 					playoffConference.getTeamWithSeed(conferenceSeed);
+			
+			playoffTeam.setConferenceSeed(conferenceSeed);
 			if (teamThatUsedToHaveSeed != null) {
 				teamThatUsedToHaveSeed.setConferenceSeed(oldConferenceSeed);
 			}
