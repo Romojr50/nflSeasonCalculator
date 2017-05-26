@@ -114,10 +114,10 @@ public class NFLPlayoffs {
 		
 		if (playoffConference != null) {
 			int oldConferenceSeed = playoffTeam.getConferenceSeed();
-			playoffTeam.setConferenceSeed(conferenceSeed);
-			
 			NFLPlayoffTeam teamThatUsedToHaveSeed = 
 					playoffConference.getTeamWithSeed(conferenceSeed);
+			
+			playoffTeam.setConferenceSeed(conferenceSeed);
 			if (teamThatUsedToHaveSeed != null) {
 				teamThatUsedToHaveSeed.setConferenceSeed(oldConferenceSeed);
 			}
@@ -341,6 +341,10 @@ public class NFLPlayoffs {
 			
 			setDivisionWinnerSeedsByEloRatings(conference);
 		}
+	}
+	
+	public boolean calculateChancesByRoundForAllPlayoffTeams() {
+		return NFLPlayoffRoundsUtil.calculateChancesByRoundForAllPlayoffTeams(this);
 	}
 	
 	private Game createGameWithTeams(NFLPlayoffTeam homeTeam,

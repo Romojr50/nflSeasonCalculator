@@ -107,6 +107,17 @@ public class NFLPlayoffConference {
 	public List<NFLPlayoffTeam> getTeams() {
 		return teams;
 	}
+	
+	public List<NFLPlayoffTeam> getTeamsInSeedOrder() {
+		List<NFLPlayoffTeam> playoffTeams = new ArrayList<NFLPlayoffTeam>();
+		playoffTeams.add(getTeamWithSeed(1));
+		playoffTeams.add(getTeamWithSeed(2));
+		playoffTeams.add(getTeamWithSeed(3));
+		playoffTeams.add(getTeamWithSeed(4));
+		playoffTeams.add(getTeamWithSeed(5));
+		playoffTeams.add(getTeamWithSeed(6));
+		return playoffTeams;
+	}
 
 	public void addTeam(NFLPlayoffTeam playoffTeam) {
 		teams.add(playoffTeam);
