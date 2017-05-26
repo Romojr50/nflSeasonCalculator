@@ -584,40 +584,11 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		List<NFLPlayoffConference> conferences = playoffs.getConferences();
 		NFLPlayoffConference conference1 = conferences.get(0);
 		
-		NFLPlayoffTeam oneSeed = conference1.getTeamWithSeed(1);
-		NFLPlayoffTeam twoSeed = conference1.getTeamWithSeed(2);
-		NFLPlayoffTeam threeSeed = conference1.getTeamWithSeed(3);
-		NFLPlayoffTeam fourSeed = conference1.getTeamWithSeed(4);
-		NFLPlayoffTeam fiveSeed = conference1.getTeamWithSeed(5);
-		NFLPlayoffTeam sixSeed = conference1.getTeamWithSeed(6);
+		assertRoundChancesInConferenceAreCorrect(conference1);
 		
-		assertEquals(100, oneSeed.getChanceOfMakingDivisionalRound());
-		assertEquals(100, twoSeed.getChanceOfMakingDivisionalRound());
-		assertEquals(57, threeSeed.getChanceOfMakingDivisionalRound());
-		assertEquals(57, fourSeed.getChanceOfMakingDivisionalRound());
-		assertEquals(43, fiveSeed.getChanceOfMakingDivisionalRound());
-		assertEquals(43, sixSeed.getChanceOfMakingDivisionalRound());
-		
-		assertEquals(57, oneSeed.getChanceOfMakingConferenceRound());
-		assertEquals(57, twoSeed.getChanceOfMakingConferenceRound());
-		assertEquals(25, threeSeed.getChanceOfMakingConferenceRound());
-		assertEquals(25, fourSeed.getChanceOfMakingConferenceRound());
-		assertEquals(18, fiveSeed.getChanceOfMakingConferenceRound());
-		assertEquals(18, sixSeed.getChanceOfMakingConferenceRound());
-		
-		assertEquals(33, oneSeed.getChanceOfMakingSuperBowl());
-		assertEquals(28, twoSeed.getChanceOfMakingSuperBowl());
-		assertEquals(12, threeSeed.getChanceOfMakingSuperBowl());
-		assertEquals(11, fourSeed.getChanceOfMakingSuperBowl());
-		assertEquals(8, fiveSeed.getChanceOfMakingSuperBowl());
-		assertEquals(8, sixSeed.getChanceOfMakingSuperBowl());
-		
-		assertEquals(16, oneSeed.getChanceOfWinningSuperBowl());
-		assertEquals(14, twoSeed.getChanceOfWinningSuperBowl());
-		assertEquals(6, threeSeed.getChanceOfWinningSuperBowl());
-		assertEquals(6, fourSeed.getChanceOfWinningSuperBowl());
-		assertEquals(4, fiveSeed.getChanceOfWinningSuperBowl());
-		assertEquals(4, sixSeed.getChanceOfWinningSuperBowl());
+		NFLPlayoffConference conference2 = conferences.get(1);
+		NFLPlayoffTeam otherOneSeed = conference2.getTeamWithSeed(1);
+		assertEquals(17, otherOneSeed.getChanceOfWinningSuperBowl());
 	}
 
 	private void assertGameListHasCorrectMatchupsAndHomeTeams(
@@ -675,6 +646,45 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		assertEquals(50, matchupSample.getTeamNeutralWinChance(leagueTeam2_1_3.getName()));
 		assertEquals(57, matchupSample.getTeamHomeWinChance(leagueTeam2_1_3.getName()));
 		assertEquals(43, matchupSample.getTeamAwayWinChance(leagueTeam2_1_3.getName()));
+	}
+	
+
+	private void assertRoundChancesInConferenceAreCorrect(
+			NFLPlayoffConference conference1) {
+		NFLPlayoffTeam oneSeed = conference1.getTeamWithSeed(1);
+		NFLPlayoffTeam twoSeed = conference1.getTeamWithSeed(2);
+		NFLPlayoffTeam threeSeed = conference1.getTeamWithSeed(3);
+		NFLPlayoffTeam fourSeed = conference1.getTeamWithSeed(4);
+		NFLPlayoffTeam fiveSeed = conference1.getTeamWithSeed(5);
+		NFLPlayoffTeam sixSeed = conference1.getTeamWithSeed(6);
+		
+		assertEquals(100, oneSeed.getChanceOfMakingDivisionalRound());
+		assertEquals(100, twoSeed.getChanceOfMakingDivisionalRound());
+		assertEquals(57, threeSeed.getChanceOfMakingDivisionalRound());
+		assertEquals(57, fourSeed.getChanceOfMakingDivisionalRound());
+		assertEquals(43, fiveSeed.getChanceOfMakingDivisionalRound());
+		assertEquals(43, sixSeed.getChanceOfMakingDivisionalRound());
+		
+		assertEquals(57, oneSeed.getChanceOfMakingConferenceRound());
+		assertEquals(57, twoSeed.getChanceOfMakingConferenceRound());
+		assertEquals(25, threeSeed.getChanceOfMakingConferenceRound());
+		assertEquals(25, fourSeed.getChanceOfMakingConferenceRound());
+		assertEquals(18, fiveSeed.getChanceOfMakingConferenceRound());
+		assertEquals(18, sixSeed.getChanceOfMakingConferenceRound());
+		
+		assertEquals(33, oneSeed.getChanceOfMakingSuperBowl());
+		assertEquals(28, twoSeed.getChanceOfMakingSuperBowl());
+		assertEquals(12, threeSeed.getChanceOfMakingSuperBowl());
+		assertEquals(11, fourSeed.getChanceOfMakingSuperBowl());
+		assertEquals(8, fiveSeed.getChanceOfMakingSuperBowl());
+		assertEquals(8, sixSeed.getChanceOfMakingSuperBowl());
+		
+		assertEquals(17, oneSeed.getChanceOfWinningSuperBowl());
+		assertEquals(14, twoSeed.getChanceOfWinningSuperBowl());
+		assertEquals(6, threeSeed.getChanceOfWinningSuperBowl());
+		assertEquals(6, fourSeed.getChanceOfWinningSuperBowl());
+		assertEquals(4, fiveSeed.getChanceOfWinningSuperBowl());
+		assertEquals(4, sixSeed.getChanceOfWinningSuperBowl());
 	}
 	
 	private void populatePlayoffTeams() {
