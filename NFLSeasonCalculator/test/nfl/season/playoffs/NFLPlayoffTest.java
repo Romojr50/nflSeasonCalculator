@@ -579,7 +579,9 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		
 		populatePlayoffTeams();
 		
-		playoffs.calculateChancesByRoundForAllPlayoffTeams();
+		boolean success = playoffs.calculateChancesByRoundForAllPlayoffTeams();
+		
+		assertTrue(success);
 		
 		List<NFLPlayoffConference> conferences = playoffs.getConferences();
 		NFLPlayoffConference conference1 = conferences.get(0);
@@ -589,6 +591,18 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		NFLPlayoffConference conference2 = conferences.get(1);
 		NFLPlayoffTeam otherOneSeed = conference2.getTeamWithSeed(1);
 		assertEquals(17, otherOneSeed.getChanceOfWinningSuperBowl());
+	}
+	
+	@Test
+	public void calculateTeamChancesButNotAllTeamsSetSoCalculationFails() {
+		connectPlayoffsWithParentMockObjects();
+		playoffs.initializeNFLPlayoffs();
+		
+		setUpMatchupsOnMockTeams();
+		
+		boolean success = playoffs.calculateChancesByRoundForAllPlayoffTeams();
+		
+		assertFalse(success);
 	}
 
 	private void assertGameListHasCorrectMatchupsAndHomeTeams(

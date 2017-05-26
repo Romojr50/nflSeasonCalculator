@@ -7,27 +7,47 @@ import nfl.season.league.Team;
 
 public class NFLPlayoffRoundsUtil {
 
-	public static void calculateChancesByRoundForAllPlayoffTeams(NFLPlayoffs playoffs) {
+	public static boolean calculateChancesByRoundForAllPlayoffTeams(NFLPlayoffs playoffs) {
 		List<NFLPlayoffConference> playoffConferences = playoffs.getConferences();
-		for (NFLPlayoffConference playoffConference : playoffConferences) {
-			double[][] conferenceMatrix = getConferenceMatrix(playoffConference);
-			List<NFLPlayoffTeam> playoffTeams = playoffConference.getTeamsInSeedOrder();
+		boolean success = allPlayoffTeamsSet(playoffConferences);
+		
+		if (success) {
+			for (NFLPlayoffConference playoffConference : playoffConferences) {
+				double[][] conferenceMatrix = getConferenceMatrix(playoffConference);
+				List<NFLPlayoffTeam> playoffTeams = playoffConference.getTeamsInSeedOrder();
+				
+				setDivisionalRoundChances(conferenceMatrix, playoffTeams);
+				setConferenceRoundChances(conferenceMatrix, playoffTeams);
+				setSuperBowlRoundChances(conferenceMatrix, playoffTeams);
+			}
 			
-			setDivisionalRoundChances(conferenceMatrix, playoffTeams);
-			setConferenceRoundChances(conferenceMatrix, playoffTeams);
-			setSuperBowlRoundChances(conferenceMatrix, playoffTeams);
+			NFLPlayoffConference playoffConference1 = playoffConferences.get(0);
+			NFLPlayoffConference playoffConference2 = playoffConferences.get(1);
+			
+			List<NFLPlayoffTeam> conferenceTeams = playoffConference1.getTeams();
+			List<NFLPlayoffTeam> otherConferenceTeams = playoffConference2.getTeams();
+			
+			setAllSuperBowlChancesInConference(conferenceTeams,
+					otherConferenceTeams);
+			setAllSuperBowlChancesInConference(otherConferenceTeams,
+					conferenceTeams);
 		}
 		
-		NFLPlayoffConference playoffConference1 = playoffConferences.get(0);
-		NFLPlayoffConference playoffConference2 = playoffConferences.get(1);
+		return success;
+	}
+
+	private static boolean allPlayoffTeamsSet(
+			List<NFLPlayoffConference> playoffConferences) {
+		boolean success = true;
 		
-		List<NFLPlayoffTeam> conferenceTeams = playoffConference1.getTeams();
-		List<NFLPlayoffTeam> otherConferenceTeams = playoffConference2.getTeams();
-		
-		setAllSuperBowlChancesInConference(conferenceTeams,
-				otherConferenceTeams);
-		setAllSuperBowlChancesInConference(otherConferenceTeams,
-				conferenceTeams);
+		for (NFLPlayoffConference playoffConference : playoffConferences) {
+			List<NFLPlayoffTeam> playoffTeams = playoffConference.getTeamsInSeedOrder();
+			if (playoffTeams.size() < 6 || playoffTeams.contains(null)) {
+				success = false;
+				break;
+			}
+		}
+		return success;
 	}
 	
 	private static double[][] getConferenceMatrix(

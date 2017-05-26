@@ -343,8 +343,8 @@ public class NFLPlayoffs {
 		}
 	}
 	
-	public void calculateChancesByRoundForAllPlayoffTeams() {
-		NFLPlayoffRoundsUtil.calculateChancesByRoundForAllPlayoffTeams(this);
+	public boolean calculateChancesByRoundForAllPlayoffTeams() {
+		return NFLPlayoffRoundsUtil.calculateChancesByRoundForAllPlayoffTeams(this);
 	}
 	
 	private Game createGameWithTeams(NFLPlayoffTeam homeTeam,

@@ -190,6 +190,8 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 		when(playoffConference2.getTeamWithSeed(5)).thenReturn(playoffTeam2_1_2);
 		when(playoffConference2.getTeamWithSeed(6)).thenReturn(playoffTeam2_2_2);
 		
+		when(playoffs.calculateChancesByRoundForAllPlayoffTeams()).thenReturn(true);
+		
 		when(input.askForInt(anyString())).thenReturn(CALCULATE_TEAM_CHANCES_BY_ROUND,
 				BACK_TO_MAIN_MENU);
 		
@@ -199,6 +201,23 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 		verify(input, times(1)).askForInt(expectedMenuMessage);
 		String allTeamAndRoundChancesMessage = getAllTeamAndRoundChancesMessage();
 		verify(input, times(1)).askForInt(allTeamAndRoundChancesMessage + expectedMenuMessage);
+		
+		verify(playoffs, times(1)).calculateChancesByRoundForAllPlayoffTeams();
+	}
+	
+	@Test
+	public void calculateTeamChancesByRoundFailsSoDisplayFailMessage() {
+		when(playoffs.calculateChancesByRoundForAllPlayoffTeams()).thenReturn(false);
+		
+		when(input.askForInt(anyString())).thenReturn(CALCULATE_TEAM_CHANCES_BY_ROUND,
+				BACK_TO_MAIN_MENU);
+		
+		playoffsMenu.launchSubMenu();
+		
+		setExpectedMenuMessage();
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+		String calculationFailedMessage = "Calculation Failed; Please set all 12 Playoff Teams\n";
+		verify(input, times(1)).askForInt(calculationFailedMessage + expectedMenuMessage);
 		
 		verify(playoffs, times(1)).calculateChancesByRoundForAllPlayoffTeams();
 	}

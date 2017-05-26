@@ -131,9 +131,22 @@ public class PlayoffsMenu extends SubMenu {
 	}
 
 	private String calculatePlayoffRoundChancesAndReturnResultPrintout() {
-		playoffs.calculateChancesByRoundForAllPlayoffTeams();
+		boolean success = playoffs.calculateChancesByRoundForAllPlayoffTeams();
 		
 		StringBuilder playoffRoundChancesBuilder = new StringBuilder();
+		
+		if (success) {
+			playoffRoundChancesBuilder.append(getPlayoffRoundChancesPrintout());
+		} else {
+			playoffRoundChancesBuilder.append("Calculation Failed; Please set all 12 Playoff Teams\n");
+		}
+		
+		return playoffRoundChancesBuilder.toString();
+	}
+
+	private String getPlayoffRoundChancesPrintout() {
+		StringBuilder playoffRoundChancesBuilder = new StringBuilder();
+		
 		List<NFLPlayoffConference> playoffConferences = playoffs.getConferences();
 		for (NFLPlayoffConference playoffConference : playoffConferences) {
 			Conference leagueConference = playoffConference.getConference();
@@ -144,7 +157,7 @@ public class PlayoffsMenu extends SubMenu {
 				NFLPlayoffTeam playoffTeam = playoffConference.getTeamWithSeed(i);
 				Team leagueTeam = playoffTeam.getTeam();
 				String teamName = leagueTeam.getName();
-					
+				
 				playoffRoundChancesBuilder.append(i + ". " + teamName + "\n");
 				playoffRoundChancesBuilder.append("Make Divisional Round: " + 
 						playoffTeam.getChanceOfMakingDivisionalRound() + "%\n");
