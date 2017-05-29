@@ -78,7 +78,7 @@ public class PlayoffsMenu extends SubMenu {
 				playoffs.populateTeamsByEloRatings();
 				playoffsPrefixMessage = "Teams set based on Elo Ratings\n";
 			} else if (PlayoffsMenuOptions.RESEED_TEAMS.optionNumber == selectedOption) {
-				launchReseedPlayoffTeamsMenu();
+				playoffsPrefixMessage = launchReseedPlayoffTeamsMenu();
 			} else if (PlayoffsMenuOptions.CALCULATE_TEAM_CHANCES_BY_ROUND.optionNumber == 
 					selectedOption) {
 				playoffsPrefixMessage = calculatePlayoffRoundChancesAndReturnResultPrintout();
@@ -133,26 +133,35 @@ public class PlayoffsMenu extends SubMenu {
 		}
 	}
 	
-	private void launchReseedPlayoffTeamsMenu() {
-		List<NFLPlayoffConference> playoffConferences = playoffs.getConferences();
-		for (NFLPlayoffConference playoffConference : playoffConferences) {
-			Conference leagueConference = playoffConference.getConference();
-			String conferenceName = leagueConference.getName();
-			
-			int conferenceSeed = 1;
-			List<NFLPlayoffTeam> playoffDivisionWinners = playoffConference.getDivisionWinners();
-			
-			for (conferenceSeed = 1; conferenceSeed < 4; conferenceSeed++) {
-				reseedNextDivisionWinner(conferenceName, conferenceSeed,
-						playoffDivisionWinners);
+	private String launchReseedPlayoffTeamsMenu() {
+		String errorMessage = "";
+		
+		boolean allPlayoffTeamsSet = playoffs.allPlayoffTeamsSet();
+		if (allPlayoffTeamsSet) {
+			List<NFLPlayoffConference> playoffConferences = playoffs.getConferences();
+			for (NFLPlayoffConference playoffConference : playoffConferences) {
+				Conference leagueConference = playoffConference.getConference();
+				String conferenceName = leagueConference.getName();
+				
+				int conferenceSeed = 1;
+				List<NFLPlayoffTeam> playoffDivisionWinners = playoffConference.getDivisionWinners();
+				
+				for (conferenceSeed = 1; conferenceSeed < 4; conferenceSeed++) {
+					reseedNextDivisionWinner(conferenceName, conferenceSeed,
+							playoffDivisionWinners);
+				}
+				NFLPlayoffTeam remainingDivisionWinner = playoffDivisionWinners.remove(0);
+				playoffs.setTeamConferenceSeed(remainingDivisionWinner, conferenceSeed);
+				
+				conferenceSeed++;
+				
+				reseedWildcards(playoffConference, conferenceName, conferenceSeed);
 			}
-			NFLPlayoffTeam remainingDivisionWinner = playoffDivisionWinners.remove(0);
-			playoffs.setTeamConferenceSeed(remainingDivisionWinner, conferenceSeed);
-			
-			conferenceSeed++;
-			
-			reseedWildcards(playoffConference, conferenceName, conferenceSeed);
+		} else {
+			errorMessage = "Please Fill Out All Playoff Teams First\n";
 		}
+		
+		return errorMessage;
 	}
 
 	private String calculatePlayoffRoundChancesAndReturnResultPrintout() {

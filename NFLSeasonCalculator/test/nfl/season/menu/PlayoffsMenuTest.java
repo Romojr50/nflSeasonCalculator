@@ -1,6 +1,9 @@
 package nfl.season.menu;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -154,6 +157,8 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 	
 	@Test
 	public void reseedPlayoffTeamsSoTeamsAreReseeded() {
+		when(playoffs.allPlayoffTeamsSet()).thenReturn(true);
+		
 		setUpDivisionWinners();
 		when(playoffConference1.getTeamWithSeed(5)).thenReturn(playoffTeam1_1_1);
 		when(playoffConference1.getTeamWithSeed(6)).thenReturn(playoffTeam1_2_2);
@@ -182,6 +187,21 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 		verify(playoffs).setTeamConferenceSeed(playoffTeam2_1_2, 4);
 		verify(playoffs).setTeamConferenceSeed(playoffTeam2_1_3, 5);
 		verify(playoffs).setTeamConferenceSeed(playoffTeam2_2_2, 6);
+	}
+	
+	@Test
+	public void reseedPlayoffTeamsButNotAllTeamsSetSoReseedingDoesNotHappen() {
+		when(playoffs.allPlayoffTeamsSet()).thenReturn(false);
+		
+		when(input.askForInt(anyString())).thenReturn(RESEED_TEAMS, BACK_TO_MAIN_MENU);
+		
+		playoffsMenu.launchSubMenu();
+		
+		expectedMenuMessage = "Please Fill Out All Playoff Teams First\n" + 
+				expectedMenuMessage;
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+		
+		verify(playoffs, never()).setTeamConferenceSeed(any(NFLPlayoffTeam.class), anyInt());
 	}
 
 	@Test

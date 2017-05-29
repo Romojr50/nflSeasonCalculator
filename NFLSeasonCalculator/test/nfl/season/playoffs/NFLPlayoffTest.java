@@ -313,6 +313,22 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 	}
 	
 	@Test
+	public void allPlayoffTeamsSetReturnsTrueIfAllTeamsAreSet() {
+		connectPlayoffsWithParentMockObjects();
+		playoffs.initializeNFLPlayoffs();
+		populatePlayoffTeams();
+		
+		assertTrue(playoffs.allPlayoffTeamsSet());
+	}
+	
+	@Test
+	public void allPlayoffTeamsSetReturnsFalseIfNotAllTeamsAreSet() {
+		playoffs.initializeNFLPlayoffs();
+		
+		assertFalse(playoffs.allPlayoffTeamsSet());
+	}
+	
+	@Test
 	public void generateWildcardMatchupsForConferenceGeneratesTheConferenceWildcardGames() {
 		playoffs.initializeNFLPlayoffs();
 		playoffs.setDivisionWinner(conference1Name, division1_1Name, playoffTeam2);
