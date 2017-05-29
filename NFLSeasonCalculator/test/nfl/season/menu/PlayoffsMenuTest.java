@@ -1,6 +1,9 @@
 package nfl.season.menu;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,9 +35,11 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 	
 	private static final int SELECT_TEAMS_BY_ELO_RATINGS = 3;
 	
-	private static final int CALCULATE_TEAM_CHANCES_BY_ROUND = 4;
+	private static final int RESEED_TEAMS = 4;
 	
-	private static final int BACK_TO_MAIN_MENU = 5;
+	private static final int CALCULATE_TEAM_CHANCES_BY_ROUND = 5;
+	
+	private static final int BACK_TO_MAIN_MENU = 6;
 	
 	private String expectedMenuMessage;
 	
@@ -66,19 +71,7 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 	
 	@Test
 	public void selectTeamsForPlayoffsHasUserPutInTeamsForPlayoffs() {
-		List<NFLPlayoffTeam> conference1DivisionWinners = new ArrayList<NFLPlayoffTeam>();
-		conference1DivisionWinners.add(playoffTeam1_1_2);
-		conference1DivisionWinners.add(playoffTeam1_2_3);
-		conference1DivisionWinners.add(playoffTeam1_3_1);
-		conference1DivisionWinners.add(playoffTeam1_4_1);
-		when(playoffConference1.getDivisionWinners()).thenReturn(conference1DivisionWinners);
-		
-		List<NFLPlayoffTeam> conference2DivisionWinners = new ArrayList<NFLPlayoffTeam>();
-		conference2DivisionWinners.add(playoffTeam2_1_2);
-		conference2DivisionWinners.add(playoffTeam2_2_1);
-		conference2DivisionWinners.add(playoffTeam2_3_1);
-		conference2DivisionWinners.add(playoffTeam2_4_1);
-		when(playoffConference2.getDivisionWinners()).thenReturn(conference2DivisionWinners);
+		setUpDivisionWinners();
 		
 		when(input.askForInt(anyString())).thenReturn(SELECT_TEAMS_FOR_PLAYOFFS, 
 				2, 3, 1, 1, 3, 1, 2, 1, 1, 1, 1, 2, BACK_TO_MAIN_MENU);
@@ -101,19 +94,7 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 	
 	@Test
 	public void selectTeamsForPlayoffsUserPutsInInvalidInputWhichIsIgnored() {
-		List<NFLPlayoffTeam> conference1DivisionWinners = new ArrayList<NFLPlayoffTeam>();
-		conference1DivisionWinners.add(playoffTeam1_1_2);
-		conference1DivisionWinners.add(playoffTeam1_2_3);
-		conference1DivisionWinners.add(playoffTeam1_3_1);
-		conference1DivisionWinners.add(playoffTeam1_4_1);
-		when(playoffConference1.getDivisionWinners()).thenReturn(conference1DivisionWinners);
-		
-		List<NFLPlayoffTeam> conference2DivisionWinners = new ArrayList<NFLPlayoffTeam>();
-		conference2DivisionWinners.add(playoffTeam2_1_2);
-		conference2DivisionWinners.add(playoffTeam2_2_1);
-		conference1DivisionWinners.add(playoffTeam2_3_1);
-		conference1DivisionWinners.add(playoffTeam2_4_1);
-		when(playoffConference2.getDivisionWinners()).thenReturn(conference2DivisionWinners);
+		setUpDivisionWinners();
 		
 		when(input.askForInt(anyString())).thenReturn(SELECT_TEAMS_FOR_PLAYOFFS, 
 				5, -1, 2, 3, 1, 1, 5, -1, 3, 1, 2, 1, 1, 1, 1, 2, BACK_TO_MAIN_MENU);
@@ -174,6 +155,55 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 		verify(playoffs, times(1)).populateTeamsByEloRatings();
 	}
 	
+	@Test
+	public void reseedPlayoffTeamsSoTeamsAreReseeded() {
+		when(playoffs.allPlayoffTeamsSet()).thenReturn(true);
+		
+		setUpDivisionWinners();
+		when(playoffConference1.getTeamWithSeed(5)).thenReturn(playoffTeam1_1_1);
+		when(playoffConference1.getTeamWithSeed(6)).thenReturn(playoffTeam1_2_2);
+		when(playoffConference2.getTeamWithSeed(5)).thenReturn(playoffTeam2_1_3);
+		when(playoffConference2.getTeamWithSeed(6)).thenReturn(playoffTeam2_2_2);
+		
+		when(input.askForInt(anyString())).thenReturn(RESEED_TEAMS, 5, -1, 
+				2, 4, 3, 1, 2, 4, 3, 2, 3, -1, 1, BACK_TO_MAIN_MENU);
+		
+		playoffsMenu.launchSubMenu();
+		
+		setUpDivisionWinners();
+		verifyChooseDivisionWinnersMessages();
+		verifyReseedWildcardMessages();
+		
+		verify(playoffs).setTeamConferenceSeed(playoffTeam1_2_3, 1);
+		verify(playoffs).setTeamConferenceSeed(playoffTeam1_4_1, 2);
+		verify(playoffs).setTeamConferenceSeed(playoffTeam1_1_2, 3);
+		verify(playoffs).setTeamConferenceSeed(playoffTeam1_3_1, 4);
+		verify(playoffs).setTeamConferenceSeed(playoffTeam1_2_2, 5);
+		verify(playoffs).setTeamConferenceSeed(playoffTeam1_1_1, 6);
+		
+		verify(playoffs).setTeamConferenceSeed(playoffTeam2_4_1, 1);
+		verify(playoffs).setTeamConferenceSeed(playoffTeam2_3_1, 2);
+		verify(playoffs).setTeamConferenceSeed(playoffTeam2_2_1, 3);
+		verify(playoffs).setTeamConferenceSeed(playoffTeam2_1_2, 4);
+		verify(playoffs).setTeamConferenceSeed(playoffTeam2_1_3, 5);
+		verify(playoffs).setTeamConferenceSeed(playoffTeam2_2_2, 6);
+	}
+	
+	@Test
+	public void reseedPlayoffTeamsButNotAllTeamsSetSoReseedingDoesNotHappen() {
+		when(playoffs.allPlayoffTeamsSet()).thenReturn(false);
+		
+		when(input.askForInt(anyString())).thenReturn(RESEED_TEAMS, BACK_TO_MAIN_MENU);
+		
+		playoffsMenu.launchSubMenu();
+		
+		expectedMenuMessage = "Please Fill Out All Playoff Teams First\n" + 
+				expectedMenuMessage;
+		verify(input, times(1)).askForInt(expectedMenuMessage);
+		
+		verify(playoffs, never()).setTeamConferenceSeed(any(NFLPlayoffTeam.class), anyInt());
+	}
+
 	@Test
 	public void calculateTeamChancesByRoundOutputsAllTeamsAndRoundsChances() {
 		when(playoffConference1.getTeamWithSeed(1)).thenReturn(playoffTeam1_1_1);
@@ -250,32 +280,27 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 		expectedMenuBuilder.append("1. Select Teams for Playoffs\n");
 		expectedMenuBuilder.append("2. Select Playoff Teams Based on Power Rankings\n");
 		expectedMenuBuilder.append("3. Select Playoff Teams Based on Elo Ratings\n");
-		expectedMenuBuilder.append("4. Calculate and Print Team Chances By Playoff Round\n");
-		expectedMenuBuilder.append("5. Back to Main Menu");
+		expectedMenuBuilder.append("4. Reseed Current Playoff Teams\n");
+		expectedMenuBuilder.append("5. Calculate and Print Team Chances By Playoff Round\n");
+		expectedMenuBuilder.append("6. Back to Main Menu");
 		
 		expectedMenuMessage = expectedMenuBuilder.toString();
 	}
 	
-	private String getChooseDivisionWinnerMessage(Conference conference, Division division) {
-		StringBuilder divisionWinnerMessageBuilder = new StringBuilder();
-		divisionWinnerMessageBuilder.append(conference.getName() + " " + 
-				division.getName() + " Champion\n"); 
-		divisionWinnerMessageBuilder.append(
-				"Please enter in an integer corresponding to one of the following:\n");
+	private void setUpDivisionWinners() {
+		List<NFLPlayoffTeam> conference1DivisionWinners = new ArrayList<NFLPlayoffTeam>();
+		conference1DivisionWinners.add(playoffTeam1_1_2);
+		conference1DivisionWinners.add(playoffTeam1_2_3);
+		conference1DivisionWinners.add(playoffTeam1_3_1);
+		conference1DivisionWinners.add(playoffTeam1_4_1);
+		when(playoffConference1.getDivisionWinners()).thenReturn(conference1DivisionWinners);
 		
-		List<Team> divisionTeams = division.getTeams();
-		int teamIndex = 1;
-		for (Team team : divisionTeams) {
-			divisionWinnerMessageBuilder.append(teamIndex + ". ");
-			divisionWinnerMessageBuilder.append(team.getName());
-			divisionWinnerMessageBuilder.append("\n");
-			teamIndex++;
-		}
-		divisionWinnerMessageBuilder.deleteCharAt(
-				divisionWinnerMessageBuilder.lastIndexOf("\n"));
-		
-		
-		return divisionWinnerMessageBuilder.toString();
+		List<NFLPlayoffTeam> conference2DivisionWinners = new ArrayList<NFLPlayoffTeam>();
+		conference2DivisionWinners.add(playoffTeam2_1_2);
+		conference2DivisionWinners.add(playoffTeam2_2_1);
+		conference2DivisionWinners.add(playoffTeam2_3_1);
+		conference2DivisionWinners.add(playoffTeam2_4_1);
+		when(playoffConference2.getDivisionWinners()).thenReturn(conference2DivisionWinners);
 	}
 	
 	private void verifyChoosePlayoffTeamsMessages() {
@@ -303,6 +328,29 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 				leagueTeam2_1_2.getName(), leagueTeam2_2_1.getName(), 
 				leagueTeam2_3_1.getName(), leagueTeam2_4_1.getName(), leagueTeam2_1_1.getName()));
 	}
+	
+	private String getChooseDivisionWinnerMessage(Conference conference, Division division) {
+		StringBuilder divisionWinnerMessageBuilder = new StringBuilder();
+		divisionWinnerMessageBuilder.append(conference.getName() + " " + 
+				division.getName() + " Champion\n"); 
+		divisionWinnerMessageBuilder.append(
+				"Please enter in an integer corresponding to one of the following:\n");
+		
+		List<Team> divisionTeams = division.getTeams();
+		int teamIndex = 1;
+		for (Team team : divisionTeams) {
+			divisionWinnerMessageBuilder.append(teamIndex + ". ");
+			divisionWinnerMessageBuilder.append(team.getName());
+			divisionWinnerMessageBuilder.append("\n");
+			teamIndex++;
+		}
+		divisionWinnerMessageBuilder.deleteCharAt(
+				divisionWinnerMessageBuilder.lastIndexOf("\n"));
+		
+		
+		return divisionWinnerMessageBuilder.toString();
+	}
+	
 	
 	private String getChooseWildcardMessage(Conference conference, String divisionWinner1, 
 			String divisionWinner2, String divisionWinner3, String divisionWinner4, 
@@ -332,7 +380,46 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 		
 		return wildcardMessageBuilder.toString();
 	}
+	
+	private void verifyChooseDivisionWinnersMessages() {
+		List<NFLPlayoffTeam> conference1DivisionWinners = 
+				playoffConference1.getDivisionWinners();
+		List<NFLPlayoffTeam> conference1DivisionWinnersCopy = new ArrayList<NFLPlayoffTeam>();
+		conference1DivisionWinnersCopy.addAll(conference1DivisionWinners);
+		
+		int conferenceSeed = 1;
+		String chooseSeedFromDivisionWinnersMessage = 
+				getChooseSeedFromDivisionWinnersMessage(conference1DivisionWinnersCopy,
+				conferenceSeed);
+		verify(input, times(3)).askForInt(chooseSeedFromDivisionWinnersMessage);
+		
+		conferenceSeed++;
+		conference1DivisionWinnersCopy.remove(playoffTeam1_2_3);
+		chooseSeedFromDivisionWinnersMessage = 
+				getChooseSeedFromDivisionWinnersMessage(conference1DivisionWinnersCopy,
+				conferenceSeed);
+		verify(input, times(2)).askForInt(chooseSeedFromDivisionWinnersMessage);
+	}
 
+	private void verifyReseedWildcardMessages() {
+		List<NFLPlayoffTeam> conference2Wildcards = new ArrayList<NFLPlayoffTeam>();
+		conference2Wildcards.add(playoffConference2.getTeamWithSeed(5));
+		conference2Wildcards.add(playoffConference2.getTeamWithSeed(6));
+		
+		StringBuilder reseedWildcardBuilder = new StringBuilder();
+		reseedWildcardBuilder.append(leagueConference2.getName() + " Seed 5\n");
+		int wildcardIndex = 1;
+		for (NFLPlayoffTeam wildcard : conference2Wildcards) {
+			Team leagueWildcard = wildcard.getTeam();
+			String wildcardName = leagueWildcard.getName();
+			reseedWildcardBuilder.append(wildcardIndex + ". " + wildcardName + "\n");
+			wildcardIndex++;
+		}
+		reseedWildcardBuilder.deleteCharAt(reseedWildcardBuilder.length() - 1);
+		String reseedWildcardMessage = reseedWildcardBuilder.toString();
+		verify(input, times(3)).askForInt(reseedWildcardMessage);
+	}
+	
 	private String getAllTeamAndRoundChancesMessage() {
 		StringBuilder teamAndRoundsMessageBuilder = new StringBuilder();
 		
@@ -362,6 +449,35 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 		}
 		
 		return teamAndRoundsMessageBuilder.toString();
+	}
+
+	private String getChooseSeedFromDivisionWinnersMessage(
+			List<NFLPlayoffTeam> conference1DivisionWinnersCopy,
+			int conferenceSeed) {
+		StringBuilder reseedDivisionWinnersMessage = new StringBuilder();
+		
+		reseedDivisionWinnersMessage.append(leagueConference1.getName() + 
+				" Seed " + conferenceSeed + "\n");
+		
+		appendListOfUnchosenDivisionWinners(conference1DivisionWinnersCopy,
+				reseedDivisionWinnersMessage);
+		
+		reseedDivisionWinnersMessage.deleteCharAt(reseedDivisionWinnersMessage.length() - 1);
+		
+		return reseedDivisionWinnersMessage.toString();
+	}
+
+	private void appendListOfUnchosenDivisionWinners(
+			List<NFLPlayoffTeam> conference1DivisionWinnersCopy,
+			StringBuilder reseedDivisionWinnersMessage) {
+		int divisionWinnerIndex = 1;
+		for (NFLPlayoffTeam divisionWinner : conference1DivisionWinnersCopy) {
+			Team leagueDivisionWinner = divisionWinner.getTeam();
+			String teamName = leagueDivisionWinner.getName();
+			reseedDivisionWinnersMessage.append(divisionWinnerIndex + ". " + 
+					teamName + "\n");
+			divisionWinnerIndex++;
+		}
 	}
 	
 }

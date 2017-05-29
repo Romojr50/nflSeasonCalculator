@@ -164,6 +164,20 @@ public class NFLPlayoffs {
 		}
 	}
 
+	public boolean allPlayoffTeamsSet() {
+		boolean allTeamsSet = true;
+		
+		for (NFLPlayoffConference playoffConference : conferences) {
+			List<NFLPlayoffTeam> playoffTeams = playoffConference.getTeams();
+			if (playoffTeams.size() < 6) {
+				allTeamsSet = false;
+				break;
+			}
+		}
+		
+		return allTeamsSet;
+	}
+
 	public List<Game> getWildcardGames(String conferenceName) {
 		List<Game> wildcardGames = new ArrayList<Game>();
 		

@@ -20,8 +20,9 @@ public class PlayoffsMenu extends SubMenu {
 		SELECT_TEAMS(1, "Select Teams for Playoffs"), 
 		SELECT_TEAMS_ON_POWER_RANKINGS(2, "Select Playoff Teams Based on Power Rankings"),
 		SELECT_TEAMS_ON_ELO_RATINGS(3, "Select Playoff Teams Based on Elo Ratings"),
-		CALCULATE_TEAM_CHANCES_BY_ROUND(4, "Calculate and Print Team Chances By Playoff Round"),
-		EXIT(5, "Back to Main Menu");
+		RESEED_TEAMS(4, "Reseed Current Playoff Teams"),
+		CALCULATE_TEAM_CHANCES_BY_ROUND(5, "Calculate and Print Team Chances By Playoff Round"),
+		EXIT(6, "Back to Main Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -76,6 +77,8 @@ public class PlayoffsMenu extends SubMenu {
 					selectedOption) {
 				playoffs.populateTeamsByEloRatings();
 				playoffsPrefixMessage = "Teams set based on Elo Ratings\n";
+			} else if (PlayoffsMenuOptions.RESEED_TEAMS.optionNumber == selectedOption) {
+				playoffsPrefixMessage = launchReseedPlayoffTeamsMenu();
 			} else if (PlayoffsMenuOptions.CALCULATE_TEAM_CHANCES_BY_ROUND.optionNumber == 
 					selectedOption) {
 				playoffsPrefixMessage = calculatePlayoffRoundChancesAndReturnResultPrintout();
@@ -128,6 +131,37 @@ public class PlayoffsMenu extends SubMenu {
 			
 			getWildcardTeams(leagueConference, divisionWinnerNames);
 		}
+	}
+	
+	private String launchReseedPlayoffTeamsMenu() {
+		String errorMessage = "";
+		
+		boolean allPlayoffTeamsSet = playoffs.allPlayoffTeamsSet();
+		if (allPlayoffTeamsSet) {
+			List<NFLPlayoffConference> playoffConferences = playoffs.getConferences();
+			for (NFLPlayoffConference playoffConference : playoffConferences) {
+				Conference leagueConference = playoffConference.getConference();
+				String conferenceName = leagueConference.getName();
+				
+				int conferenceSeed = 1;
+				List<NFLPlayoffTeam> playoffDivisionWinners = playoffConference.getDivisionWinners();
+				
+				for (conferenceSeed = 1; conferenceSeed < 4; conferenceSeed++) {
+					reseedNextDivisionWinner(conferenceName, conferenceSeed,
+							playoffDivisionWinners);
+				}
+				NFLPlayoffTeam remainingDivisionWinner = playoffDivisionWinners.remove(0);
+				playoffs.setTeamConferenceSeed(remainingDivisionWinner, conferenceSeed);
+				
+				conferenceSeed++;
+				
+				reseedWildcards(playoffConference, conferenceName, conferenceSeed);
+			}
+		} else {
+			errorMessage = "Please Fill Out All Playoff Teams First\n";
+		}
+		
+		return errorMessage;
 	}
 
 	private String calculatePlayoffRoundChancesAndReturnResultPrintout() {
@@ -238,6 +272,65 @@ public class PlayoffsMenu extends SubMenu {
 			playoffs.addWildcardTeam(conferenceName, newWildcardTeam);
 			conferenceTeams.remove(leagueNewWildcard);
 		}
+	}
+
+	private void reseedNextDivisionWinner(String conferenceName, int conferenceSeed,
+			List<NFLPlayoffTeam> playoffDivisionWinners) {
+		StringBuilder reseedDivisionWinnersBuilder = new StringBuilder();
+		reseedDivisionWinnersBuilder.append(conferenceName + " Seed " + 
+				conferenceSeed + "\n");
+		
+		int divisionWinnerIndex = 1;
+		for (NFLPlayoffTeam playoffDivisionWinner : playoffDivisionWinners) {
+			Team leagueDivisionWinner = playoffDivisionWinner.getTeam();
+			String divisionWinnerName = leagueDivisionWinner.getName();
+			reseedDivisionWinnersBuilder.append(divisionWinnerIndex + ". " + 
+					divisionWinnerName + "\n");
+			
+			divisionWinnerIndex++;
+		}
+		reseedDivisionWinnersBuilder.deleteCharAt(reseedDivisionWinnersBuilder.length() - 1);
+		String reseedDivisionWinnerMessage = reseedDivisionWinnersBuilder.toString();
+		
+		int reseededTeamIndex = -1;
+		while (reseededTeamIndex < 1 || reseededTeamIndex > playoffDivisionWinners.size()) {
+			reseededTeamIndex = input.askForInt(reseedDivisionWinnerMessage);
+		}
+		
+		NFLPlayoffTeam reseededTeam = playoffDivisionWinners.remove(reseededTeamIndex - 1);
+		playoffs.setTeamConferenceSeed(reseededTeam, conferenceSeed);
+	}
+
+	private void reseedWildcards(NFLPlayoffConference playoffConference,
+			String conferenceName, int conferenceSeed) {
+		StringBuilder reseedWildcardBuilder = new StringBuilder();
+		reseedWildcardBuilder.append(conferenceName + " Seed 5\n");
+		List<NFLPlayoffTeam> playoffWildcards = new ArrayList<NFLPlayoffTeam>();
+		playoffWildcards.add(playoffConference.getTeamWithSeed(5));
+		playoffWildcards.add(playoffConference.getTeamWithSeed(6));
+		
+		int playoffWildcardIndex = 1;
+		for (NFLPlayoffTeam playoffWildcard : playoffWildcards) {
+			Team leagueWildcard = playoffWildcard.getTeam();
+			String wildcardName = leagueWildcard.getName();
+			reseedWildcardBuilder.append(playoffWildcardIndex + ". " + wildcardName + "\n");
+			playoffWildcardIndex++;
+		}
+		reseedWildcardBuilder.deleteCharAt(reseedWildcardBuilder.length() - 1);
+		
+		String reseedWildcardMessage = reseedWildcardBuilder.toString();
+		
+		int reseededTeamIndex = -1;
+		while (reseededTeamIndex < 1 || reseededTeamIndex > playoffWildcards.size()) {
+			reseededTeamIndex = input.askForInt(reseedWildcardMessage);
+		}
+		
+		NFLPlayoffTeam reseededTeam = playoffWildcards.remove(reseededTeamIndex - 1);
+		playoffs.setTeamConferenceSeed(reseededTeam, conferenceSeed);
+		
+		conferenceSeed++;
+		NFLPlayoffTeam remainingWildcard = playoffWildcards.remove(0);
+		playoffs.setTeamConferenceSeed(remainingWildcard, conferenceSeed);
 	}
 	
 	private String getSelectDivisionWinnerMessage(String conferenceName,
