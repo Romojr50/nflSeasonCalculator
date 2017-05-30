@@ -26,10 +26,11 @@ public class TeamsMenu extends SubMenu {
 	public enum TeamsMenuOptions implements MenuOptions {
 		SELECT_TEAM(1, "Select Team"), 
 		SET_ALL_RANKINGS(2, "Set all Team Power Rankings"),
-		RESET_TO_DEFAULTS(3, "Revert All Teams and Matchups to Default Settings"),
-		LOAD_SAVED_TEAM_SETTINGS(4, "Load Saved Team and Matchup Settings"),
-		SAVE_CURRENT_TEAM_SETTINGS(5, "Save Current Team and Matchup Settings"),
-		EXIT(6, "Back to Main Menu");
+		SET_ALL_MATCHUPS_BY_ELO(3, "Set all Teams' Matchups using Elo Rating Calculations"),
+		RESET_TO_DEFAULTS(4, "Revert All Teams and Matchups to Default Settings"),
+		LOAD_SAVED_TEAM_SETTINGS(5, "Load Saved Team and Matchup Settings"),
+		SAVE_CURRENT_TEAM_SETTINGS(6, "Save Current Team and Matchup Settings"),
+		EXIT(7, "Back to Main Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -91,6 +92,9 @@ public class TeamsMenu extends SubMenu {
 			} else if (TeamsMenuOptions.LOAD_SAVED_TEAM_SETTINGS.optionNumber == 
 					selectedOption) {
 				saveLoadFilePrefix = loadSettingsFile();
+			} else if (TeamsMenuOptions.SET_ALL_MATCHUPS_BY_ELO.optionNumber == 
+					selectedOption) {
+				launchSetAllMatchupsByElo();
 			} else if (TeamsMenuOptions.RESET_TO_DEFAULTS.optionNumber == selectedOption) {
 				List<Team> allTeams = nfl.getTeams();
 				for (Team team : allTeams) {
@@ -201,6 +205,13 @@ public class TeamsMenu extends SubMenu {
 			saveLoadFilePrefix = LOAD_FILE_FAILED;
 		}
 		return saveLoadFilePrefix;
+	}
+	
+	private void launchSetAllMatchupsByElo() {
+		List<Team> teams = nfl.getTeams();
+		for (Team team : teams) {
+			team.calculateAllMatchupsUsingEloRatings();
+		}
 	}
 
 	private String createTeamListMessage() {

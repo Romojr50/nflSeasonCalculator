@@ -38,10 +38,12 @@ public class SingleTeamMenuTest {
 	private static final int SET_DEFAULT_HOME_FIELD_ADVANTAGE = 6;
 	
 	private static final int SET_ALL_DEFAULTS = 7;
-
-	private static final int CHOOSE_MATCHUP = 8;
 	
-	private static final int EXIT_FROM_SINGLE_TEAM_MENU = 9;
+	private static final int SET_ALL_MATCHUPS_TO_ELO_RATING = 8;
+
+	private static final int CHOOSE_MATCHUP = 9;
+	
+	private static final int EXIT_FROM_SINGLE_TEAM_MENU = 10;
 	
 	private String expectedMenuMessage;
 	
@@ -431,6 +433,16 @@ public class SingleTeamMenuTest {
 	}
 	
 	@Test
+	public void setAllMatchupsToEloSoAllMatchupsUseEloCalculation() {
+		when(input.askForInt(anyString())).thenReturn(SET_ALL_MATCHUPS_TO_ELO_RATING, 
+				EXIT_FROM_SINGLE_TEAM_MENU);
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(colts).calculateAllMatchupsUsingEloRatings();
+	}
+	
+	@Test
 	public void setSubMenuWithSingleTeamsMenuSoSingleTeamsMenuIsSet() {
 		singleTeamMenu.setSubMenu(matchupMenu, 1);
 		
@@ -476,8 +488,10 @@ public class SingleTeamMenuTest {
 				"1. Set Power Ranking\n2. Set Elo Rating\n3. Set Home Field Advantage\n" +
 				"4. Set Power Ranking to Default\n5. Set Elo Rating to Default\n" +
 				"6. Set Home Field Advantage to Default\n" +
-				"7. Revert All Team Values to Defaults\n8. Edit Matchup Settings\n" +
-				"9. Back to Teams Menu";
+				"7. Revert All Team Values to Defaults\n" +
+				"8. Calculate All Team Matchup Win Chances Using Elo Ratings\n" + 
+				"9. Edit Matchup Settings\n" +
+				"10. Back to Teams Menu";
 	}
 	
 

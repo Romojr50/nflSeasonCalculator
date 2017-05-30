@@ -122,4 +122,12 @@ public class TeamTest {
 		verify(matchup2).calculateHomeWinChanceFromHomeFieldAdvantage(opponent2);
 	}
 	
+	@Test
+	public void calculateAllMatchupsUsingEloRatingsGoesThroughAllMatchups() {
+		team.calculateAllMatchupsUsingEloRatings();
+		
+		verify(matchup1).calculateTeamWinChancesFromEloRatings();
+		verify(matchup2).calculateTeamWinChancesFromEloRatings();
+	}
+	
 }
