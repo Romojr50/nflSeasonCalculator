@@ -86,6 +86,12 @@ public class Team {
 	
 	public void setHomeFieldAdvantage(int newHomeFieldAdvantage) {
 		this.homeFieldAdvantage = newHomeFieldAdvantage;
+		for (Matchup matchup : matchups) {
+			if (matchup.getHomeAwayWinChanceMode(name) == 
+					HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE) {
+				matchup.calculateHomeWinChanceFromHomeFieldAdvantage(name);
+			}
+		}
 	}
 
 	public List<Matchup> getMatchups() {

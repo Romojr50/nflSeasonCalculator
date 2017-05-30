@@ -48,6 +48,9 @@ public class TeamTest {
 		when(matchup1.getWinChanceMode()).thenReturn(WinChanceModeEnum.POWER_RANKINGS);
 		when(matchup2.getWinChanceMode()).thenReturn(WinChanceModeEnum.ELO_RATINGS);
 		
+		when(matchup1.getHomeAwayWinChanceMode(teamName)).thenReturn(
+				HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE);
+		
 		when(matchup1.getOpponentName(teamName)).thenReturn(opponent1);
 		when(matchup2.getOpponentName(teamName)).thenReturn(opponent2);
 		
@@ -73,12 +76,8 @@ public class TeamTest {
 		team.setPowerRanking(13);
 		
 		verify(matchup1).calculateTeamWinChancesFromPowerRankings();
-		verify(matchup2, never()).calculateTeamWinChancesFromPowerRankings();
-		
-		when(matchup1.getHomeAwayWinChanceMode(teamName)).thenReturn(
-				HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE);
-		team.setPowerRanking(16);
 		verify(matchup1).calculateHomeWinChanceFromHomeFieldAdvantage(teamName);
+		verify(matchup2, never()).calculateTeamWinChancesFromPowerRankings();
 		
 		when(matchup1.getHomeAwayWinChanceMode(opponent1)).thenReturn(
 				HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE);
@@ -94,6 +93,15 @@ public class TeamTest {
 		verify(matchup1, never()).calculateHomeWinChanceFromHomeFieldAdvantage(anyString());
 		verify(matchup1).setWinChanceMode(WinChanceModeEnum.CUSTOM_SETTING);
 		verify(matchup2, never()).setWinChanceMode(any(WinChanceModeEnum.class));
+	}
+	
+	@Test
+	public void setHomeFieldAdvantageSoHomeWinChancesAreRecalculated() {
+		team.setHomeFieldAdvantage(21);
+		
+		verify(matchup1).calculateHomeWinChanceFromHomeFieldAdvantage(teamName);
+		verify(matchup1, never()).calculateHomeWinChanceFromHomeFieldAdvantage(opponent1);
+		verify(matchup2, never()).calculateHomeWinChanceFromHomeFieldAdvantage(anyString());
 	}
 	
 }
