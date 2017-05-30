@@ -18,8 +18,9 @@ public class SingleTeamMenu extends SubMenu {
 		SET_DEFAULT_ELO_RATING(5, "Set Elo Rating to Default"),
 		SET_DEFAULT_HOME_FIELD_ADVANTAGE(6, "Set Home Field Advantage to Default"),
 		SET_ALL_DEFAULTS(7, "Revert All Team Values to Defaults"),
-		CHOOSE_MATCHUP(8, "Edit Matchup Settings"),
-		EXIT(9, "Back to Teams Menu");
+		CALCULATE_MATCHUPS_BY_ELO(8, "Calculate All Team Matchup Win Chances Using Elo Ratings"),
+		CHOOSE_MATCHUP(9, "Edit Matchup Settings"),
+		EXIT(10, "Back to Teams Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -114,6 +115,9 @@ public class SingleTeamMenu extends SubMenu {
 					selectedTeam.getDefaultHomeFieldAdvantage());
 		} else if (SingleTeamMenuOptions.SET_ALL_DEFAULTS.optionNumber == selectedOption) {
 			selectedTeam.resetToDefaults();
+		} else if (SingleTeamMenuOptions.CALCULATE_MATCHUPS_BY_ELO.optionNumber == 
+				selectedOption) {
+			selectedTeam.calculateAllMatchupsUsingEloRatings();
 		} else if (SingleTeamMenuOptions.CHOOSE_MATCHUP.optionNumber == selectedOption) {
 			launchSelectMatchupMenu();
 		}
