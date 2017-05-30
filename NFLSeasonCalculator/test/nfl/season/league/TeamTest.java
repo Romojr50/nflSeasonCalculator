@@ -104,4 +104,22 @@ public class TeamTest {
 		verify(matchup2, never()).calculateHomeWinChanceFromHomeFieldAdvantage(anyString());
 	}
 	
+	@Test
+	public void setEloRatingSoMatchupsAreRecalculated() {
+		team.setEloRating(1502);
+		
+		verify(matchup1, never()).calculateTeamWinChancesFromEloRatings();
+		verify(matchup2).calculateTeamWinChancesFromEloRatings();
+		
+		when(matchup2.getHomeAwayWinChanceMode(teamName)).thenReturn(
+				HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE);
+		team.setEloRating(1578);
+		verify(matchup2).calculateHomeWinChanceFromHomeFieldAdvantage(teamName);
+		
+		when(matchup2.getHomeAwayWinChanceMode(opponent2)).thenReturn(
+				HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE);
+		team.setEloRating(1456);
+		verify(matchup2).calculateHomeWinChanceFromHomeFieldAdvantage(opponent2);
+	}
+	
 }

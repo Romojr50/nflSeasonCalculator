@@ -78,6 +78,23 @@ public class Team {
 
 	public void setEloRating(int newEloRating) {
 		this.eloRating = newEloRating;
+		
+		for (Matchup matchup : matchups) {
+			if (matchup.getWinChanceMode() == WinChanceModeEnum.ELO_RATINGS) {
+				matchup.calculateTeamWinChancesFromEloRatings();
+				
+				if (matchup.getHomeAwayWinChanceMode(name) == 
+						HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE) {
+					matchup.calculateHomeWinChanceFromHomeFieldAdvantage(name);
+				}
+				
+				String opponentName = matchup.getOpponentName(name);
+				if (matchup.getHomeAwayWinChanceMode(opponentName) == 
+						HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE) {
+					matchup.calculateHomeWinChanceFromHomeFieldAdvantage(opponentName);
+				}
+			}
+		}
 	}
 	
 	public int getHomeFieldAdvantage() {
