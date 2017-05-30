@@ -1,5 +1,7 @@
 package nfl.season.league;
 
+import nfl.season.league.Matchup.WinChanceModeEnum;
+
 public class Matchup {
 
 	public enum WinChanceModeEnum {
@@ -287,6 +289,10 @@ public class Matchup {
 
 	public WinChanceModeEnum getWinChanceMode() {
 		return winChanceMode;
+	}
+
+	public void setWinChanceMode(WinChanceModeEnum winChanceMode) {
+		this.winChanceMode = winChanceMode;
 	}
 	
 	public HomeAwayWinChanceModeEnum getHomeAwayWinChanceMode(String teamName) {
