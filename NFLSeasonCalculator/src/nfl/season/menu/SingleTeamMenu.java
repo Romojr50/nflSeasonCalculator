@@ -125,19 +125,26 @@ public class SingleTeamMenu extends SubMenu {
 
 	private void launchSetPowerRankingMenu() {
 		int newPowerRanking = NON_POWER_RANKING;
+		int oldPowerRanking = selectedTeam.getPowerRanking();
 		while ((newPowerRanking < 1 || 
 				newPowerRanking > NFLTeamEnum.values().length)) {
-			String powerRankingMessage = "Currently #" + selectedTeam.getPowerRanking() + 
+			
+			String powerRankingMessage = "Currently #" + oldPowerRanking + 
 					POWER_RANKING_MESSAGE_SUFFIX;
 			newPowerRanking = input.askForInt(powerRankingMessage);
 			
-			newPowerRanking = handleOverwritePowerRankings(newPowerRanking);
+			if (newPowerRanking != oldPowerRanking) {
+				newPowerRanking = handleOverwritePowerRankings(newPowerRanking);
+			}
 		}
 	}
 	
 	private void launchSetDefaultPowerRankingMenu() {
 		int defaultPowerRanking = selectedTeam.getDefaultPowerRanking();
-		handleOverwritePowerRankings(defaultPowerRanking);
+		int oldPowerRanking = selectedTeam.getPowerRanking();
+		if (defaultPowerRanking != oldPowerRanking) {
+			handleOverwritePowerRankings(defaultPowerRanking);
+		}
 	}
 	
 	private void launchSetEloRatingMenu() {

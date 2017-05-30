@@ -221,6 +221,25 @@ public class SingleTeamMenuTest {
 	}
 	
 	@Test
+	public void setPowerRankingToOwnPowerRankingDoesNothing() {
+		int overwritePowerRanking = colts.getPowerRanking();
+		String coltsName = colts.getName();
+		String overwriteMessage = getOverwritePowerRankingMessage(
+				overwritePowerRanking, coltsName);
+		
+		when(nfl.getTeamWithPowerRanking(overwritePowerRanking)).thenReturn(colts);
+		when(input.askForInt(anyString())).thenReturn(SET_POWER_RANKING, overwritePowerRanking, 
+				EXIT_FROM_SINGLE_TEAM_MENU);
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, times(1)).askForInt(expectedPowerRankingsMessage);
+		verify(input, never()).askForString(overwriteMessage);
+		verify(colts, never()).setPowerRanking(anyInt());
+	}
+	
+	@Test
 	public void eloRatingIsSet() {
 		int newEloRating = 17;
 		
@@ -354,6 +373,25 @@ public class SingleTeamMenuTest {
 		verify(input, times(2)).askForString(overwriteMessage);
 		verify(colts, times(1)).setPowerRanking(overwritePowerRanking);
 		verify(eagles, times(1)).setPowerRanking(colts.getPowerRanking());
+	}
+	
+	@Test
+	public void setDefaultPowerRankingButAlreadyHaveDefaultSoNothingIsDone() {
+		int overwritePowerRanking = colts.getPowerRanking();
+		when(colts.getDefaultPowerRanking()).thenReturn(overwritePowerRanking);
+		String coltsName = colts.getName();
+		String overwriteMessage = getOverwritePowerRankingMessage(
+				overwritePowerRanking, coltsName);
+		
+		when(nfl.getTeamWithPowerRanking(overwritePowerRanking)).thenReturn(colts);
+		when(input.askForInt(anyString())).thenReturn(SET_DEFAULT_POWER_RANKING, 
+				EXIT_FROM_SINGLE_TEAM_MENU);
+		
+		singleTeamMenu.launchSubMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, never()).askForString(overwriteMessage);
+		verify(colts, never()).setPowerRanking(anyInt());
 	}
 	
 	@Test
