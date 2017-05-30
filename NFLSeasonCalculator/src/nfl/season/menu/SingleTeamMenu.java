@@ -41,8 +41,7 @@ public class SingleTeamMenu extends SubMenu {
 	}
 	
 	private static final String POWER_RANKING_MESSAGE_SUFFIX = "\nPlease enter in " +
-			"a number between 1-32 to set the team to that ranking\nor -1 to clear " +
-			"this team's ranking:";
+			"a number between 1-32 to set the team to that ranking:";
 	
 	private static final String PLEASE_ENTER_NATURAL_NUMBER = "\nPlease enter in an integer above 0";
 	
@@ -123,8 +122,7 @@ public class SingleTeamMenu extends SubMenu {
 	private void launchSetPowerRankingMenu() {
 		int newPowerRanking = NON_POWER_RANKING;
 		while ((newPowerRanking < 1 || 
-				newPowerRanking > NFLTeamEnum.values().length) && 
-				newPowerRanking != Team.CLEAR_RANKING) {
+				newPowerRanking > NFLTeamEnum.values().length)) {
 			String powerRankingMessage = "Currently #" + selectedTeam.getPowerRanking() + 
 					POWER_RANKING_MESSAGE_SUFFIX;
 			newPowerRanking = input.askForInt(powerRankingMessage);
@@ -218,17 +216,19 @@ public class SingleTeamMenu extends SubMenu {
 		String overwriteAnswer = "";
 		
 		String teamWithThatRankingName = teamWithThatRanking.getName();
-		String overwriteMessage = "The " + teamWithThatRankingName + 
-				" already are #" + newPowerRanking + ". Clear the " + 
-				teamWithThatRankingName + " ranking and assign #" + 
-				newPowerRanking + " to " + selectedTeam.getName() + 
-				"? (Y/N)";
+		int oldPowerRanking = selectedTeam.getPowerRanking();
+		
+		String overwriteMessage = "The " + teamWithThatRankingName + " already are #" + 
+				newPowerRanking + ". Assign #" + selectedTeam.getPowerRanking() + 
+				" to the " + teamWithThatRankingName + " and assign #" + 
+				newPowerRanking + " to the " + 
+				selectedTeam.getName() + "? (Y/N)";
 		
 		while (isNotYesOrNoIndicator(overwriteAnswer)) {
 			overwriteAnswer = input.askForString(overwriteMessage);
 			if ("Y".equalsIgnoreCase(overwriteAnswer)) {
 				selectedTeam.setPowerRanking(newPowerRanking);
-				teamWithThatRanking.setPowerRanking(Team.CLEAR_RANKING);
+				teamWithThatRanking.setPowerRanking(oldPowerRanking);
 			} else if ("N".equalsIgnoreCase(overwriteAnswer)){
 				newPowerRanking = NON_POWER_RANKING;
 			}

@@ -143,19 +143,20 @@ public class SingleTeamMenuTest {
 	
 	@Test
 	public void intOutsideOfExpectedRangeIsInputForPowerRankingSoInputIsIgnored() {
-		when(input.askForInt(anyString())).thenReturn(SET_POWER_RANKING, 999, 13, 
-				EXIT_FROM_SINGLE_TEAM_MENU);
+		when(input.askForInt(anyString())).thenReturn(SET_POWER_RANKING, 999, 
+				Team.CLEAR_RANKING, 13, EXIT_FROM_SINGLE_TEAM_MENU);
 		
 		singleTeamMenu.launchSubMenu();
 		
 		verify(input, times(2)).askForInt(expectedMenuMessage);
-		verify(input, times(2)).askForInt(expectedPowerRankingsMessage);
+		verify(input, times(3)).askForInt(expectedPowerRankingsMessage);
 		verify(colts, times(1)).setPowerRanking(13);
 	}
 	
 	@Test
 	public void setPowerRankingThatOtherTeamAlreadyHasSoAskAndThenOverwriteOtherTeam() {
 		int powerRanking = 11;
+		int oldPowerRanking = colts.getPowerRanking();
 		String eaglesName = eagles.getName();
 		String overwriteMessage = getOverwritePowerRankingMessage(powerRanking,
 				eaglesName);
@@ -171,7 +172,7 @@ public class SingleTeamMenuTest {
 		verify(input, times(2)).askForInt(expectedPowerRankingsMessage);
 		verify(input, times(2)).askForString(overwriteMessage);
 		verify(colts, times(2)).setPowerRanking(powerRanking);
-		verify(eagles, times(2)).setPowerRanking(Team.CLEAR_RANKING);
+		verify(eagles, times(2)).setPowerRanking(oldPowerRanking);
 	}
 	
 	@Test
@@ -214,21 +215,7 @@ public class SingleTeamMenuTest {
 		verify(input, times(1)).askForInt(expectedPowerRankingsMessage);
 		verify(input, times(2)).askForString(overwriteMessage);
 		verify(colts, times(1)).setPowerRanking(overwritePowerRanking);
-		verify(eagles, times(1)).setPowerRanking(-1);
-	}
-	
-	@Test
-	public void setClearPowerRankingWhenOtherTeamsAreClearedButNoOverwriteMessageAppears() {
-		when(colts.getPowerRanking()).thenReturn(15);
-		when(eagles.getPowerRanking()).thenReturn(-1);
-		
-		when(input.askForInt(anyString())).thenReturn(SET_POWER_RANKING, Team.CLEAR_RANKING, 
-				EXIT_FROM_SINGLE_TEAM_MENU);
-		
-		singleTeamMenu.launchSubMenu();
-		
-		verify(input, never()).askForString(anyString());
-		verify(nfl, never()).getTeamWithPowerRanking(anyInt());
+		verify(eagles, times(1)).setPowerRanking(colts.getPowerRanking());
 	}
 	
 	@Test
@@ -322,7 +309,7 @@ public class SingleTeamMenuTest {
 		
 		verify(input, times(3)).askForInt(expectedMenuMessage);
 		verify(colts, times(2)).setPowerRanking(powerRanking);
-		verify(eagles, times(2)).setPowerRanking(Team.CLEAR_RANKING);
+		verify(eagles, times(2)).setPowerRanking(colts.getPowerRanking());
 	}
 	
 	@Test
@@ -364,7 +351,7 @@ public class SingleTeamMenuTest {
 		verify(input, times(2)).askForInt(expectedMenuMessage);
 		verify(input, times(2)).askForString(overwriteMessage);
 		verify(colts, times(1)).setPowerRanking(overwritePowerRanking);
-		verify(eagles, times(1)).setPowerRanking(Team.CLEAR_RANKING);
+		verify(eagles, times(1)).setPowerRanking(colts.getPowerRanking());
 	}
 	
 	@Test
@@ -459,7 +446,7 @@ public class SingleTeamMenuTest {
 	private void setExpectedPowerRankingsMessage() {
 		expectedPowerRankingsMessage = "Currently #" + colts.getPowerRanking() + 
 				"\nPlease enter in a number between 1-32 to set the team to that " +
-				"ranking\nor -1 to clear this team's ranking:";
+				"ranking:";
 	}
 	
 	private void setExpectedEloRatingMessage() {
@@ -502,8 +489,9 @@ public class SingleTeamMenuTest {
 	private String getOverwritePowerRankingMessage(int overwritePowerRanking,
 			String eaglesName) {
 		String overwriteMessage = "The " + eaglesName + " already are #" + 
-				overwritePowerRanking + ". Clear the " + eaglesName + " ranking and assign #" + 
-				overwritePowerRanking + " to " + colts.getName() + "? (Y/N)";
+				overwritePowerRanking + ". Assign #" + colts.getPowerRanking() + 
+				" to the " + eaglesName + " and assign #" + overwritePowerRanking + 
+				" to the " + colts.getName() + "? (Y/N)";
 		return overwriteMessage;
 	}
 	
