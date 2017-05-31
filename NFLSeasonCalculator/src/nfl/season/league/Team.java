@@ -152,6 +152,12 @@ public class Team {
 		eloRating = defaultEloRating;
 		homeFieldAdvantage = defaultHomeFieldAdvantage;
 	}
+	
+	public void calculateAllMatchupsUsingPowerRankings() {
+		for (Matchup matchup : matchups) {
+			matchup.calculateTeamWinChancesFromPowerRankings();
+		}
+	}
 
 	public void calculateAllMatchupsUsingEloRatings() {
 		for (Matchup matchup : matchups) {

@@ -36,15 +36,17 @@ public class TeamsMenuTest {
 	
 	private static final int GO_TO_SET_ALL_RANKINGS = 2;
 	
-	private static final int SET_ALL_MATCHUPS_BY_ELO = 3;
+	private static final int SET_ALL_MATCHUPS_BY_RANKINGS = 3;
 	
-	private static final int RESET_TO_DEFAULTS = 4;
+	private static final int SET_ALL_MATCHUPS_BY_ELO = 4;
 	
-	private static final int LOAD_SAVED_SETTINGS = 5;
+	private static final int RESET_TO_DEFAULTS = 5;
 	
-	private static final int SAVE_CURRENT_TEAM_SETTINGS = 6;
+	private static final int LOAD_SAVED_SETTINGS = 6;
+	
+	private static final int SAVE_CURRENT_TEAM_SETTINGS = 7;
 
-	private static final int EXIT_FROM_TEAMS_MENU = 7;
+	private static final int EXIT_FROM_TEAMS_MENU = 8;
 	
 	private static final int EXIT_FROM_TEAM_SELECT = NFLTeamEnum.values().length + 1;
 
@@ -104,11 +106,12 @@ public class TeamsMenuTest {
 		expectedMenuMessage = 
 				MenuOptionsUtil.MENU_INTRO + "1. Select Team\n" +
 				"2. Set all Team Power Rankings\n" +
-				"3. Set all Teams' Matchups using Elo Rating Calculations\n" + 
-				"4. Revert All Teams and Matchups to Default Settings\n" +
-				"5. Load Saved Team and Matchup Settings\n" +
-				"6. Save Current Team and Matchup Settings\n" +
-				"7. Back to Main Menu";
+				"3. Set all Teams' Matchups using Power Ranking Calculations\n" +
+				"4. Set all Teams' Matchups using Elo Rating Calculations\n" + 
+				"5. Revert All Teams and Matchups to Default Settings\n" +
+				"6. Load Saved Team and Matchup Settings\n" +
+				"7. Save Current Team and Matchup Settings\n" +
+				"8. Back to Main Menu";
 		
 		confirmationMessage = "All rankings will be cleared. Proceed? (Y/N)";
 		
@@ -266,6 +269,18 @@ public class TeamsMenuTest {
 		teamsMenu.launchSubMenu();
 		
 		verifyTeamListMessagesForSetAllRankings(2, 2);
+	}
+	
+	@Test
+	public void setAllMatchupsToPowerRankingsSetsAllMatchupsForAllTeams() {
+		when(input.askForInt(anyString())).thenReturn(SET_ALL_MATCHUPS_BY_RANKINGS, 
+				EXIT_FROM_TEAMS_MENU);
+		
+		teamsMenu.launchSubMenu();
+		
+		for (Team team : mockTeams) {
+			verify(team).calculateAllMatchupsUsingPowerRankings();
+		}
 	}
 	
 	@Test
