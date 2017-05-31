@@ -7,6 +7,7 @@ import java.util.List;
 
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
+import nfl.season.league.League;
 import nfl.season.league.Team;
 
 import org.mockito.Mock;
@@ -230,6 +231,26 @@ public class TestWithMockPlayoffObjects {
 		when(playoffs.createPlayoffTeam(leagueTeam2_4_1)).thenReturn(playoffTeam2_4_1);
 	}
 	
+	public void setUpMockLeague(League mockLeague) {
+		when(mockLeague.getTeam("Team 1 - 1 - 1")).thenReturn(leagueTeam1_1_1);
+		when(mockLeague.getTeam("Team 1 - 1 - 2")).thenReturn(leagueTeam1_1_2);
+		when(mockLeague.getTeam("Team 1 - 1 - 3")).thenReturn(leagueTeam1_1_3);
+		when(mockLeague.getTeam("Team 1 - 2 - 1")).thenReturn(leagueTeam1_2_1);
+		when(mockLeague.getTeam("Team 1 - 2 - 2")).thenReturn(leagueTeam1_2_2);
+		when(mockLeague.getTeam("Team 1 - 2 - 3")).thenReturn(leagueTeam1_2_3);
+		when(mockLeague.getTeam("Team 1 - 3 - 1")).thenReturn(leagueTeam1_3_1);
+		when(mockLeague.getTeam("Team 1 - 4 - 1")).thenReturn(leagueTeam1_4_1);
+		
+		when(mockLeague.getTeam("Team 2 - 1 - 1")).thenReturn(leagueTeam2_1_1);
+		when(mockLeague.getTeam("Team 2 - 1 - 2")).thenReturn(leagueTeam2_1_2);
+		when(mockLeague.getTeam("Team 2 - 1 - 3")).thenReturn(leagueTeam2_1_3);
+		when(mockLeague.getTeam("Team 2 - 2 - 1")).thenReturn(leagueTeam2_2_1);
+		when(mockLeague.getTeam("Team 2 - 2 - 2")).thenReturn(leagueTeam2_2_2);
+		when(mockLeague.getTeam("Team 2 - 2 - 3")).thenReturn(leagueTeam2_2_3);
+		when(mockLeague.getTeam("Team 2 - 3 - 1")).thenReturn(leagueTeam2_3_1);
+		when(mockLeague.getTeam("Team 2 - 4 - 1")).thenReturn(leagueTeam2_4_1);
+	}
+	
 	private void setUpConferences() {
 		conference1Divisions = new ArrayList<NFLPlayoffDivision>();
 		conference1LeagueDivisions = new ArrayList<Division>();
@@ -255,6 +276,14 @@ public class TestWithMockPlayoffObjects {
 		conference1Teams.add(leagueTeam1_2_3);
 		conference1Teams.add(leagueTeam1_3_1);
 		conference1Teams.add(leagueTeam1_4_1);
+		when(playoffConference1.getDivision(playoffTeam1_1_1)).thenReturn(playoffDivision1_1);
+		when(playoffConference1.getDivision(playoffTeam1_1_2)).thenReturn(playoffDivision1_1);
+		when(playoffConference1.getDivision(playoffTeam1_1_3)).thenReturn(playoffDivision1_1);
+		when(playoffConference1.getDivision(playoffTeam1_2_1)).thenReturn(playoffDivision1_2);
+		when(playoffConference1.getDivision(playoffTeam1_2_2)).thenReturn(playoffDivision1_2);
+		when(playoffConference1.getDivision(playoffTeam1_2_3)).thenReturn(playoffDivision1_2);
+		when(playoffConference1.getDivision(playoffTeam1_3_1)).thenReturn(playoffDivision1_3);
+		when(playoffConference1.getDivision(playoffTeam1_4_1)).thenReturn(playoffDivision1_4);
 		List<Team> conference1TeamsCopy = new ArrayList<Team>();
 		conference1TeamsCopy.addAll(conference1Teams);
 		when(leagueConference1.getTeams()).thenReturn(conference1TeamsCopy);
@@ -283,6 +312,14 @@ public class TestWithMockPlayoffObjects {
 		conference2Teams.add(leagueTeam2_2_3);
 		conference2Teams.add(leagueTeam2_3_1);
 		conference2Teams.add(leagueTeam2_4_1);
+		when(playoffConference2.getDivision(playoffTeam2_1_1)).thenReturn(playoffDivision2_1);
+		when(playoffConference2.getDivision(playoffTeam2_1_2)).thenReturn(playoffDivision2_1);
+		when(playoffConference2.getDivision(playoffTeam2_1_3)).thenReturn(playoffDivision2_1);
+		when(playoffConference2.getDivision(playoffTeam2_2_1)).thenReturn(playoffDivision2_2);
+		when(playoffConference2.getDivision(playoffTeam2_2_2)).thenReturn(playoffDivision2_2);
+		when(playoffConference2.getDivision(playoffTeam2_2_3)).thenReturn(playoffDivision2_2);
+		when(playoffConference2.getDivision(playoffTeam2_3_1)).thenReturn(playoffDivision2_3);
+		when(playoffConference2.getDivision(playoffTeam2_4_1)).thenReturn(playoffDivision2_4);
 		List<Team> conference2TeamsCopy = new ArrayList<Team>();
 		conference2TeamsCopy.addAll(conference2Teams);
 		when(leagueConference2.getTeams()).thenReturn(conference2TeamsCopy);
@@ -293,6 +330,9 @@ public class TestWithMockPlayoffObjects {
 		division1_1Teams.add(leagueTeam1_1_1);
 		division1_1Teams.add(leagueTeam1_1_2);
 		division1_1Teams.add(leagueTeam1_1_3);
+		when(leagueDivision1_1.getTeam("Team 1 - 1 - 1")).thenReturn(leagueTeam1_1_1);
+		when(leagueDivision1_1.getTeam("Team 1 - 1 - 2")).thenReturn(leagueTeam1_1_2);
+		when(leagueDivision1_1.getTeam("Team 1 - 1 - 3")).thenReturn(leagueTeam1_1_3);
 		when(leagueDivision1_1.getTeams()).thenReturn(division1_1Teams);
 		when(playoffDivision1_1.getDivision()).thenReturn(leagueDivision1_1);
 		when(leagueDivision1_1.getName()).thenReturn("Div 1 - 1");
@@ -301,18 +341,23 @@ public class TestWithMockPlayoffObjects {
 		division1_2Teams.add(leagueTeam1_2_1);
 		division1_2Teams.add(leagueTeam1_2_2);
 		division1_2Teams.add(leagueTeam1_2_3);
+		when(leagueDivision1_1.getTeam("Team 1 - 2 - 1")).thenReturn(leagueTeam1_2_1);
+		when(leagueDivision1_1.getTeam("Team 1 - 2 - 2")).thenReturn(leagueTeam1_2_2);
+		when(leagueDivision1_1.getTeam("Team 1 - 2 - 3")).thenReturn(leagueTeam1_2_3);
 		when(leagueDivision1_2.getTeams()).thenReturn(division1_2Teams);
 		when(playoffDivision1_2.getDivision()).thenReturn(leagueDivision1_2);
 		when(leagueDivision1_2.getName()).thenReturn("Div 1 - 2");
 		
 		division1_3Teams = new ArrayList<Team>();
 		division1_3Teams.add(leagueTeam1_3_1);
+		when(leagueDivision1_1.getTeam("Team 1 - 3 - 1")).thenReturn(leagueTeam1_3_1);
 		when(leagueDivision1_3.getTeams()).thenReturn(division1_3Teams);
 		when(playoffDivision1_3.getDivision()).thenReturn(leagueDivision1_3);
 		when(leagueDivision1_3.getName()).thenReturn("Div 1 - 3");
 		
 		division1_4Teams = new ArrayList<Team>();
 		division1_4Teams.add(leagueTeam1_4_1);
+		when(leagueDivision1_1.getTeam("Team 1 - 4 - 1")).thenReturn(leagueTeam1_4_1);
 		when(leagueDivision1_4.getTeams()).thenReturn(division1_4Teams);
 		when(playoffDivision1_4.getDivision()).thenReturn(leagueDivision1_4);
 		when(leagueDivision1_4.getName()).thenReturn("Div 1 - 4");
@@ -321,6 +366,9 @@ public class TestWithMockPlayoffObjects {
 		division2_1Teams.add(leagueTeam2_1_1);
 		division2_1Teams.add(leagueTeam2_1_2);
 		division2_1Teams.add(leagueTeam2_1_3);
+		when(leagueDivision1_1.getTeam("Team 2 - 1 - 1")).thenReturn(leagueTeam2_1_1);
+		when(leagueDivision1_1.getTeam("Team 2 - 1 - 2")).thenReturn(leagueTeam2_1_2);
+		when(leagueDivision1_1.getTeam("Team 2 - 1 - 3")).thenReturn(leagueTeam2_1_3);
 		when(leagueDivision2_1.getTeams()).thenReturn(division2_1Teams);
 		when(playoffDivision2_1.getDivision()).thenReturn(leagueDivision2_1);
 		when(leagueDivision2_1.getName()).thenReturn("Div 2 - 1");
@@ -329,18 +377,23 @@ public class TestWithMockPlayoffObjects {
 		division2_2Teams.add(leagueTeam2_2_1);
 		division2_2Teams.add(leagueTeam2_2_2);
 		division2_2Teams.add(leagueTeam2_2_3);
+		when(leagueDivision1_1.getTeam("Team 2 - 2 - 1")).thenReturn(leagueTeam2_2_1);
+		when(leagueDivision1_1.getTeam("Team 2 - 2 - 2")).thenReturn(leagueTeam2_2_2);
+		when(leagueDivision1_1.getTeam("Team 2 - 2 - 3")).thenReturn(leagueTeam2_2_3);
 		when(leagueDivision2_2.getTeams()).thenReturn(division2_2Teams);
 		when(playoffDivision2_2.getDivision()).thenReturn(leagueDivision2_2);
 		when(leagueDivision2_2.getName()).thenReturn("Div 2 - 2");
 		
 		division2_3Teams = new ArrayList<Team>();
 		division2_3Teams.add(leagueTeam2_3_1);
+		when(leagueDivision1_1.getTeam("Team 2 - 3 - 1")).thenReturn(leagueTeam2_3_1);
 		when(leagueDivision2_3.getTeams()).thenReturn(division2_3Teams);
 		when(playoffDivision2_3.getDivision()).thenReturn(leagueDivision2_3);
 		when(leagueDivision2_3.getName()).thenReturn("Div 2 - 3");
 		
 		division2_4Teams = new ArrayList<Team>();
 		division2_4Teams.add(leagueTeam2_4_1);
+		when(leagueDivision1_1.getTeam("Team 2 - 4 - 1")).thenReturn(leagueTeam2_4_1);
 		when(leagueDivision2_4.getTeams()).thenReturn(division2_4Teams);
 		when(playoffDivision2_4.getDivision()).thenReturn(leagueDivision2_4);
 		when(leagueDivision2_4.getName()).thenReturn("Div 2 - 4");
