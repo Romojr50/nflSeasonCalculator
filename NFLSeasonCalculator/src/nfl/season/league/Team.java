@@ -54,17 +54,6 @@ public class Team {
 			if (powerRanking != CLEAR_RANKING) {
 				if (matchup.getWinChanceMode() == WinChanceModeEnum.POWER_RANKINGS) {
 					matchup.calculateTeamWinChancesFromPowerRankings();
-					
-					if (matchup.getHomeAwayWinChanceMode(name) == 
-							HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE) {
-						matchup.calculateHomeWinChanceFromHomeFieldAdvantage(name);
-					}
-					
-					String opponentName = matchup.getOpponentName(name);
-					if (matchup.getHomeAwayWinChanceMode(opponentName) == 
-							HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE) {
-						matchup.calculateHomeWinChanceFromHomeFieldAdvantage(opponentName);
-					}
 				}
 			} else if (matchup.getWinChanceMode() == WinChanceModeEnum.POWER_RANKINGS) {
 				matchup.setWinChanceMode(WinChanceModeEnum.CUSTOM_SETTING);
@@ -82,17 +71,6 @@ public class Team {
 		for (Matchup matchup : matchups) {
 			if (matchup.getWinChanceMode() == WinChanceModeEnum.ELO_RATINGS) {
 				matchup.calculateTeamWinChancesFromEloRatings();
-				
-				if (matchup.getHomeAwayWinChanceMode(name) == 
-						HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE) {
-					matchup.calculateHomeWinChanceFromHomeFieldAdvantage(name);
-				}
-				
-				String opponentName = matchup.getOpponentName(name);
-				if (matchup.getHomeAwayWinChanceMode(opponentName) == 
-						HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE) {
-					matchup.calculateHomeWinChanceFromHomeFieldAdvantage(opponentName);
-				}
 			}
 		}
 	}
