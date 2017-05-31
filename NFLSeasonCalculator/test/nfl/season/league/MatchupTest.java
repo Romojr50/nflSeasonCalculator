@@ -247,6 +247,31 @@ public class MatchupTest {
 		testHomeFieldAdvantageCalculation(25, 14);
 	}
 	
+	@Test
+	public void anyChangeToNeutralWinChanceChangesHomeWinChanceWithCorrectSetting() {
+		int homeFieldAdvantage = 14;
+		when(team1.getHomeFieldAdvantage()).thenReturn(homeFieldAdvantage);
+		matchup.calculateHomeWinChanceFromHomeFieldAdvantage(team1Name);
+		
+		int customNeutralWinChance = 52;
+		matchup.setTeamNeutralWinChance(team1Name, customNeutralWinChance);
+		int returnedHomeWinChance = matchup.getTeamHomeWinChance(team1Name);
+		assertEquals(returnedHomeWinChance, 
+				customNeutralWinChance + (homeFieldAdvantage / 2));
+		
+		when(team1.getPowerRanking()).thenReturn(1);
+		when(team2.getPowerRanking()).thenReturn(25);
+		matchup.calculateTeamWinChancesFromPowerRankings();
+		returnedHomeWinChance = matchup.getTeamHomeWinChance(team1Name);
+		assertEquals(returnedHomeWinChance, 90 + (homeFieldAdvantage / 2));
+		
+		when(team1.getEloRating()).thenReturn(1450);
+		when(team2.getEloRating()).thenReturn(1550);
+		matchup.calculateTeamWinChancesFromEloRatings();
+		returnedHomeWinChance = matchup.getTeamHomeWinChance(team1Name);
+		assertEquals(returnedHomeWinChance, 36 + (homeFieldAdvantage / 2));
+	}
+	
 	private void testRankingCalculation(
 			int expectedTeam1WinChance, int team1Ranking, int team2Ranking) {
 		when(team1.getPowerRanking()).thenReturn(team1Ranking);

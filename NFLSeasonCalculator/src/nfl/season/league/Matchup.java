@@ -1,6 +1,5 @@
 package nfl.season.league;
 
-import nfl.season.league.Matchup.WinChanceModeEnum;
 
 public class Matchup {
 
@@ -114,6 +113,8 @@ public class Matchup {
 				winChanceMode = WinChanceModeEnum.CUSTOM_SETTING;
 			}
 		}
+		
+		recalculateHomeWinChanceIfNeeded(teamName);
 	}
 	
 	public int getTeamHomeWinChance(String teamName) {
@@ -235,6 +236,8 @@ public class Matchup {
 			success = true;
 		}
 		
+		recalculateHomeWinChanceIfNeeded(team1.getName());
+		
 		return success;
 	}
 	
@@ -259,6 +262,8 @@ public class Matchup {
 			team2NeutralWinChance = 100 - team1NeutralWinChance;
 			success = true;
 		}
+		
+		recalculateHomeWinChanceIfNeeded(team1.getName());
 		
 		return success;
 	}
@@ -307,6 +312,19 @@ public class Matchup {
 		}
 		
 		return returnWinChance;
+	}
+
+	private void recalculateHomeWinChanceIfNeeded(String teamName) {
+		if (getHomeAwayWinChanceMode(teamName) == 
+				HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE) {
+			calculateHomeWinChanceFromHomeFieldAdvantage(teamName);
+		}
+		
+		String opponentName = getOpponentName(teamName);
+		if (getHomeAwayWinChanceMode(opponentName) == 
+				HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE) {
+			calculateHomeWinChanceFromHomeFieldAdvantage(opponentName);
+		}
 	}
 	
 	private int calculateBetterWinChance(int team1Ranking, int team2Ranking) {
