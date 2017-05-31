@@ -1,10 +1,14 @@
 package nfl.season.input;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -54,6 +58,12 @@ public class NFLPlayoffSettingsTest extends TestWithMockPlayoffObjects {
 	@Mock
 	private NFLFileWriterFactory fileWriterFactory;
 	
+	@Mock
+	private BufferedReader fileReader;
+	
+	@Mock
+	private NFLFileReaderFactory fileReaderFactory;
+	
 	private NFLPlayoffSettings playoffSettings;
 	
 	@Before
@@ -82,6 +92,7 @@ public class NFLPlayoffSettingsTest extends TestWithMockPlayoffObjects {
 		setUpMockLeague(nfl);
 		
 		when(fileWriterFactory.createNFLPlayoffSettingsWriter()).thenReturn(fileWriter);
+		when(fileReaderFactory.createNFLPlayoffSettingsReader()).thenReturn(fileReader);
 		
 		playoffSettings = new NFLPlayoffSettings();
 	}
@@ -145,6 +156,52 @@ public class NFLPlayoffSettingsTest extends TestWithMockPlayoffObjects {
 		verify(fileWriter).close();
 		
 		assertTrue(success);
+	}
+	
+	@Test
+	public void saveToSettingsFileFailsButFileWriterIsStillClosed() throws IOException {
+		boolean success = true;
+		
+		doThrow(new IOException()).when(fileWriter).write(any(byte[].class));
+			
+		success = playoffSettings.saveToSettingsFile(playoffs, fileWriterFactory);
+		verify(fileWriter).close();
+		assertFalse(success);
+	}
+	
+	@Test
+	public void loadSettingsFileReadsFromSettingsFile() {
+		String[] loadedTeamSettingsFileLines = new String[3];
+		loadedTeamSettingsFileLines[0] = "This is the first line";
+		loadedTeamSettingsFileLines[1] = "Another line!";
+		
+		String expectedTeamSettingsFileString = loadedTeamSettingsFileLines[0] + 
+				"\n" + loadedTeamSettingsFileLines[1] + "\n";
+		
+		try {
+			when(fileReader.readLine()).thenReturn(loadedTeamSettingsFileLines[0], 
+					loadedTeamSettingsFileLines[1], loadedTeamSettingsFileLines[2], null);
+			String returnedTeamSettingsFileString = playoffSettings.loadSettingsFile(
+					fileReaderFactory);
+			
+			verify(fileReaderFactory).createNFLPlayoffSettingsReader();
+			verify(fileReader).close();
+			assertEquals(returnedTeamSettingsFileString, expectedTeamSettingsFileString);
+		} catch (IOException e) {
+			assertTrue(e.getMessage(), false);
+		}
+	}
+	
+	@Test
+	public void loadSettingsFileFailsButFileReaderIsStillClosed() throws IOException {
+		try {
+			when(fileReader.readLine()).thenThrow(new IOException());
+			
+			playoffSettings.loadSettingsFile(fileReaderFactory);
+			
+		} catch (IOException e) {
+			verify(fileReader).close();
+		}
 	}
 	
 	private void verifyConference1TeamsSet() {

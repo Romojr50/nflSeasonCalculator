@@ -1,5 +1,6 @@
 package nfl.season.input;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -123,6 +124,27 @@ public class NFLPlayoffSettings {
 		}
 		
 		return success;
+	}
+
+	public String loadSettingsFile(NFLFileReaderFactory fileReaderFactory) throws IOException {
+		BufferedReader fileReader = fileReaderFactory.createNFLPlayoffSettingsReader();
+		
+		StringBuilder nflTeamSettingsBuilder = new StringBuilder();
+		
+		String line;
+		try {
+			line = fileReader.readLine();
+			while (line != null) {
+				nflTeamSettingsBuilder.append(line);
+				nflTeamSettingsBuilder.append("\n");
+				line = fileReader.readLine();
+			}
+		} finally {
+			fileReader.close();
+		}
+		
+		
+		return nflTeamSettingsBuilder.toString();
 	}
 
 }
