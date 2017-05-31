@@ -123,6 +123,14 @@ public class TeamTest {
 	}
 	
 	@Test
+	public void calculateAllMatchupsUsingPowerRankingsGoesThroughAllMatchups() {
+		team.calculateAllMatchupsUsingPowerRankings();
+		
+		verify(matchup1).calculateTeamWinChancesFromPowerRankings();
+		verify(matchup2).calculateTeamWinChancesFromPowerRankings();
+	}
+	
+	@Test
 	public void calculateAllMatchupsUsingEloRatingsGoesThroughAllMatchups() {
 		team.calculateAllMatchupsUsingEloRatings();
 		
