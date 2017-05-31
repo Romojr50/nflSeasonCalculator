@@ -19,6 +19,7 @@ import nfl.season.input.NFLPlayoffSettings;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
+import nfl.season.league.League;
 import nfl.season.league.Team;
 import nfl.season.playoffs.NFLPlayoffConference;
 import nfl.season.playoffs.NFLPlayoffTeam;
@@ -44,14 +45,19 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 	
 	private static final int CALCULATE_TEAM_CHANCES_BY_ROUND = 5;
 	
-	private static final int SAVE_PLAYOFF_SETTINGS = 6;
+	private static final int LOAD_PLAYOFF_SETTINGS = 6;
 	
-	private static final int BACK_TO_MAIN_MENU = 7;
+	private static final int SAVE_PLAYOFF_SETTINGS = 7;
+	
+	private static final int BACK_TO_MAIN_MENU = 8;
 	
 	private String expectedMenuMessage;
 	
 	@Mock
 	private NFLSeasonInput input;
+	
+	@Mock
+	private League league;
 	
 	@Mock
 	private NFLPlayoffs playoffs;
@@ -65,6 +71,8 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 	@Mock
 	private NFLFileReaderFactory fileReaderFactory;
 	
+	private String loadedPlayoffsFileString = "Load Playoffs File";
+	
 	private PlayoffsMenu playoffsMenu;
 	
 	@Before
@@ -75,6 +83,7 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 		super.setUpMockObjects();
 		super.setUpMockPlayoffsWithTeamsAndConferences(playoffs);
 		setExpectedMenuMessage();
+		when(playoffs.getLeague()).thenReturn(league);
 	}
 
 	@Test
@@ -306,6 +315,46 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 		
 		verifySaveSettingsFailureOccurs();
 	}
+	
+	@Test
+	public void loadTeamSettingsPullsInSavedSettings() throws IOException {
+		when(input.askForInt(anyString())).thenReturn(LOAD_PLAYOFF_SETTINGS, 
+				BACK_TO_MAIN_MENU);
+		when(playoffSettings.loadSettingsFile(fileReaderFactory)).thenReturn(
+				loadedPlayoffsFileString);
+		
+		playoffsMenu.launchSubMenu();
+		
+		verify(playoffSettings).loadSettingsFile(fileReaderFactory);
+		verify(playoffSettings).loadPlayoffSettingsString(playoffs, league,
+				loadedPlayoffsFileString);
+		
+		String expectedMessageWithSuccessfulLoad = "Playoffs Loaded Successfully\n" +
+				expectedMenuMessage;
+		verify(input, times(1)).askForInt(expectedMessageWithSuccessfulLoad);
+	}
+	
+	@Test
+	public void loadTeamSettingsFailsWithExceptionSoFailMessageIsDisplayed() throws IOException {
+		when(input.askForInt(anyString())).thenReturn(LOAD_PLAYOFF_SETTINGS, 
+				BACK_TO_MAIN_MENU);
+		when(playoffSettings.loadSettingsFile(fileReaderFactory)).thenThrow(new IOException());
+		
+		playoffsMenu.launchSubMenu();
+		
+		verifyLoadSettingsFailureOccurs();
+	}
+	
+	@Test
+	public void loadTeamSettingsFailsWithEmptyResponseSoFailMessageIsDisplayed() throws IOException {
+		when(input.askForInt(anyString())).thenReturn(LOAD_PLAYOFF_SETTINGS, 
+				BACK_TO_MAIN_MENU);
+		when(playoffSettings.loadSettingsFile(fileReaderFactory)).thenReturn("");
+		
+		playoffsMenu.launchSubMenu();
+		
+		verifyLoadSettingsFailureOccurs();
+	}
 
 	private void setExpectedMenuMessage() {
 		StringBuilder expectedMenuBuilder = new StringBuilder();
@@ -337,8 +386,9 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 		expectedMenuBuilder.append("3. Select Playoff Teams Based on Elo Ratings\n");
 		expectedMenuBuilder.append("4. Reseed Current Playoff Teams\n");
 		expectedMenuBuilder.append("5. Calculate and Print Team Chances By Playoff Round\n");
-		expectedMenuBuilder.append("6. Save Playoff Teams\n");
-		expectedMenuBuilder.append("7. Back to Main Menu");
+		expectedMenuBuilder.append("6. Load Saved Playoff Teams\n");
+		expectedMenuBuilder.append("7. Save Playoff Teams\n");
+		expectedMenuBuilder.append("8. Back to Main Menu");
 		
 		expectedMenuMessage = expectedMenuBuilder.toString();
 	}
@@ -513,6 +563,14 @@ public class PlayoffsMenuTest extends TestWithMockPlayoffObjects {
 		verify(input, times(1)).askForInt(expectedMessageWithSuccessfulSave);
 		
 		verify(playoffSettings).saveToSettingsFile(playoffs, fileWriterFactory);
+	}
+	
+	private void verifyLoadSettingsFailureOccurs() throws IOException {
+		String expectedMessageWithFailedLoad = "Playoffs Load FAILED\n" +
+				expectedMenuMessage;
+		verify(input, times(1)).askForInt(expectedMessageWithFailedLoad);
+		
+		verify(playoffSettings).loadSettingsFile(fileReaderFactory);
 	}
 
 	private String getChooseSeedFromDivisionWinnersMessage(

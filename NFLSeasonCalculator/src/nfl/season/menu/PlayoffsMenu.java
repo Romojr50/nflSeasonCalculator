@@ -24,8 +24,9 @@ public class PlayoffsMenu extends SubMenu {
 		SELECT_TEAMS_ON_ELO_RATINGS(3, "Select Playoff Teams Based on Elo Ratings"),
 		RESEED_TEAMS(4, "Reseed Current Playoff Teams"),
 		CALCULATE_TEAM_CHANCES_BY_ROUND(5, "Calculate and Print Team Chances By Playoff Round"),
-		SAVE_PLAYOFFS(6, "Save Playoff Teams"),
-		EXIT(7, "Back to Main Menu");
+		LOAD_PLAYOFFS(6, "Load Saved Playoff Teams"),
+		SAVE_PLAYOFFS(7, "Save Playoff Teams"),
+		EXIT(8, "Back to Main Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -51,6 +52,10 @@ public class PlayoffsMenu extends SubMenu {
 	private static final String SAVE_FILE_SUCCEEDED = "Playoffs Saved Successfully\n";
 	
 	private static final String SAVE_FILE_FAILED = "Playoffs Save FAILED\n";
+
+	private static final String LOAD_FILE_SUCCEEDED = "Playoffs Loaded Successfully\n";
+
+	private static final String LOAD_FILE_FAILED = "Playoffs Load FAILED\n";
 	
 	private NFLSeasonInput input;
 	
@@ -103,6 +108,8 @@ public class PlayoffsMenu extends SubMenu {
 			} else if (PlayoffsMenuOptions.CALCULATE_TEAM_CHANCES_BY_ROUND.optionNumber == 
 					selectedOption) {
 				playoffsPrefixMessage = calculatePlayoffRoundChancesAndReturnResultPrintout();
+			} else if (PlayoffsMenuOptions.LOAD_PLAYOFFS.optionNumber == selectedOption) {
+				playoffsPrefixMessage = loadSettingsFile();
 			} else if (PlayoffsMenuOptions.SAVE_PLAYOFFS.optionNumber == selectedOption) {
 				playoffsPrefixMessage = saveToSettingsFile();
 			}
@@ -217,6 +224,25 @@ public class PlayoffsMenu extends SubMenu {
 		return saveFilePrefix;
 	}
 
+	private String loadSettingsFile() {
+		String saveLoadFilePrefix;
+		String playoffFileString = null;
+		try {
+			playoffFileString = playoffSettings.loadSettingsFile(fileReaderFactory);
+			
+			if (playoffFileString != null && !"".equals(playoffFileString)) {
+				playoffSettings.loadPlayoffSettingsString(playoffs, 
+						playoffs.getLeague(), playoffFileString);
+				saveLoadFilePrefix = LOAD_FILE_SUCCEEDED;
+			} else {
+				saveLoadFilePrefix = LOAD_FILE_FAILED;
+			}
+		} catch (IOException e) {
+			saveLoadFilePrefix = LOAD_FILE_FAILED;
+		}
+		return saveLoadFilePrefix;
+	}
+	
 	private String getPlayoffRoundChancesPrintout() {
 		StringBuilder playoffRoundChancesBuilder = new StringBuilder();
 		
