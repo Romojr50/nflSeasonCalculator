@@ -2,6 +2,7 @@ package nfl.season.calculator;
 
 import java.io.IOException;
 
+import nfl.season.input.NFLPlayoffSettings;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.input.NFLTeamSettings;
 import nfl.season.input.NFLFileReaderFactory;
@@ -62,9 +63,15 @@ public class NFLSeasonCalculator {
 	
 	public static PlayoffsMenu createPlayoffsMenu(NFLSeasonInput input,
 			League nfl) {
+		NFLPlayoffSettings playoffSettings = new NFLPlayoffSettings();
+		NFLFileWriterFactory fileWriterFactory = 
+				new NFLFileWriterFactory();
+		NFLFileReaderFactory fileReaderFactory = 
+				new NFLFileReaderFactory();
 		NFLPlayoffs playoffs = new NFLPlayoffs(nfl);
 		playoffs.initializeNFLPlayoffs();
-		PlayoffsMenu playoffsMenu = new PlayoffsMenu(input, playoffs);
+		PlayoffsMenu playoffsMenu = new PlayoffsMenu(input, playoffs, playoffSettings, 
+				fileWriterFactory, fileReaderFactory);
 		
 		return playoffsMenu;
 	}
