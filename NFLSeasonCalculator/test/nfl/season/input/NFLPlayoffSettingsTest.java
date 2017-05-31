@@ -141,6 +141,7 @@ public class NFLPlayoffSettingsTest extends TestWithMockPlayoffObjects {
 	@Test
 	public void loadPlayoffSettingsStringSetsTeamsToAllConferences() {
 		playoffSettings.loadPlayoffSettingsString(playoffs, nfl, PLAYOFF_SETTINGS_STRING);
+		verify(playoffs).clearPlayoffTeams();
 		
 		verifyConference1TeamsSet();
 		verifyConference2TeamsSet();

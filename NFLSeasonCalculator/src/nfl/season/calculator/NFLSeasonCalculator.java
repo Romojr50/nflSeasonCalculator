@@ -70,6 +70,7 @@ public class NFLSeasonCalculator {
 				new NFLFileReaderFactory();
 		NFLPlayoffs playoffs = new NFLPlayoffs(nfl);
 		playoffs.initializeNFLPlayoffs();
+		loadPlayoffSettings(playoffs);
 		PlayoffsMenu playoffsMenu = new PlayoffsMenu(input, playoffs, playoffSettings, 
 				fileWriterFactory, fileReaderFactory);
 		
@@ -87,6 +88,22 @@ public class NFLSeasonCalculator {
 			if (loadSettingsFileString != null && !"".equals(loadSettingsFileString)) {
 				nflTeamSettings.setTeamsSettingsFromTeamSettingsFileString(nfl, 
 						loadSettingsFileString);
+			}
+		} catch (IOException e) {
+		}
+	}
+	
+	public static void loadPlayoffSettings(NFLPlayoffs playoffs) {
+		NFLPlayoffSettings playoffSettings = new NFLPlayoffSettings();
+		NFLFileReaderFactory fileReaderFactory = new NFLFileReaderFactory();
+		
+		League nfl = playoffs.getLeague();
+		try {
+			String playoffSettingsFileString = playoffSettings.loadSettingsFile(
+					fileReaderFactory);
+			if (playoffSettingsFileString != null && !"".equals(playoffSettingsFileString)) {
+				playoffSettings.loadPlayoffSettingsString(playoffs, nfl, 
+						playoffSettingsFileString);
 			}
 		} catch (IOException e) {
 		}

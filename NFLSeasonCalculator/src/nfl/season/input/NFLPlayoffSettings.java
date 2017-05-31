@@ -102,6 +102,7 @@ public class NFLPlayoffSettings {
 
 	public void loadPlayoffSettingsString(NFLPlayoffs playoffs, League nfl,
 			String playoffSettingsString) {
+		playoffs.clearPlayoffTeams();
 		String[] conferenceLines = playoffSettingsString.split("\n");
 		for (String conferenceLine : conferenceLines) {
 			loadConferencePlayoffTeamsLine(playoffs, nfl, conferenceLine);
