@@ -16,8 +16,8 @@ import java.util.List;
 
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.input.NFLTeamSettings;
-import nfl.season.input.NFLTeamSettingsFileReaderFactory;
-import nfl.season.input.NFLTeamSettingsFileWriterFactory;
+import nfl.season.input.NFLFileReaderFactory;
+import nfl.season.input.NFLFileWriterFactory;
 import nfl.season.league.League;
 import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
@@ -86,10 +86,10 @@ public class TeamsMenuTest {
 	private NFLTeamSettings nflTeamSettings;
 	
 	@Mock
-	private NFLTeamSettingsFileWriterFactory fileWriterFactory;
+	private NFLFileWriterFactory fileWriterFactory;
 	
 	@Mock
-	private NFLTeamSettingsFileReaderFactory fileReaderFactory;
+	private NFLFileReaderFactory fileReaderFactory;
 	
 	private String loadedSettingsFileString = "Load Settings File";
 	
@@ -311,7 +311,7 @@ public class TeamsMenuTest {
 		when(input.askForInt(anyString())).thenReturn(SAVE_CURRENT_TEAM_SETTINGS, 
 				EXIT_FROM_TEAMS_MENU);
 		when(nflTeamSettings.saveToSettingsFile(any(League.class), 
-				any(NFLTeamSettingsFileWriterFactory.class))).thenReturn(true);
+				any(NFLFileWriterFactory.class))).thenReturn(true);
 		
 		teamsMenu.launchSubMenu();
 		

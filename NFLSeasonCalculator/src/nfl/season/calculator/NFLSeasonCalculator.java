@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.input.NFLTeamSettings;
-import nfl.season.input.NFLTeamSettingsFileReaderFactory;
-import nfl.season.input.NFLTeamSettingsFileWriterFactory;
+import nfl.season.input.NFLFileReaderFactory;
+import nfl.season.input.NFLFileWriterFactory;
 import nfl.season.league.League;
 import nfl.season.menu.MainMenu;
 import nfl.season.menu.MainMenu.MainMenuOptions;
@@ -44,10 +44,10 @@ public class NFLSeasonCalculator {
 
 	public static TeamsMenu createTeamsMenu(NFLSeasonInput input, League nfl) {
 		NFLTeamSettings nflTeamSettings = new NFLTeamSettings();
-		NFLTeamSettingsFileWriterFactory teamSettingsFileWriterFactory = 
-				new NFLTeamSettingsFileWriterFactory();
-		NFLTeamSettingsFileReaderFactory teamSettingsFileReaderFactory = 
-				new NFLTeamSettingsFileReaderFactory();
+		NFLFileWriterFactory teamSettingsFileWriterFactory = 
+				new NFLFileWriterFactory();
+		NFLFileReaderFactory teamSettingsFileReaderFactory = 
+				new NFLFileReaderFactory();
 		TeamsMenu teamsMenu = new TeamsMenu(input, nfl, nflTeamSettings, 
 				teamSettingsFileWriterFactory, teamSettingsFileReaderFactory);
 		
@@ -71,8 +71,8 @@ public class NFLSeasonCalculator {
 	
 	public static void loadTeamSettings(League nfl) {
 		NFLTeamSettings nflTeamSettings = new NFLTeamSettings();
-		NFLTeamSettingsFileReaderFactory teamSettingsFileReaderFactory = 
-				new NFLTeamSettingsFileReaderFactory();
+		NFLFileReaderFactory teamSettingsFileReaderFactory = 
+				new NFLFileReaderFactory();
 		
 		try {
 			String loadSettingsFileString = nflTeamSettings.loadSettingsFile(

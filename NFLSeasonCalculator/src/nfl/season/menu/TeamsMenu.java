@@ -5,8 +5,8 @@ import java.util.List;
 
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.input.NFLTeamSettings;
-import nfl.season.input.NFLTeamSettingsFileReaderFactory;
-import nfl.season.input.NFLTeamSettingsFileWriterFactory;
+import nfl.season.input.NFLFileReaderFactory;
+import nfl.season.input.NFLFileWriterFactory;
 import nfl.season.league.League;
 import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
@@ -58,15 +58,15 @@ public class TeamsMenu extends SubMenu {
 	
 	private NFLTeamSettings nflTeamSettings;
 	
-	private NFLTeamSettingsFileWriterFactory fileWriterFactory;
+	private NFLFileWriterFactory fileWriterFactory;
 	
-	private NFLTeamSettingsFileReaderFactory fileReaderFactory;
+	private NFLFileReaderFactory fileReaderFactory;
 	
 	private SingleTeamMenu singleTeamMenu;
 	
 	public TeamsMenu(NFLSeasonInput input, League nfl, NFLTeamSettings nflTeamSettings, 
-			NFLTeamSettingsFileWriterFactory fileWriterFactory, 
-			NFLTeamSettingsFileReaderFactory fileReaderFactory) {
+			NFLFileWriterFactory fileWriterFactory, 
+			NFLFileReaderFactory fileReaderFactory) {
 		this.input = input;
 		this.nfl = nfl;
 		this.nflTeamSettings = nflTeamSettings;
