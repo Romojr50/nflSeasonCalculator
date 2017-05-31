@@ -9,6 +9,10 @@ public class NFLFileWriterFactory extends NFLFileIO {
 		return createNFLFileWriter(NFL_TEAM_SETTINGS_FILE_LOCATION);
 	}
 
+	public FileOutputStream createNFLPlayoffSettingsWriter() throws FileNotFoundException {
+		return createNFLFileWriter(NFL_PLAYOFF_SETTINGS_FILE_LOCATION);
+	}
+	
 	private FileOutputStream createNFLFileWriter(String fileLocation) 
 			throws FileNotFoundException {
 		FileOutputStream fileOutputStream = new FileOutputStream(fileLocation);

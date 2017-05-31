@@ -1,5 +1,7 @@
 package nfl.season.input;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,6 +105,24 @@ public class NFLPlayoffSettings {
 		for (String conferenceLine : conferenceLines) {
 			loadConferencePlayoffTeamsLine(playoffs, nfl, conferenceLine);
 		}
+	}
+
+	public boolean saveToSettingsFile(NFLPlayoffs playoffs,
+			NFLFileWriterFactory fileWriterFactory) throws IOException {
+		boolean success = true;
+		
+		FileOutputStream fileWriter = null;
+		try {
+			fileWriter = fileWriterFactory.createNFLPlayoffSettingsWriter();
+			String playoffSettingsString = createPlayoffSettingsString(playoffs);
+			fileWriter.write(playoffSettingsString.getBytes());
+		} catch (IOException e) {
+			success = false;
+		} finally {
+			fileWriter.close();
+		}
+		
+		return success;
 	}
 
 }

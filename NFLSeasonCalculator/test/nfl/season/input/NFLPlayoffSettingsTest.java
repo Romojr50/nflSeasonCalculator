@@ -1,9 +1,13 @@
 package nfl.season.input;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,10 +48,16 @@ public class NFLPlayoffSettingsTest extends TestWithMockPlayoffObjects {
 	
 	private List<NFLPlayoffTeam> playoffConference2Teams;
 	
+	@Mock
+	private FileOutputStream fileWriter;
+	
+	@Mock
+	private NFLFileWriterFactory fileWriterFactory;
+	
 	private NFLPlayoffSettings playoffSettings;
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws FileNotFoundException {
 		setUpMockObjects();
 		setUpMockPlayoffsWithTeamsAndConferences(playoffs);
 		
@@ -70,6 +80,8 @@ public class NFLPlayoffSettingsTest extends TestWithMockPlayoffObjects {
 		when(playoffConference2.getTeamsInSeedOrder()).thenReturn(playoffConference2Teams);
 		
 		setUpMockLeague(nfl);
+		
+		when(fileWriterFactory.createNFLPlayoffSettingsWriter()).thenReturn(fileWriter);
 		
 		playoffSettings = new NFLPlayoffSettings();
 	}
@@ -121,6 +133,18 @@ public class NFLPlayoffSettingsTest extends TestWithMockPlayoffObjects {
 		
 		verifyConference1TeamsSet();
 		verifyConference2TeamsSet();
+	}
+	
+	@Test
+	public void saveToSettingsFileWritesAllTeamsToFile() throws IOException {
+		String playoffsSettingsString = playoffSettings.createPlayoffSettingsString(playoffs);
+		
+		boolean success = playoffSettings.saveToSettingsFile(playoffs, fileWriterFactory);
+		verify(fileWriterFactory).createNFLPlayoffSettingsWriter();
+		verify(fileWriter).write(playoffsSettingsString.getBytes());
+		verify(fileWriter).close();
+		
+		assertTrue(success);
 	}
 	
 	private void verifyConference1TeamsSet() {
