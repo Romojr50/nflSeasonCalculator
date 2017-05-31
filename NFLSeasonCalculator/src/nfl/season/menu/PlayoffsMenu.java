@@ -1,8 +1,12 @@
 package nfl.season.menu;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import nfl.season.input.NFLFileReaderFactory;
+import nfl.season.input.NFLFileWriterFactory;
+import nfl.season.input.NFLPlayoffSettings;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
@@ -13,8 +17,6 @@ import nfl.season.playoffs.NFLPlayoffTeam;
 import nfl.season.playoffs.NFLPlayoffs;
 
 public class PlayoffsMenu extends SubMenu {
-
-	private static final int NUMBER_OF_WILDCARDS_IN_CONFERENCE = 2;
 	
 	public enum PlayoffsMenuOptions implements MenuOptions {
 		SELECT_TEAMS(1, "Select Teams for Playoffs"), 
@@ -22,7 +24,9 @@ public class PlayoffsMenu extends SubMenu {
 		SELECT_TEAMS_ON_ELO_RATINGS(3, "Select Playoff Teams Based on Elo Ratings"),
 		RESEED_TEAMS(4, "Reseed Current Playoff Teams"),
 		CALCULATE_TEAM_CHANCES_BY_ROUND(5, "Calculate and Print Team Chances By Playoff Round"),
-		EXIT(6, "Back to Main Menu");
+		LOAD_PLAYOFFS(6, "Load Saved Playoff Teams"),
+		SAVE_PLAYOFFS(7, "Save Playoff Teams"),
+		EXIT(8, "Back to Main Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -43,13 +47,35 @@ public class PlayoffsMenu extends SubMenu {
 		}
 	}
 	
+	private static final int NUMBER_OF_WILDCARDS_IN_CONFERENCE = 2;
+	
+	private static final String SAVE_FILE_SUCCEEDED = "Playoffs Saved Successfully\n";
+	
+	private static final String SAVE_FILE_FAILED = "Playoffs Save FAILED\n";
+
+	private static final String LOAD_FILE_SUCCEEDED = "Playoffs Loaded Successfully\n";
+
+	private static final String LOAD_FILE_FAILED = "Playoffs Load FAILED\n";
+	
 	private NFLSeasonInput input;
 	
 	private NFLPlayoffs playoffs;
 	
-	public PlayoffsMenu(NFLSeasonInput input, NFLPlayoffs playoffs) {
+	private NFLPlayoffSettings playoffSettings;
+	
+	private NFLFileWriterFactory fileWriterFactory;
+	
+	private NFLFileReaderFactory fileReaderFactory;
+	
+	public PlayoffsMenu(NFLSeasonInput input, NFLPlayoffs playoffs, 
+			NFLPlayoffSettings playoffSettings, 
+			NFLFileWriterFactory fileWriterFactory, 
+			NFLFileReaderFactory fileReaderFactory) {
 		this.input = input;
 		this.playoffs = playoffs;
+		this.playoffSettings = playoffSettings;
+		this.fileWriterFactory = fileWriterFactory;
+		this.fileReaderFactory = fileReaderFactory;
 	}
 
 	@Override
@@ -82,6 +108,10 @@ public class PlayoffsMenu extends SubMenu {
 			} else if (PlayoffsMenuOptions.CALCULATE_TEAM_CHANCES_BY_ROUND.optionNumber == 
 					selectedOption) {
 				playoffsPrefixMessage = calculatePlayoffRoundChancesAndReturnResultPrintout();
+			} else if (PlayoffsMenuOptions.LOAD_PLAYOFFS.optionNumber == selectedOption) {
+				playoffsPrefixMessage = loadSettingsFile();
+			} else if (PlayoffsMenuOptions.SAVE_PLAYOFFS.optionNumber == selectedOption) {
+				playoffsPrefixMessage = saveToSettingsFile();
 			}
 		}
 	}
@@ -177,7 +207,42 @@ public class PlayoffsMenu extends SubMenu {
 		
 		return playoffRoundChancesBuilder.toString();
 	}
+	
+	private String saveToSettingsFile() {
+		String saveFilePrefix;
+		try {
+			boolean saveSuccess = playoffSettings.saveToSettingsFile(playoffs, 
+					fileWriterFactory);
+			if (saveSuccess) {
+				saveFilePrefix = SAVE_FILE_SUCCEEDED;
+			} else {
+				saveFilePrefix = SAVE_FILE_FAILED;
+			}
+		} catch (IOException e) {
+			saveFilePrefix = SAVE_FILE_FAILED;
+		}
+		return saveFilePrefix;
+	}
 
+	private String loadSettingsFile() {
+		String saveLoadFilePrefix;
+		String playoffFileString = null;
+		try {
+			playoffFileString = playoffSettings.loadSettingsFile(fileReaderFactory);
+			
+			if (playoffFileString != null && !"".equals(playoffFileString)) {
+				playoffSettings.loadPlayoffSettingsString(playoffs, 
+						playoffs.getLeague(), playoffFileString);
+				saveLoadFilePrefix = LOAD_FILE_SUCCEEDED;
+			} else {
+				saveLoadFilePrefix = LOAD_FILE_FAILED;
+			}
+		} catch (IOException e) {
+			saveLoadFilePrefix = LOAD_FILE_FAILED;
+		}
+		return saveLoadFilePrefix;
+	}
+	
 	private String getPlayoffRoundChancesPrintout() {
 		StringBuilder playoffRoundChancesBuilder = new StringBuilder();
 		

@@ -65,7 +65,7 @@ public class NFLTeamSettings {
 	}
 
 	public boolean saveToSettingsFile(League league, 
-			NFLTeamSettingsFileWriterFactory fileWriterFactory) throws IOException {
+			NFLFileWriterFactory fileWriterFactory) throws IOException {
 		boolean success = true;
 		
 		FileOutputStream fileWriter = null;
@@ -149,7 +149,7 @@ public class NFLTeamSettings {
 	}
 	
 	public String loadSettingsFile(
-			NFLTeamSettingsFileReaderFactory fileReaderFactory) throws IOException {
+			NFLFileReaderFactory fileReaderFactory) throws IOException {
 		BufferedReader fileReader = fileReaderFactory.createNFLTeamSettingsReader();
 		
 		StringBuilder nflTeamSettingsBuilder = new StringBuilder();

@@ -2,10 +2,11 @@ package nfl.season.calculator;
 
 import java.io.IOException;
 
+import nfl.season.input.NFLPlayoffSettings;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.input.NFLTeamSettings;
-import nfl.season.input.NFLTeamSettingsFileReaderFactory;
-import nfl.season.input.NFLTeamSettingsFileWriterFactory;
+import nfl.season.input.NFLFileReaderFactory;
+import nfl.season.input.NFLFileWriterFactory;
 import nfl.season.league.League;
 import nfl.season.menu.MainMenu;
 import nfl.season.menu.MainMenu.MainMenuOptions;
@@ -44,10 +45,10 @@ public class NFLSeasonCalculator {
 
 	public static TeamsMenu createTeamsMenu(NFLSeasonInput input, League nfl) {
 		NFLTeamSettings nflTeamSettings = new NFLTeamSettings();
-		NFLTeamSettingsFileWriterFactory teamSettingsFileWriterFactory = 
-				new NFLTeamSettingsFileWriterFactory();
-		NFLTeamSettingsFileReaderFactory teamSettingsFileReaderFactory = 
-				new NFLTeamSettingsFileReaderFactory();
+		NFLFileWriterFactory teamSettingsFileWriterFactory = 
+				new NFLFileWriterFactory();
+		NFLFileReaderFactory teamSettingsFileReaderFactory = 
+				new NFLFileReaderFactory();
 		TeamsMenu teamsMenu = new TeamsMenu(input, nfl, nflTeamSettings, 
 				teamSettingsFileWriterFactory, teamSettingsFileReaderFactory);
 		
@@ -62,17 +63,24 @@ public class NFLSeasonCalculator {
 	
 	public static PlayoffsMenu createPlayoffsMenu(NFLSeasonInput input,
 			League nfl) {
+		NFLPlayoffSettings playoffSettings = new NFLPlayoffSettings();
+		NFLFileWriterFactory fileWriterFactory = 
+				new NFLFileWriterFactory();
+		NFLFileReaderFactory fileReaderFactory = 
+				new NFLFileReaderFactory();
 		NFLPlayoffs playoffs = new NFLPlayoffs(nfl);
 		playoffs.initializeNFLPlayoffs();
-		PlayoffsMenu playoffsMenu = new PlayoffsMenu(input, playoffs);
+		loadPlayoffSettings(playoffs);
+		PlayoffsMenu playoffsMenu = new PlayoffsMenu(input, playoffs, playoffSettings, 
+				fileWriterFactory, fileReaderFactory);
 		
 		return playoffsMenu;
 	}
 	
 	public static void loadTeamSettings(League nfl) {
 		NFLTeamSettings nflTeamSettings = new NFLTeamSettings();
-		NFLTeamSettingsFileReaderFactory teamSettingsFileReaderFactory = 
-				new NFLTeamSettingsFileReaderFactory();
+		NFLFileReaderFactory teamSettingsFileReaderFactory = 
+				new NFLFileReaderFactory();
 		
 		try {
 			String loadSettingsFileString = nflTeamSettings.loadSettingsFile(
@@ -80,6 +88,22 @@ public class NFLSeasonCalculator {
 			if (loadSettingsFileString != null && !"".equals(loadSettingsFileString)) {
 				nflTeamSettings.setTeamsSettingsFromTeamSettingsFileString(nfl, 
 						loadSettingsFileString);
+			}
+		} catch (IOException e) {
+		}
+	}
+	
+	public static void loadPlayoffSettings(NFLPlayoffs playoffs) {
+		NFLPlayoffSettings playoffSettings = new NFLPlayoffSettings();
+		NFLFileReaderFactory fileReaderFactory = new NFLFileReaderFactory();
+		
+		League nfl = playoffs.getLeague();
+		try {
+			String playoffSettingsFileString = playoffSettings.loadSettingsFile(
+					fileReaderFactory);
+			if (playoffSettingsFileString != null && !"".equals(playoffSettingsFileString)) {
+				playoffSettings.loadPlayoffSettingsString(playoffs, nfl, 
+						playoffSettingsFileString);
 			}
 		} catch (IOException e) {
 		}

@@ -107,7 +107,7 @@ public class NFLTeamSettingsTest {
 	private FileOutputStream fileWriter;
 	
 	@Mock
-	private NFLTeamSettingsFileWriterFactory fileWriterFactory;
+	private NFLFileWriterFactory fileWriterFactory;
 	
 	private NFLTeamSettings nflTeamSettings;
 	
@@ -115,7 +115,7 @@ public class NFLTeamSettingsTest {
 	private BufferedReader fileReader;
 	
 	@Mock
-	private NFLTeamSettingsFileReaderFactory fileReaderFactory;
+	private NFLFileReaderFactory fileReaderFactory;
 	
 	@Before
 	public void setUp() throws FileNotFoundException {

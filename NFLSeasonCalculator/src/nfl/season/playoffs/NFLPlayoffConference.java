@@ -5,6 +5,7 @@ import java.util.List;
 
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
+import nfl.season.league.Team;
 
 public class NFLPlayoffConference {
 
@@ -134,6 +135,23 @@ public class NFLPlayoffConference {
 			Division leagueDivision = playoffDivision.getDivision();
 			String leagueDivisionName = leagueDivision.getName();
 			if (leagueDivisionName.equalsIgnoreCase(divisionName)) {
+				returnDivision = playoffDivision;
+				break;
+			}
+		}
+		
+		return returnDivision;
+	}
+	
+	public NFLPlayoffDivision getDivision(NFLPlayoffTeam playoffTeam) {
+		NFLPlayoffDivision returnDivision = null;
+		Team leagueTeam = playoffTeam.getTeam();
+		String teamName = leagueTeam.getName();
+		
+		for (NFLPlayoffDivision playoffDivision : divisions) {
+			Division leagueDivision = playoffDivision.getDivision();
+			Team divisionTeam = leagueDivision.getTeam(teamName);
+			if (divisionTeam != null) {
 				returnDivision = playoffDivision;
 				break;
 			}

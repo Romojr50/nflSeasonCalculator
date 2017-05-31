@@ -1,0 +1,2 @@
+=AFC=/EAST/Patriots,/NORTH/Steelers,/WEST/Raiders,/SOUTH/Titans,Broncos,Chiefs,
+=NFC=/SOUTH/Falcons,/NORTH/Packers,/EAST/Cowboys,/WEST/Seahawks,Giants,Buccaneers,

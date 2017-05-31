@@ -39,6 +39,10 @@ public class NFLPlayoffs {
 		}
 	}
 
+	public League getLeague() {
+		return nfl;
+	}
+
 	public List<NFLPlayoffConference> getConferences() {
 		List<NFLPlayoffConference> returnConferences = new ArrayList<NFLPlayoffConference>();
 		returnConferences.addAll(conferences);
@@ -528,4 +532,5 @@ public class NFLPlayoffs {
 			playoffDivisionWinnerIndex++;
 		}
 	}
+	
 }
