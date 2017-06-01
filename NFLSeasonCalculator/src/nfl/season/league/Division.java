@@ -14,7 +14,7 @@ public class Division {
 		teams = new ArrayList<Team>();
 	}
 
-	public Object getName() {
+	public String getName() {
 		return name;
 	}
 

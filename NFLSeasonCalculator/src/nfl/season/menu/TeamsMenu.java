@@ -5,21 +5,33 @@ import java.util.List;
 
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.input.NFLTeamSettings;
-import nfl.season.input.NFLTeamSettingsFileWriterFactory;
+import nfl.season.input.NFLFileReaderFactory;
+import nfl.season.input.NFLFileWriterFactory;
 import nfl.season.league.League;
 import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
 
 public class TeamsMenu extends SubMenu {
-	
+
 	private static final int EXIT_FROM_TEAM_SELECT = NFLTeamEnum.values().length + 1;
+	
+	private static final String SAVE_FILE_SUCCEEDED = "Team Settings Saved Successfully\n";
+
+	private static final String SAVE_FILE_FAILED = "Team Settings Save FAILED\n";
+	
+	private static final String LOAD_FILE_SUCCEEDED = "Team Settings Loaded Successfully\n";
+	
+	private static final String LOAD_FILE_FAILED = "Team Settings Load FAILED\n";
 
 	public enum TeamsMenuOptions implements MenuOptions {
 		SELECT_TEAM(1, "Select Team"), 
 		SET_ALL_RANKINGS(2, "Set all Team Power Rankings"),
-		RESET_TO_DEFAULTS(3, "Revert All Teams and Matchups to Default Settings"),
-		SAVE_CURRENT_TEAM_SETTINGS(4, "Save Current Team and Matchup Settings"),
-		EXIT(5, "Back to Main Menu");
+		SET_ALL_MATCHUPS_BY_RANKINGS(3, "Set all Teams' Matchups using Power Ranking Calculations"),
+		SET_ALL_MATCHUPS_BY_ELO(4, "Set all Teams' Matchups using Elo Rating Calculations"),
+		RESET_TO_DEFAULTS(5, "Revert All Teams and Matchups to Default Settings"),
+		LOAD_SAVED_TEAM_SETTINGS(6, "Load Saved Team and Matchup Settings"),
+		SAVE_CURRENT_TEAM_SETTINGS(7, "Save Current Team and Matchup Settings"),
+		EXIT(8, "Back to Main Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -46,34 +58,47 @@ public class TeamsMenu extends SubMenu {
 	
 	private NFLTeamSettings nflTeamSettings;
 	
-	private NFLTeamSettingsFileWriterFactory fileWriterFactory;
+	private NFLFileWriterFactory fileWriterFactory;
+	
+	private NFLFileReaderFactory fileReaderFactory;
 	
 	private SingleTeamMenu singleTeamMenu;
 	
 	public TeamsMenu(NFLSeasonInput input, League nfl, NFLTeamSettings nflTeamSettings, 
-			NFLTeamSettingsFileWriterFactory fileWriterFactory) {
+			NFLFileWriterFactory fileWriterFactory, 
+			NFLFileReaderFactory fileReaderFactory) {
 		this.input = input;
 		this.nfl = nfl;
 		this.nflTeamSettings = nflTeamSettings;
 		this.fileWriterFactory = fileWriterFactory;
+		this.fileReaderFactory = fileReaderFactory;
 		subMenus = new SubMenu[TeamsMenuOptions.values().length - 1];
 	}
 	
 	@Override
 	public void launchSubMenu() {
 		String teamsMenuMessage = MenuOptionsUtil.createMenuMessage(TeamsMenuOptions.class);
-		String saveFilePrefix = "";
+		String saveLoadFilePrefix = "";
 		
 		int selectedOption = -1;
 		while (selectedOption != TeamsMenuOptions.EXIT.optionNumber) {
-			teamsMenuMessage = saveFilePrefix + teamsMenuMessage;
+			teamsMenuMessage = saveLoadFilePrefix + teamsMenuMessage;
 			selectedOption = input.askForInt(teamsMenuMessage);
-			saveFilePrefix = "";
+			saveLoadFilePrefix = "";
 				
 			if (TeamsMenuOptions.SELECT_TEAM.optionNumber == selectedOption) {
 				launchTeamSelect();
 			} else if (TeamsMenuOptions.SET_ALL_RANKINGS.optionNumber == selectedOption) {
 				launchSetAllRankings();
+			} else if (TeamsMenuOptions.LOAD_SAVED_TEAM_SETTINGS.optionNumber == 
+					selectedOption) {
+				saveLoadFilePrefix = loadSettingsFile();
+			} else if (TeamsMenuOptions.SET_ALL_MATCHUPS_BY_RANKINGS.optionNumber ==
+					selectedOption) {
+				launchSetAllMatchupsByRankings();
+			} else if (TeamsMenuOptions.SET_ALL_MATCHUPS_BY_ELO.optionNumber == 
+					selectedOption) {
+				launchSetAllMatchupsByElo();
 			} else if (TeamsMenuOptions.RESET_TO_DEFAULTS.optionNumber == selectedOption) {
 				List<Team> allTeams = nfl.getTeams();
 				for (Team team : allTeams) {
@@ -81,12 +106,7 @@ public class TeamsMenu extends SubMenu {
 				}
 			} else if (TeamsMenuOptions.SAVE_CURRENT_TEAM_SETTINGS.optionNumber == 
 					selectedOption) {
-				try {
-					nflTeamSettings.saveToSettingsFile(nfl, fileWriterFactory);
-					saveFilePrefix = "Team Settings Saved Successfully\n";
-				} catch (IOException e) {
-					saveFilePrefix = "Team Settings Save FAILED\n";
-				}
+				saveLoadFilePrefix = saveToSettingsFile();
 			}
 		}
 	}
@@ -154,6 +174,55 @@ public class TeamsMenu extends SubMenu {
 			}
 		}
 		
+	}
+	
+	private String saveToSettingsFile() {
+		String saveFilePrefix;
+		try {
+			boolean saveSuccess = nflTeamSettings.saveToSettingsFile(nfl, 
+					fileWriterFactory);
+			if (saveSuccess) {
+				saveFilePrefix = SAVE_FILE_SUCCEEDED;
+			} else {
+				saveFilePrefix = SAVE_FILE_FAILED;
+			}
+		} catch (IOException e) {
+			saveFilePrefix = SAVE_FILE_FAILED;
+		}
+		return saveFilePrefix;
+	}
+
+	private String loadSettingsFile() {
+		String saveLoadFilePrefix;
+		String nflTeamSettingsFileString = null;
+		try {
+			nflTeamSettingsFileString = nflTeamSettings.loadSettingsFile(fileReaderFactory);
+			
+			if (nflTeamSettingsFileString != null && !"".equals(nflTeamSettingsFileString)) {
+				nflTeamSettings.setTeamsSettingsFromTeamSettingsFileString(nfl, 
+						nflTeamSettingsFileString);
+				saveLoadFilePrefix = LOAD_FILE_SUCCEEDED;
+			} else {
+				saveLoadFilePrefix = LOAD_FILE_FAILED;
+			}
+		} catch (IOException e) {
+			saveLoadFilePrefix = LOAD_FILE_FAILED;
+		}
+		return saveLoadFilePrefix;
+	}
+	
+	private void launchSetAllMatchupsByRankings() {
+		List<Team> teams = nfl.getTeams();
+		for (Team team : teams) {
+			team.calculateAllMatchupsUsingPowerRankings();
+		}
+	}
+	
+	private void launchSetAllMatchupsByElo() {
+		List<Team> teams = nfl.getTeams();
+		for (Team team : teams) {
+			team.calculateAllMatchupsUsingEloRatings();
+		}
 	}
 
 	private String createTeamListMessage() {

@@ -3,6 +3,9 @@ package nfl.season.league;
 import java.util.ArrayList;
 import java.util.List;
 
+import nfl.season.league.Matchup.HomeAwayWinChanceModeEnum;
+import nfl.season.league.Matchup.WinChanceModeEnum;
+
 public class Team {
 
 	public static final int CLEAR_RANKING = -1;
@@ -47,6 +50,15 @@ public class Team {
 
 	public void setPowerRanking(int powerRanking) {
 		this.powerRanking = powerRanking;
+		for (Matchup matchup : matchups) {
+			if (powerRanking != CLEAR_RANKING) {
+				if (matchup.getWinChanceMode() == WinChanceModeEnum.POWER_RANKINGS) {
+					matchup.calculateTeamWinChancesFromPowerRankings();
+				}
+			} else if (matchup.getWinChanceMode() == WinChanceModeEnum.POWER_RANKINGS) {
+				matchup.setWinChanceMode(WinChanceModeEnum.CUSTOM_SETTING);
+			}
+		}
 	}
 
 	public int getEloRating() {
@@ -55,6 +67,12 @@ public class Team {
 
 	public void setEloRating(int newEloRating) {
 		this.eloRating = newEloRating;
+		
+		for (Matchup matchup : matchups) {
+			if (matchup.getWinChanceMode() == WinChanceModeEnum.ELO_RATINGS) {
+				matchup.calculateTeamWinChancesFromEloRatings();
+			}
+		}
 	}
 	
 	public int getHomeFieldAdvantage() {
@@ -63,6 +81,12 @@ public class Team {
 	
 	public void setHomeFieldAdvantage(int newHomeFieldAdvantage) {
 		this.homeFieldAdvantage = newHomeFieldAdvantage;
+		for (Matchup matchup : matchups) {
+			if (matchup.getHomeAwayWinChanceMode(name) == 
+					HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE) {
+				matchup.calculateHomeWinChanceFromHomeFieldAdvantage(name);
+			}
+		}
 	}
 
 	public List<Matchup> getMatchups() {
@@ -105,6 +129,18 @@ public class Team {
 		powerRanking = defaultPowerRanking;
 		eloRating = defaultEloRating;
 		homeFieldAdvantage = defaultHomeFieldAdvantage;
+	}
+	
+	public void calculateAllMatchupsUsingPowerRankings() {
+		for (Matchup matchup : matchups) {
+			matchup.calculateTeamWinChancesFromPowerRankings();
+		}
+	}
+
+	public void calculateAllMatchupsUsingEloRatings() {
+		for (Matchup matchup : matchups) {
+			matchup.calculateTeamWinChancesFromEloRatings();
+		}
 	}
 	
 }

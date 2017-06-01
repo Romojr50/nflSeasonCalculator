@@ -45,5 +45,13 @@ public class Conference {
 	public void addDivision(Division newDivision) {
 		divisions.add(newDivision);
 	}
+
+	public List<Team> getTeams() {
+		List<Team> returnTeams = new ArrayList<Team>();
+		for (Division division : divisions) {
+			returnTeams.addAll(division.getTeams());
+		}
+		return returnTeams;
+	}
 	
 }

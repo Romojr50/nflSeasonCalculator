@@ -18,8 +18,10 @@ public class SingleTeamMenu extends SubMenu {
 		SET_DEFAULT_ELO_RATING(5, "Set Elo Rating to Default"),
 		SET_DEFAULT_HOME_FIELD_ADVANTAGE(6, "Set Home Field Advantage to Default"),
 		SET_ALL_DEFAULTS(7, "Revert All Team Values to Defaults"),
-		CHOOSE_MATCHUP(8, "Edit Matchup Settings"),
-		EXIT(9, "Back to Teams Menu");
+		CALCULATE_MATCHUPS_BY_RANKINGS(8, "Calculate All Team Matchup Win Chances Using Power Rankings"),
+		CALCULATE_MATCHUPS_BY_ELO(9, "Calculate All Team Matchup Win Chances Using Elo Ratings"),
+		CHOOSE_MATCHUP(10, "Edit Matchup Settings"),
+		EXIT(11, "Back to Teams Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -41,8 +43,7 @@ public class SingleTeamMenu extends SubMenu {
 	}
 	
 	private static final String POWER_RANKING_MESSAGE_SUFFIX = "\nPlease enter in " +
-			"a number between 1-32 to set the team to that ranking\nor -1 to clear " +
-			"this team's ranking:";
+			"a number between 1-32 to set the team to that ranking:";
 	
 	private static final String PLEASE_ENTER_NATURAL_NUMBER = "\nPlease enter in an integer above 0";
 	
@@ -115,6 +116,12 @@ public class SingleTeamMenu extends SubMenu {
 					selectedTeam.getDefaultHomeFieldAdvantage());
 		} else if (SingleTeamMenuOptions.SET_ALL_DEFAULTS.optionNumber == selectedOption) {
 			selectedTeam.resetToDefaults();
+		} else if (SingleTeamMenuOptions.CALCULATE_MATCHUPS_BY_RANKINGS.optionNumber == 
+				selectedOption) {
+			selectedTeam.calculateAllMatchupsUsingPowerRankings();
+		} else if (SingleTeamMenuOptions.CALCULATE_MATCHUPS_BY_ELO.optionNumber == 
+				selectedOption) {
+			selectedTeam.calculateAllMatchupsUsingEloRatings();
 		} else if (SingleTeamMenuOptions.CHOOSE_MATCHUP.optionNumber == selectedOption) {
 			launchSelectMatchupMenu();
 		}
@@ -122,20 +129,26 @@ public class SingleTeamMenu extends SubMenu {
 
 	private void launchSetPowerRankingMenu() {
 		int newPowerRanking = NON_POWER_RANKING;
+		int oldPowerRanking = selectedTeam.getPowerRanking();
 		while ((newPowerRanking < 1 || 
-				newPowerRanking > NFLTeamEnum.values().length) && 
-				newPowerRanking != Team.CLEAR_RANKING) {
-			String powerRankingMessage = "Currently #" + selectedTeam.getPowerRanking() + 
+				newPowerRanking > NFLTeamEnum.values().length)) {
+			
+			String powerRankingMessage = "Currently #" + oldPowerRanking + 
 					POWER_RANKING_MESSAGE_SUFFIX;
 			newPowerRanking = input.askForInt(powerRankingMessage);
 			
-			newPowerRanking = handleOverwritePowerRankings(newPowerRanking);
+			if (newPowerRanking != oldPowerRanking) {
+				newPowerRanking = handleOverwritePowerRankings(newPowerRanking);
+			}
 		}
 	}
 	
 	private void launchSetDefaultPowerRankingMenu() {
 		int defaultPowerRanking = selectedTeam.getDefaultPowerRanking();
-		handleOverwritePowerRankings(defaultPowerRanking);
+		int oldPowerRanking = selectedTeam.getPowerRanking();
+		if (defaultPowerRanking != oldPowerRanking) {
+			handleOverwritePowerRankings(defaultPowerRanking);
+		}
 	}
 	
 	private void launchSetEloRatingMenu() {
@@ -218,17 +231,19 @@ public class SingleTeamMenu extends SubMenu {
 		String overwriteAnswer = "";
 		
 		String teamWithThatRankingName = teamWithThatRanking.getName();
-		String overwriteMessage = "The " + teamWithThatRankingName + 
-				" already are #" + newPowerRanking + ". Clear the " + 
-				teamWithThatRankingName + " ranking and assign #" + 
-				newPowerRanking + " to " + selectedTeam.getName() + 
-				"? (Y/N)";
+		int oldPowerRanking = selectedTeam.getPowerRanking();
+		
+		String overwriteMessage = "The " + teamWithThatRankingName + " already are #" + 
+				newPowerRanking + ". Assign #" + selectedTeam.getPowerRanking() + 
+				" to the " + teamWithThatRankingName + " and assign #" + 
+				newPowerRanking + " to the " + 
+				selectedTeam.getName() + "? (Y/N)";
 		
 		while (isNotYesOrNoIndicator(overwriteAnswer)) {
 			overwriteAnswer = input.askForString(overwriteMessage);
 			if ("Y".equalsIgnoreCase(overwriteAnswer)) {
 				selectedTeam.setPowerRanking(newPowerRanking);
-				teamWithThatRanking.setPowerRanking(Team.CLEAR_RANKING);
+				teamWithThatRanking.setPowerRanking(oldPowerRanking);
 			} else if ("N".equalsIgnoreCase(overwriteAnswer)){
 				newPowerRanking = NON_POWER_RANKING;
 			}
