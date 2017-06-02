@@ -6,7 +6,7 @@
 //
 
 
-package nfl.season.xml;
+package nfl.season.scorestrip;
 
 import java.util.ArrayList;
 import java.util.List;

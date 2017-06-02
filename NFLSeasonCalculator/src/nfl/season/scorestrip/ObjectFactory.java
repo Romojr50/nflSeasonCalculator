@@ -6,7 +6,7 @@
 //
 
 
-package nfl.season.xml;
+package nfl.season.scorestrip;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
