@@ -1,6 +1,7 @@
 package nfl.season.league;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -89,6 +90,36 @@ public class LeagueTest {
 		
 		Team returnTeam = nfl.getTeamWithPowerRanking(10);
 		assertEquals(teamAtRankingTen, returnTeam);
+	}
+	
+	@Test
+	public void areInSameDivisionDeterminesIfTeamsAreInSameDivision() {
+		League nfl = new League(League.NFL);
+		nfl.initializeNFL();
+		
+		Team dolphins = nfl.getTeam("Dolphins");
+		Team bills = nfl.getTeam("Bills");
+		Team steelers = nfl.getTeam("Steelers");
+		Team cowboys = nfl.getTeam("Cowboys");
+		
+		assertTrue(nfl.areInSameDivision(dolphins, bills));
+		assertFalse(nfl.areInSameDivision(dolphins, steelers));
+		assertFalse(nfl.areInSameDivision(dolphins, cowboys));
+	}
+	
+	@Test
+	public void areInSameConferenceDeterminesIfTeamsAreInSameConference() {
+		League nfl = new League(League.NFL);
+		nfl.initializeNFL();
+		
+		Team dolphins = nfl.getTeam("Dolphins");
+		Team bills = nfl.getTeam("Bills");
+		Team steelers = nfl.getTeam("Steelers");
+		Team cowboys = nfl.getTeam("Cowboys");
+		
+		assertTrue(nfl.areInSameConference(dolphins, bills));
+		assertTrue(nfl.areInSameConference(dolphins, steelers));
+		assertFalse(nfl.areInSameConference(dolphins, cowboys));
 	}
 
 	private void assertConferenceHasCorrectDivisions(Conference conference) {

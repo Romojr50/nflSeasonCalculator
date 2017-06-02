@@ -53,5 +53,19 @@ public class Conference {
 		}
 		return returnTeams;
 	}
+
+	public Team getTeam(String teamName) {
+		Team returnTeam = null;
+		
+		for (Division division : divisions) {
+			Team divisionTeam = division.getTeam(teamName);
+			if (divisionTeam != null) {
+				returnTeam = divisionTeam;
+				break;
+			}
+		}
+		
+		return returnTeam;
+	}
 	
 }
