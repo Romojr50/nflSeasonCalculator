@@ -3,6 +3,7 @@ package nfl.season.scorestrip;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -139,6 +140,15 @@ public class ScoreStripMapperTest {
 	}
 	
 	@Test
+	public void scoreStripMapperHasAGameWithEmptyTeamsSoNullIsReturned() {
+		when(scoreStripGame1_2.getHnn()).thenReturn("");
+		
+		SeasonGame seasonGame = mapper.mapScoreStripGameToSeasonGame(scoreStripGame1_2);
+		
+		assertNull(seasonGame);
+	}
+	
+	@Test
 	public void scoreStripMapperMapsAScoreStripWeekToASeasonWeek() {
 		SeasonWeek seasonWeek = mapper.mapScoreStripWeekToSeasonWeek(scoreStripWeek);
 		
@@ -150,6 +160,26 @@ public class ScoreStripMapperTest {
 		for (SeasonGame seasonGame : seasonGames) {
 			assertNotNull(seasonGame.getHomeTeam());
 		}
+	}
+	
+	@Test
+	public void scoreStripMapperEncountersANullGameButNoNullIsAddedToWeekGames() {
+		when(scoreStripGame1_2.getHnn()).thenReturn("");
+		
+		SeasonWeek seasonWeek = mapper.mapScoreStripWeekToSeasonWeek(scoreStripWeek);
+		
+		List<SeasonGame> seasonGames = seasonWeek.getSeasonGames();
+		assertEquals(2, seasonGames.size());
+		assertFalse(seasonGames.contains(null));
+	}
+	
+	@Test
+	public void scoreStripMapperHasWeekWithZeroNumberSoNullWeekIsReturned() {
+		when(scoreStripGames.getW()).thenReturn(Byte.valueOf("0"));
+		
+		SeasonWeek seasonWeek = mapper.mapScoreStripWeekToSeasonWeek(scoreStripWeek);
+		
+		assertNull(seasonWeek);
 	}
 	
 }

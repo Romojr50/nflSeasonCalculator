@@ -42,16 +42,22 @@ public class ScoreStripMapper {
 	}
 
 	public SeasonWeek mapScoreStripWeekToSeasonWeek(Ss scoreStripWeek) {
+		SeasonWeek seasonWeek = null;
+		
 		Gms scoreStripGames = scoreStripWeek.getGms();
 		byte scoreStripWeekNumber = scoreStripGames.getW();
 		int weekNumber = (int) scoreStripWeekNumber;
-		
-		SeasonWeek seasonWeek = new SeasonWeek(weekNumber);
-		
-		List<G> scoreStripGameList = scoreStripGames.getG();
-		for (G scoreStripGame : scoreStripGameList) {
-			SeasonGame seasonGame = mapScoreStripGameToSeasonGame(scoreStripGame);
-			seasonWeek.addSeasonGame(seasonGame);
+			
+		if (weekNumber > 0) {
+			seasonWeek = new SeasonWeek(weekNumber);
+			
+			List<G> scoreStripGameList = scoreStripGames.getG();
+			for (G scoreStripGame : scoreStripGameList) {
+				SeasonGame seasonGame = mapScoreStripGameToSeasonGame(scoreStripGame);
+				if (seasonGame != null) {
+					seasonWeek.addSeasonGame(seasonGame);
+				}
+			}
 		}
 		
 		return seasonWeek;
