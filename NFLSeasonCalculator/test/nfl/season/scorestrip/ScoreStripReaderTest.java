@@ -63,4 +63,16 @@ public class ScoreStripReaderTest {
 		assertNull(scoreStripReturn);
 	}
 	
+	@Test
+	public void generateScoreStripURLUsesYearAndWeekNumberToGenerateURL() {
+		String url = scoreStripReader.generateScoreStripURL("2017", 3);
+		assertEquals("http://www.nfl.com/ajax/scorestrip?season=2017&seasonType=REG&week=3", url);
+		
+		url = scoreStripReader.generateScoreStripURL("2017", 5);
+		assertEquals("http://www.nfl.com/ajax/scorestrip?season=2017&seasonType=REG&week=5", url);
+		
+		url = scoreStripReader.generateScoreStripURL("2014", 12);
+		assertEquals("http://www.nfl.com/ajax/scorestrip?season=2014&seasonType=REG&week=12", url);
+	}
+	
 }

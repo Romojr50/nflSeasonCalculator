@@ -24,4 +24,10 @@ public class ScoreStripReader {
 		return scoreStripReturn;
 	}
 
+	public String generateScoreStripURL(String year, int weekNumber) {
+		String url = "http://www.nfl.com/ajax/scorestrip?season=" + year + "&seasonType=REG&week=" + weekNumber;
+		
+		return url;
+	}
+
 }

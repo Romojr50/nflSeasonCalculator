@@ -4,8 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,6 +18,9 @@ import nfl.season.league.Conference;
 import nfl.season.league.Division;
 import nfl.season.league.League;
 import nfl.season.league.Team;
+import nfl.season.scorestrip.ScoreStripMapper;
+import nfl.season.scorestrip.ScoreStripReader;
+import nfl.season.scorestrip.Ss;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -112,6 +119,15 @@ public class NFLSeasonTest {
 	private String team2_1_1Name = "Team 2 - 1 - 1";
 	
 	private List<Team> division2_1Teams;
+	
+	@Mock
+	private ScoreStripReader scoreStripReader;
+	
+	@Mock
+	private ScoreStripMapper scoreStripMapper;
+	
+	@Mock
+	private Ss scoreStripWeek;
 	
 	private NFLSeason season;
 	
@@ -253,6 +269,32 @@ public class NFLSeasonTest {
 		NFLSeasonTeam seasonTeam1_2_2 = season.getTeam(team1_2_2Name);
 		SeasonGame team1_2_2Week3Game = seasonTeam1_2_2.getSeasonGame(WEEK_NUMBER);
 		assertNull(team1_2_2Week3Game);
+	}
+	
+	@Test
+	public void loadSeasonTakesInReaderAndMapperAndLoadsWholeSeason() throws MalformedURLException {
+		when(week.getWeekNumber()).thenReturn(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 
+				12, 13, 14, 15, 16, 17);
+		
+		when(scoreStripMapper.mapScoreStripWeekToSeasonWeek(scoreStripWeek)).thenReturn(week);
+		when(scoreStripReader.readScoreStripURL(anyString())).thenReturn(scoreStripWeek);
+		
+		season.initializeNFLRegularSeason(league);
+		season.loadSeason(scoreStripReader, scoreStripMapper);
+		
+		SeasonWeek[] weeks = season.getWeeks();
+		for (SeasonWeek week : weeks) {
+			assertNotNull(week);
+		}
+		
+		NFLSeasonTeam seasonTeam1_1_1 = season.getTeam(team1_1_1Name);
+		
+		for (int i = 1; i <= NFLSeason.NUMBER_OF_WEEKS_IN_SEASON; i++) {
+			verify(scoreStripReader).generateScoreStripURL("2017", i);
+			assertEquals(seasonGame1, seasonTeam1_1_1.getSeasonGame(i));
+			
+		}
+		verify(scoreStripReader, times(17)).readScoreStripURL(anyString());
 	}
 	
 	private void assertSeasonHasConferencesDivisionsAndTeams(

@@ -1,12 +1,17 @@
 package nfl.season.season;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
 import nfl.season.league.League;
 import nfl.season.league.Team;
+import nfl.season.scorestrip.ScoreStripMapper;
+import nfl.season.scorestrip.ScoreStripReader;
+import nfl.season.scorestrip.Ss;
 
 public class NFLSeason {
 
@@ -106,6 +111,25 @@ public class NFLSeason {
 				NFLSeasonTeam awaySeasonTeam = getTeam(awayTeamName);
 				homeSeasonTeam.addSeasonGame(weekNumber, seasonGame);
 				awaySeasonTeam.addSeasonGame(weekNumber, seasonGame);
+			}
+		}
+	}
+
+	public void loadSeason(ScoreStripReader scoreStripReader,
+			ScoreStripMapper scoreStripMapper) {
+		Calendar calendar = Calendar.getInstance();
+		int year = calendar.get(Calendar.YEAR);
+		String yearString = "" + year;
+		
+		for (int i = 1; i <= NUMBER_OF_WEEKS_IN_SEASON; i++) {
+			String url = scoreStripReader.generateScoreStripURL(yearString, i);
+			try {
+				Ss scoreStripWeek = scoreStripReader.readScoreStripURL(url);
+				SeasonWeek seasonWeek = 
+						scoreStripMapper.mapScoreStripWeekToSeasonWeek(scoreStripWeek);
+				addWeek(seasonWeek);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
 			}
 		}
 	}
