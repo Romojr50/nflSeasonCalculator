@@ -1,4 +1,7 @@
-package nfl.season.league;
+package nfl.season.season;
+
+import nfl.season.league.Game;
+import nfl.season.league.Team;
 
 public class SeasonGame extends Game {
 

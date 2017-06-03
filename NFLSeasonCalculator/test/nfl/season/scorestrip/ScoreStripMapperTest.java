@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nfl.season.league.League;
-import nfl.season.league.SeasonGame;
-import nfl.season.league.SeasonWeek;
 import nfl.season.league.Team;
 import nfl.season.scorestrip.Ss.Gms;
 import nfl.season.scorestrip.Ss.Gms.G;
+import nfl.season.season.SeasonGame;
+import nfl.season.season.SeasonWeek;
 
 import org.junit.Before;
 import org.junit.Test;
