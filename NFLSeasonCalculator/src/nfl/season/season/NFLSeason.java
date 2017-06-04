@@ -135,16 +135,22 @@ public class NFLSeason {
 	}
 
 	public String getWeekString(SeasonWeek week) {
-		StringBuilder weekStringBuilder = new StringBuilder();
-		List<SeasonGame> weekGames = week.getSeasonGames();
-		for (SeasonGame weekGame : weekGames) {
-			Team homeTeam = weekGame.getHomeTeam();
-			Team awayTeam = weekGame.getAwayTeam();
-			weekStringBuilder.append(awayTeam.getName() + " at " + 
-					homeTeam.getName() + "\n");
+		String weekString = "This week is empty or null; please load the season";
+		
+		if (week != null) {
+			StringBuilder weekStringBuilder = new StringBuilder();
+			List<SeasonGame> weekGames = week.getSeasonGames();
+			for (SeasonGame weekGame : weekGames) {
+				Team homeTeam = weekGame.getHomeTeam();
+				Team awayTeam = weekGame.getAwayTeam();
+				weekStringBuilder.append(awayTeam.getName() + " at " + 
+						homeTeam.getName() + "\n");
+			}
+			
+			weekString = weekStringBuilder.toString();
 		}
 		
-		return weekStringBuilder.toString();
+		return weekString;
 	}
 
 }

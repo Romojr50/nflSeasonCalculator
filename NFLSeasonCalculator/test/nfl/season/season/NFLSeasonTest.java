@@ -315,6 +315,15 @@ public class NFLSeasonTest {
 		assertEquals(expectedWeekStringBuilder.toString(), weekString);
 	}
 	
+	@Test
+	public void getWeekStringWithNullWeekSoEmptyWeekStringIsReturned() {
+		season.initializeNFLRegularSeason(league);
+		
+		String weekString = season.getWeekString(null);
+		
+		assertEquals("This week is empty or null; please load the season", weekString);
+	}
+	
 	private void assertSeasonHasConferencesDivisionsAndTeams(
 			List<Conference> returnedConferences,
 			List<Division> returnedDivisions, List<Team> returnedTeams) {

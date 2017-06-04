@@ -8,6 +8,7 @@ import nfl.season.input.NFLSeasonInput;
 import nfl.season.scorestrip.ScoreStripMapper;
 import nfl.season.scorestrip.ScoreStripReader;
 import nfl.season.season.NFLSeason;
+import nfl.season.season.SeasonWeek;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +21,9 @@ public class SeasonMenuTest {
 
 	private static final int LOAD_SEASON = 1;
 	
-	private static final int BACK_TO_MAIN_MENU = 2;
+	private static final int PRINT_WEEK = 2;
+	
+	private static final int BACK_TO_MAIN_MENU = 3;
 	
 	private String expectedMenuMessage;
 	
@@ -29,6 +32,15 @@ public class SeasonMenuTest {
 	
 	@Mock
 	private NFLSeason season;
+	
+	@Mock
+	private SeasonWeek week1;
+	
+	@Mock
+	private SeasonWeek week3;
+	
+	@Mock
+	private SeasonWeek week15;
 	
 	@Mock
 	private ScoreStripReader scoreStripReader;
@@ -42,7 +54,12 @@ public class SeasonMenuTest {
 	public void setUp() {
 		expectedMenuMessage = MenuOptionsUtil.MENU_INTRO + 
 				"1. Load/Refresh the current season\n" +
-				"2. Back to Main Menu";
+				"2. Print out games in week\n" +
+				"3. Back to Main Menu";
+		
+		when(season.getWeek(1)).thenReturn(week1);
+		when(season.getWeek(3)).thenReturn(week3);
+		when(season.getWeek(15)).thenReturn(week15);
 		
 		seasonMenu = new SeasonMenu(input, season, scoreStripReader, scoreStripMapper);
 	}
@@ -64,6 +81,35 @@ public class SeasonMenuTest {
 		
 		verify(season).loadSeason(scoreStripReader, scoreStripMapper);
 		verify(input, times(1)).printMessage("Loading season...");
+	}
+	
+	@Test
+	public void printOutWeekSoSelectAWeekToPrintOut() {
+		when(input.askForInt(anyString())).thenReturn(PRINT_WEEK, 3, PRINT_WEEK, 15, 
+				PRINT_WEEK, 1, BACK_TO_MAIN_MENU);
+		
+		seasonMenu.launchSubMenu();
+		
+		verify(season).getWeek(3);
+		verify(season).getWeek(15);
+		verify(season).getWeekString(week3);
+		verify(season).getWeekString(week15);
+		verify(season).getWeek(1);
+		verify(season).getWeekString(week1);
+		
+		verify(input, times(3)).askForInt("Please enter in a number between 1-17:");
+	}
+	
+	@Test
+	public void printOutWeekIgnoreInvalidInput() {
+		when(input.askForInt(anyString())).thenReturn(PRINT_WEEK, 18, 0, 3, BACK_TO_MAIN_MENU);
+		
+		seasonMenu.launchSubMenu();
+		
+		verify(season).getWeek(3);
+		verify(season).getWeekString(week3);
+		
+		verify(input, times(3)).askForInt("Please enter in a number between 1-17:");
 	}
 	
 }
