@@ -17,6 +17,7 @@ import java.util.List;
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
 import nfl.season.league.League;
+import nfl.season.league.Matchup;
 import nfl.season.league.Team;
 import nfl.season.scorestrip.ScoreStripMapper;
 import nfl.season.scorestrip.ScoreStripReader;
@@ -37,7 +38,13 @@ public class NFLSeasonTest {
 	private SeasonGame seasonGame1;
 	
 	@Mock
+	private Matchup matchup1;
+	
+	@Mock
 	private SeasonGame seasonGame2;
+	
+	@Mock
+	private Matchup matchup2;
 	
 	@Mock
 	private SeasonGame seasonGame3;
@@ -146,11 +153,15 @@ public class NFLSeasonTest {
 		when(seasonGame1.getAwayTeam()).thenReturn(team1_1_2);
 		when(seasonGame1.isDivisionGame()).thenReturn(true);
 		when(seasonGame1.isConferenceGame()).thenReturn(true);
+		when(seasonGame1.getMatchup()).thenReturn(matchup1);
+		when(matchup1.getOpponentName(team1_1_1Name)).thenReturn(team1_1_2Name);
 		
 		when(seasonGame2.getHomeTeam()).thenReturn(team1_2_1);
 		when(seasonGame2.getAwayTeam()).thenReturn(team1_3_1);
 		when(seasonGame2.isDivisionGame()).thenReturn(false);
 		when(seasonGame2.isConferenceGame()).thenReturn(true);
+		when(seasonGame2.getMatchup()).thenReturn(matchup2);
+		when(matchup2.getOpponentName(team1_2_1Name)).thenReturn(team1_3_1Name);
 		
 		when(seasonGame3.getHomeTeam()).thenReturn(team1_1_3);
 		when(seasonGame3.getAwayTeam()).thenReturn(team2_1_1);
@@ -250,6 +261,12 @@ public class NFLSeasonTest {
 	
 	@Test
 	public void addWeekToSeasonAddsWeekToSeasonAndTeamSchedules() {
+		when(seasonGame1.getWinner()).thenReturn(team1_1_1);
+		when(seasonGame1.alreadyHappened()).thenReturn(true);
+		
+		when(seasonGame2.alreadyHappened()).thenReturn(true);
+		when(seasonGame2.wasATie()).thenReturn(true);
+		
 		season.initializeNFLRegularSeason(league);
 		season.addWeek(week);
 		
@@ -260,8 +277,15 @@ public class NFLSeasonTest {
 		assertEquals(week, week3);
 		
 		NFLSeasonTeam seasonTeam1_1_1 = season.getTeam(team1_1_1Name);
+		NFLSeasonTeam seasonTeam1_1_2 = season.getTeam(team1_1_2Name);
 		SeasonGame[] teamGames = seasonTeam1_1_1.getSeasonGames();
 		assertTrue(Arrays.asList(teamGames).contains(seasonGame1));
+		assertSeasonGame1TalliesWinAndLoss(seasonTeam1_1_1, seasonTeam1_1_2);
+		
+		NFLSeasonTeam seasonTeam1_2_1 = season.getTeam(team1_2_1Name);
+		SeasonGame[] team1_2_1Games = seasonTeam1_2_1.getSeasonGames();
+		assertTrue(Arrays.asList(team1_2_1Games).contains(seasonGame2));
+		assertSeasonGame2TalliesTie(seasonTeam1_2_1);
 		
 		SeasonGame team1_1_1Week3Game = seasonTeam1_1_1.getSeasonGame(WEEK_NUMBER);
 		assertEquals(seasonGame1, team1_1_1Week3Game);
@@ -343,6 +367,32 @@ public class NFLSeasonTest {
 		assertTrue(returnedTeams.contains(team2_1_1));
 		
 		assertEquals(NFLSeason.NUMBER_OF_WEEKS_IN_SEASON, season.getWeeks().length);
+	}
+	
+	private void assertSeasonGame1TalliesWinAndLoss(
+			NFLSeasonTeam seasonTeam1_1_1, NFLSeasonTeam seasonTeam1_1_2) {
+		assertEquals(1, seasonTeam1_1_1.getNumberOfWins());
+		assertEquals(1, seasonTeam1_1_1.getWinsAgainst().size());
+		assertEquals(1, seasonTeam1_1_1.getNumberOfConferenceWins());
+		assertEquals(1, seasonTeam1_1_1.getNumberOfDivisionWins());
+		assertEquals(1, seasonTeam1_1_2.getNumberOfLosses());
+		assertEquals(1, seasonTeam1_1_2.getLossesAgainst().size());
+		assertEquals(1, seasonTeam1_1_2.getNumberOfConferenceLosses());
+		assertEquals(1, seasonTeam1_1_2.getNumberOfDivisionLosses());
+	}
+
+	private void assertSeasonGame2TalliesTie(NFLSeasonTeam seasonTeam1_2_1) {
+		assertEquals(0, seasonTeam1_2_1.getNumberOfWins());
+		assertEquals(0, seasonTeam1_2_1.getWinsAgainst().size());
+		assertEquals(0, seasonTeam1_2_1.getNumberOfConferenceWins());
+		assertEquals(0, seasonTeam1_2_1.getNumberOfDivisionWins());
+		assertEquals(0, seasonTeam1_2_1.getNumberOfLosses());
+		assertEquals(0, seasonTeam1_2_1.getLossesAgainst().size());
+		assertEquals(0, seasonTeam1_2_1.getNumberOfConferenceLosses());
+		assertEquals(0, seasonTeam1_2_1.getNumberOfDivisionLosses());
+		assertEquals(1, seasonTeam1_2_1.getNumberOfTies());
+		assertEquals(1, seasonTeam1_2_1.getTiesAgainst().size());
+		assertEquals(1, seasonTeam1_2_1.getNumberOfConferenceTies());
 	}
 	
 }

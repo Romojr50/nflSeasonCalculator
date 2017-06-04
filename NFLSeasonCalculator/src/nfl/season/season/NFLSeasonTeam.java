@@ -1,5 +1,8 @@
 package nfl.season.season;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nfl.season.league.Matchup;
 import nfl.season.league.Team;
 
@@ -9,9 +12,36 @@ public class NFLSeasonTeam {
 	
 	private SeasonGame[] seasonGames;
 	
+	private int numberOfWins;
+	
+	private int numberOfLosses;
+	
+	private int numberOfTies;
+	
+	private List<String> winsAgainst;
+	
+	private List<String> lossesAgainst;
+	
+	private List<String> tiesAgainst;
+	
+	private int numberOfConferenceWins;
+	
+	private int numberOfConferenceLosses;
+	
+	private int numberOfConferenceTies;
+	
+	private int numberOfDivisionWins;
+	
+	private int numberOfDivisionLosses;
+	
+	private int numberOfDivisionTies;
+	
 	public NFLSeasonTeam(Team leagueTeam) {
 		this.leagueTeam = leagueTeam;
 		seasonGames = new SeasonGame[NFLSeason.NUMBER_OF_WEEKS_IN_SEASON];
+		winsAgainst = new ArrayList<String>();
+		lossesAgainst = new ArrayList<String>();
+		tiesAgainst = new ArrayList<String>();
 	}
 	
 	public Team getTeam() {
@@ -35,6 +65,22 @@ public class NFLSeasonTeam {
 	public void addSeasonGame(int weekNumber, SeasonGame seasonGame) {
 		if (weekNumber >= 1 && weekNumber <= NFLSeason.NUMBER_OF_WEEKS_IN_SEASON) {
 			seasonGames[weekNumber - 1] = seasonGame;
+			
+			if (seasonGame.alreadyHappened()) {
+				Team winner = seasonGame.getWinner();
+				Matchup matchup = seasonGame.getMatchup();
+				String opponentName = matchup.getOpponentName(leagueTeam.getName());
+				
+				if (winner != null) {
+					if (winner.equals(leagueTeam)) {
+						tallyWin(seasonGame, opponentName);
+					} else {
+						tallyLoss(seasonGame, opponentName);
+					}
+				} else {
+					tallyTie(seasonGame, opponentName);
+				}
+			}
 		}
 	}
 
@@ -46,6 +92,90 @@ public class NFLSeasonTeam {
 		}
 		
 		return scheduleString;
+	}
+	
+	public int getNumberOfWins() {
+		return numberOfWins;
+	}
+	
+	public int getNumberOfLosses() {
+		return numberOfLosses;
+	}
+	
+	public int getNumberOfTies() {
+		return numberOfTies;
+	}
+	
+	public List<String> getWinsAgainst() {
+		return winsAgainst;
+	}
+	
+	public List<String> getLossesAgainst() {
+		return lossesAgainst;
+	}
+	
+	public List<String> getTiesAgainst() {
+		return tiesAgainst;
+	}
+	
+	public int getNumberOfConferenceWins() {
+		return numberOfConferenceWins;
+	}
+	
+	public int getNumberOfConferenceLosses() {
+		return numberOfConferenceLosses;
+	}
+	
+	public int getNumberOfConferenceTies() {
+		return numberOfConferenceTies;
+	}
+	
+	public int getNumberOfDivisionWins() {
+		return numberOfDivisionWins;
+	}
+	
+	public int getNumberOfDivisionLosses() {
+		return numberOfDivisionLosses;
+	}
+	
+	public int getNumberOfDivisionTies() {
+		return numberOfDivisionTies;
+	}
+	
+	private void tallyWin(SeasonGame seasonGame, String opponentName) {
+		numberOfWins++;
+		winsAgainst.add(opponentName);
+		
+		if (seasonGame.isConferenceGame()) {
+			numberOfConferenceWins++;
+		}
+		if (seasonGame.isDivisionGame()) {
+			numberOfDivisionWins++;
+		}
+	}
+
+	private void tallyLoss(SeasonGame seasonGame, String opponentName) {
+		numberOfLosses++;
+		lossesAgainst.add(opponentName);
+		
+		if (seasonGame.isConferenceGame()) {
+			numberOfConferenceLosses++;
+		}
+		if (seasonGame.isDivisionGame()) {
+			numberOfDivisionLosses++;
+		}
+	}
+
+	private void tallyTie(SeasonGame seasonGame, String opponentName) {
+		numberOfTies++;
+		tiesAgainst.add(opponentName);
+		
+		if (seasonGame.isConferenceGame()) {
+			numberOfConferenceTies++;
+		}
+		if (seasonGame.isDivisionGame()) {
+			numberOfDivisionTies++;
+		}
 	}
 
 	private boolean seasonGamesAreEmpty() {
