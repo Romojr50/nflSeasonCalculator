@@ -12,10 +12,14 @@ import nfl.season.menu.MainMenu;
 import nfl.season.menu.MainMenu.MainMenuOptions;
 import nfl.season.menu.MatchupMenu;
 import nfl.season.menu.PlayoffsMenu;
+import nfl.season.menu.SeasonMenu;
 import nfl.season.menu.SingleTeamMenu;
 import nfl.season.menu.TeamsMenu;
 import nfl.season.menu.TeamsMenu.TeamsMenuOptions;
 import nfl.season.playoffs.NFLPlayoffs;
+import nfl.season.scorestrip.ScoreStripMapper;
+import nfl.season.scorestrip.ScoreStripReader;
+import nfl.season.season.NFLSeason;
 
 public class NFLSeasonCalculator {
 
@@ -36,6 +40,9 @@ public class NFLSeasonCalculator {
 		
 		TeamsMenu teamsMenu = createTeamsMenu(input, nfl);
 		mainMenu.setSubMenu(teamsMenu, MainMenuOptions.TEAMS.getOptionNumber());
+		
+		SeasonMenu seasonMenu = createSeasonMenu(input, nfl);
+		mainMenu.setSubMenu(seasonMenu, MainMenuOptions.SEASON.getOptionNumber());
 		
 		PlayoffsMenu playoffsMenu = createPlayoffsMenu(input, nfl);
 		mainMenu.setSubMenu(playoffsMenu, MainMenuOptions.PLAYOFFS.getOptionNumber());
@@ -59,6 +66,19 @@ public class NFLSeasonCalculator {
 		teamsMenu.setSubMenu(singleTeamMenu, TeamsMenuOptions.SELECT_TEAM.getOptionNumber());
 		
 		return teamsMenu;
+	}
+	
+	public static SeasonMenu createSeasonMenu(NFLSeasonInput input, League nfl) {
+		NFLSeason season = new NFLSeason();
+		season.initializeNFLRegularSeason(nfl);
+		
+		ScoreStripReader scoreStripReader = new ScoreStripReader();
+		ScoreStripMapper scoreStripMapper = new ScoreStripMapper(nfl);
+		
+		SeasonMenu seasonMenu = new SeasonMenu(input, season, scoreStripReader, 
+				scoreStripMapper);
+		
+		return seasonMenu;
 	}
 	
 	public static PlayoffsMenu createPlayoffsMenu(NFLSeasonInput input,

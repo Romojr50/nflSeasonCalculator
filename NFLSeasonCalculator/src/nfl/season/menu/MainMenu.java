@@ -5,9 +5,10 @@ import nfl.season.input.NFLSeasonInput;
 public class MainMenu {
 
 	public enum MainMenuOptions implements MenuOptions {
-		TEAMS(1, "Edit Team Settings"), 
-		PLAYOFFS(2, "Go to Playoffs Menu"),
-		EXIT(3, "Exit");
+		TEAMS(1, "Edit Team Settings"),
+		SEASON(2, "Go to Season Menu"),
+		PLAYOFFS(3, "Go to Playoffs Menu"),
+		EXIT(4, "Exit");
 		private int optionNumber;
 		private String optionDescription;
 		

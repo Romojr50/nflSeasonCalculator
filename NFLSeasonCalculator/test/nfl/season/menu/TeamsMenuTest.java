@@ -14,12 +14,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import nfl.season.input.NFLSeasonInput;
-import nfl.season.input.NFLTeamSettings;
 import nfl.season.input.NFLFileReaderFactory;
 import nfl.season.input.NFLFileWriterFactory;
+import nfl.season.input.NFLSeasonInput;
+import nfl.season.input.NFLTeamSettings;
 import nfl.season.league.League;
-import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
 import nfl.season.menu.TeamsMenu.TeamsMenuOptions;
 
@@ -48,8 +47,6 @@ public class TeamsMenuTest {
 
 	private static final int EXIT_FROM_TEAMS_MENU = 8;
 	
-	private static final int EXIT_FROM_TEAM_SELECT = NFLTeamEnum.values().length + 1;
-
 	private static final int COLTS_INDEX = 10;
 
 	private TeamsMenu teamsMenu;
@@ -132,13 +129,14 @@ public class TeamsMenuTest {
 	
 	@Test
 	public void teamMenuIsLaunchedAndSelectTeamIsSelectedSoTeamsAreListed() {
-		when(input.askForInt(anyString())).thenReturn(1, EXIT_FROM_TEAM_SELECT, EXIT_FROM_TEAMS_MENU);
+		when(input.askForInt(anyString())).thenReturn(1, 
+				MenuOptionsUtil.EXIT_FROM_TEAM_SELECT, EXIT_FROM_TEAMS_MENU);
 		
 		teamsMenu.launchSubMenu();
 		
 		verify(input, times(2)).askForInt(expectedMenuMessage);
 		
-		String teamListMessage = buildTeamListMessage();
+		String teamListMessage = MenuOptionsUtil.buildTeamListMessage();
 		
 		verify(input, times(1)).askForInt(teamListMessage);
 	}
@@ -155,12 +153,12 @@ public class TeamsMenuTest {
 	@Test
 	public void teamIsSelectedAndPowerRankingIsSet() {
 		when(input.askForInt(anyString())).thenReturn(1, COLTS_INDEX, 
-				EXIT_FROM_TEAM_SELECT, EXIT_FROM_TEAMS_MENU);
+				MenuOptionsUtil.EXIT_FROM_TEAM_SELECT, EXIT_FROM_TEAMS_MENU);
 		when(nfl.getTeam(COLTS_INDEX)).thenReturn(colts);
 		
 		teamsMenu.launchSubMenu();
 		
-		String teamListMessage = buildTeamListMessage();
+		String teamListMessage = MenuOptionsUtil.buildTeamListMessage();
 		verify(input, times(2)).askForInt(expectedMenuMessage);
 		verify(input, times(2)).askForInt(teamListMessage);
 		verify(singleTeamMenu).setTeam(colts);
@@ -170,11 +168,11 @@ public class TeamsMenuTest {
 	@Test
 	public void intOutsideExpectedInputIsPutInTeamSelectAndInputIsIgnored() {
 		when(input.askForInt(anyString())).thenReturn(GO_TO_TEAM_SELECT, 999, 
-				EXIT_FROM_TEAM_SELECT, EXIT_FROM_TEAMS_MENU);
+				MenuOptionsUtil.EXIT_FROM_TEAM_SELECT, EXIT_FROM_TEAMS_MENU);
 		
 		teamsMenu.launchSubMenu();
 		
-		String teamListMessage = buildTeamListMessage();
+		String teamListMessage = MenuOptionsUtil.buildTeamListMessage();
 		verify(input, times(2)).askForInt(expectedMenuMessage);
 		verify(input, times(2)).askForInt(teamListMessage);
 	}
@@ -191,12 +189,12 @@ public class TeamsMenuTest {
 	@Test
 	public void setAllRankingsIsSelectedAndThenExitedImmediately() {
 		when(input.askForInt(anyString())).thenReturn(GO_TO_SET_ALL_RANKINGS, 
-				EXIT_FROM_TEAM_SELECT, EXIT_FROM_TEAMS_MENU);
+				MenuOptionsUtil.EXIT_FROM_TEAM_SELECT, EXIT_FROM_TEAMS_MENU);
 		when(input.askForString(confirmationMessage)).thenReturn("Y");
 		
 		teamsMenu.launchSubMenu();
 		
-		String teamListMessage = buildTeamListMessage();
+		String teamListMessage = MenuOptionsUtil.buildTeamListMessage();
 		teamListMessage = "Set #1\n" + teamListMessage;
 		verify(input, times(2)).askForInt(expectedMenuMessage);
 		verifyTeamListMessagesForSetAllRankings(1, 1);
@@ -262,7 +260,7 @@ public class TeamsMenuTest {
 		when(input.askForInt(anyString())).thenReturn(GO_TO_SET_ALL_RANKINGS, 
 				indexesChosenForPowerRankingsInOrder[0],
 				mockTeams.size(),
-				EXIT_FROM_TEAM_SELECT, 
+				MenuOptionsUtil.EXIT_FROM_TEAM_SELECT, 
 				EXIT_FROM_TEAMS_MENU);
 		when(input.askForString(confirmationMessage)).thenReturn("Y");
 		
@@ -385,20 +383,6 @@ public class TeamsMenuTest {
 		verifyLoadSettingsFailureOccurs();
 	}
 
-	private String buildTeamListMessage() {
-		StringBuilder teamListMessage = new StringBuilder();
-		teamListMessage.append(MenuOptionsUtil.MENU_INTRO);
-		int teamIndex = 1;
-		for (NFLTeamEnum nflTeam : NFLTeamEnum.values()) {
-			teamListMessage.append(teamIndex + ". ");
-			teamListMessage.append(nflTeam.getTeamName());
-			teamListMessage.append("\n");
-			teamIndex++;
-		}
-		teamListMessage.append(EXIT_FROM_TEAM_SELECT + ". Back to Team Menu");
-		return teamListMessage.toString();
-	}
-	
 	private void verifyTeamListMessagesForSetAllRankings(int numberOfRankingsToSet, 
 			int numberOfRepeatsOfLastMessage) {
 		List<Team> mockTeamsCopy = new ArrayList<Team>();
@@ -414,7 +398,8 @@ public class TeamsMenuTest {
 				teamListForSetAllRankings.append("\n");
 				teamIndex++;
 			}
-			teamListForSetAllRankings.append(EXIT_FROM_TEAM_SELECT + ". Back to Team Menu");
+			teamListForSetAllRankings.append(MenuOptionsUtil.EXIT_FROM_TEAM_SELECT + 
+					". Back to Team Menu");
 			
 			if (i == numberOfRankingsToSet) {
 				verify(input, times(numberOfRepeatsOfLastMessage)).askForInt(

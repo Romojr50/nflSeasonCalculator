@@ -18,9 +18,11 @@ public class MainMenuTest {
 	
 	private static final int GO_TO_TEAMS_MENU = 1;
 	
-	private static final int GO_TO_PLAYOFFS_MENU = 2;
+	private static final int GO_TO_SEASON_MENU = 2;
+	
+	private static final int GO_TO_PLAYOFFS_MENU = 3;
 
-	private static final int EXIT = 3;
+	private static final int EXIT = 4;
 
 	private MainMenu mainMenu;
 	
@@ -31,6 +33,9 @@ public class MainMenuTest {
 	private TeamsMenu teamsMenu;
 	
 	@Mock
+	private SeasonMenu seasonMenu;
+	
+	@Mock
 	private PlayoffsMenu playoffsMenu;
 	
 	String expectedMenuMessage;
@@ -39,10 +44,11 @@ public class MainMenuTest {
 	public void setUp() {
 		mainMenu = new MainMenu(input);
 		mainMenu.setSubMenu(teamsMenu, MainMenuOptions.TEAMS.getOptionNumber());
+		mainMenu.setSubMenu(seasonMenu, MainMenuOptions.SEASON.getOptionNumber());
 		mainMenu.setSubMenu(playoffsMenu, MainMenuOptions.PLAYOFFS.getOptionNumber());
 		
 		expectedMenuMessage = MenuOptionsUtil.MENU_INTRO + "1. Edit Team Settings\n" +
-				"2. Go to Playoffs Menu\n3. Exit";
+				"2. Go to Season Menu\n3. Go to Playoffs Menu\n4. Exit";
 	}
 	
 	@Test
@@ -53,6 +59,16 @@ public class MainMenuTest {
 		
 		verify(input, times(2)).askForInt(expectedMenuMessage);
 		verify(teamsMenu, times(1)).launchSubMenu();
+	}
+	
+	@Test
+	public void mainMenuPrintsOutOptionsAndGoesToSeasonMenu() {
+		when(input.askForInt(anyString())).thenReturn(GO_TO_SEASON_MENU, EXIT);
+	
+		mainMenu.launchMainMenu();
+		
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(seasonMenu, times(1)).launchSubMenu();
 	}
 	
 	@Test

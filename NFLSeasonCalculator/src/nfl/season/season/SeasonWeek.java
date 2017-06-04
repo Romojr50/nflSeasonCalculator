@@ -1,4 +1,4 @@
-package nfl.season.league;
+package nfl.season.season;
 
 import java.util.ArrayList;
 import java.util.List;

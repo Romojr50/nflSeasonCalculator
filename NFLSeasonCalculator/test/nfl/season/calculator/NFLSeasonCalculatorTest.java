@@ -11,6 +11,9 @@ import nfl.season.menu.SingleTeamMenu;
 import nfl.season.menu.SubMenu;
 import nfl.season.menu.TeamsMenu;
 import nfl.season.menu.TeamsMenu.TeamsMenuOptions;
+import nfl.season.scorestrip.ScoreStripMapper;
+import nfl.season.scorestrip.ScoreStripReader;
+import nfl.season.season.NFLSeason;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,13 +29,24 @@ public class NFLSeasonCalculatorTest {
 	@Mock
 	private League nfl;
 	
+	@Mock
+	private NFLSeason season;
+	
+	@Mock
+	private ScoreStripReader scoreStripReader;
+	
+	@Mock
+	private ScoreStripMapper scoreStripMapper;
+	
 	@Test
 	public void mainMethodSetsUpMenusAndLaunchesMainMenu() {
 		MainMenu mainMenu = NFLSeasonCalculator.createMainMenu(input, nfl);
 		TeamsMenu teamsMenu = NFLSeasonCalculator.createTeamsMenu(input, nfl);
+		NFLSeasonCalculator.createSeasonMenu(input, nfl);
 		NFLSeasonCalculator.createPlayoffsMenu(input, nfl);
 		
 		assertNotNull(mainMenu.getSubMenu(MainMenuOptions.TEAMS.getOptionNumber()));
+		assertNotNull(mainMenu.getSubMenu(MainMenuOptions.SEASON.getOptionNumber()));
 		assertNotNull(mainMenu.getSubMenu(MainMenuOptions.PLAYOFFS.getOptionNumber()));
 		
 		SubMenu singleTeamMenu = teamsMenu.getSubMenu(

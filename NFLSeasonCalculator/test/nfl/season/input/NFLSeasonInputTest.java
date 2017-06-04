@@ -87,4 +87,17 @@ public class NFLSeasonInputTest {
 		assertEquals(3, returnInt2);
 	}
 	
+	@Test
+	public void printMessagePrintsInputMessage() {
+		String message = "message";
+		
+		String input = "1\n3a\n3\n";
+		inputStream = new ByteArrayInputStream(input.getBytes());
+		nflSeasonInput = new NFLSeasonInput(inputStream, printStream);
+		
+		nflSeasonInput.printMessage(message);
+		
+		verify(printStream, times(1)).println(message);
+	}
+	
 }
