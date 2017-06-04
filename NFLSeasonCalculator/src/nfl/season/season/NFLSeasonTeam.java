@@ -209,6 +209,8 @@ public class NFLSeasonTeam {
 				}
 				
 				scheduleBuilder.append(opponentName);
+				
+				NFLSeason.appendGameResultToStringBuilder(scheduleBuilder, seasonGame);
 			} else {
 				scheduleBuilder.append("Bye");
 			}
@@ -218,5 +220,5 @@ public class NFLSeasonTeam {
 		
 		return scheduleBuilder.toString();
 	}
-
+	
 }

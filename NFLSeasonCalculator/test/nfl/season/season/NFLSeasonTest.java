@@ -154,6 +154,8 @@ public class NFLSeasonTest {
 		when(seasonGame1.isDivisionGame()).thenReturn(true);
 		when(seasonGame1.isConferenceGame()).thenReturn(true);
 		when(seasonGame1.getMatchup()).thenReturn(matchup1);
+		when(seasonGame1.alreadyHappened()).thenReturn(true);
+		when(seasonGame1.getWinner()).thenReturn(team1_1_1);
 		when(matchup1.getOpponentName(team1_1_1Name)).thenReturn(team1_1_2Name);
 		
 		when(seasonGame2.getHomeTeam()).thenReturn(team1_2_1);
@@ -161,6 +163,8 @@ public class NFLSeasonTest {
 		when(seasonGame2.isDivisionGame()).thenReturn(false);
 		when(seasonGame2.isConferenceGame()).thenReturn(true);
 		when(seasonGame2.getMatchup()).thenReturn(matchup2);
+		when(seasonGame2.alreadyHappened()).thenReturn(true);
+		when(seasonGame2.wasATie()).thenReturn(true);
 		when(matchup2.getOpponentName(team1_2_1Name)).thenReturn(team1_3_1Name);
 		
 		when(seasonGame3.getHomeTeam()).thenReturn(team1_1_3);
@@ -334,6 +338,8 @@ public class NFLSeasonTest {
 			Team awayTeam = weekGame.getAwayTeam();
 			expectedWeekStringBuilder.append(awayTeam.getName() + " at " + 
 					homeTeam.getName() + "\n");
+			
+			appendGameResult(expectedWeekStringBuilder, weekGame);
 		}
 		
 		assertEquals(expectedWeekStringBuilder.toString(), weekString);
@@ -393,6 +399,20 @@ public class NFLSeasonTest {
 		assertEquals(1, seasonTeam1_2_1.getNumberOfTies());
 		assertEquals(1, seasonTeam1_2_1.getTiesAgainst().size());
 		assertEquals(1, seasonTeam1_2_1.getNumberOfConferenceTies());
+	}
+	
+	private void appendGameResult(StringBuilder expectedScheduleBuilder,
+			SeasonGame seasonGame) {
+		if (seasonGame.alreadyHappened()) {
+			Team winner = seasonGame.getWinner();
+			
+			if (winner != null) {
+				String winnerName = winner.getName();
+				expectedScheduleBuilder.append(", " + winnerName);
+			} else if (seasonGame.wasATie()) {
+				expectedScheduleBuilder.append(", Tie");
+			}
+		}
 	}
 	
 }
