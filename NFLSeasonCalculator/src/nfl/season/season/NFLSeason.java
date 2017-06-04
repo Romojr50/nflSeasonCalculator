@@ -145,12 +145,27 @@ public class NFLSeason {
 				Team awayTeam = weekGame.getAwayTeam();
 				weekStringBuilder.append(awayTeam.getName() + " at " + 
 						homeTeam.getName() + "\n");
+				appendGameResultToStringBuilder(weekStringBuilder, weekGame);
 			}
 			
 			weekString = weekStringBuilder.toString();
 		}
 		
 		return weekString;
+	}
+	
+	public static void appendGameResultToStringBuilder(StringBuilder scheduleBuilder,
+			SeasonGame seasonGame) {
+		if (seasonGame.alreadyHappened()) {
+			Team winner = seasonGame.getWinner();
+			
+			if (winner != null) {
+				String winnerName = winner.getName();
+				scheduleBuilder.append(", " + winnerName);
+			} else if (seasonGame.wasATie()) {
+				scheduleBuilder.append(", Tie");
+			}
+		}
 	}
 
 }

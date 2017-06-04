@@ -66,11 +66,15 @@ public class NFLSeasonTeamTest {
 		when(seasonGame1.getHomeTeam()).thenReturn(leagueTeam);
 		when(seasonGame1.getAwayTeam()).thenReturn(opponent1);
 		when(seasonGame1.getMatchup()).thenReturn(matchup1);
+		when(seasonGame1.alreadyHappened()).thenReturn(true);
+		when(seasonGame1.getWinner()).thenReturn(leagueTeam);
 		when(matchup1.getOpponentName(leagueTeamName)).thenReturn(opponent1Name);
 		
 		when(seasonGame2.getHomeTeam()).thenReturn(opponent2);
 		when(seasonGame2.getAwayTeam()).thenReturn(leagueTeam);
 		when(seasonGame2.getMatchup()).thenReturn(matchup2);
+		when(seasonGame2.alreadyHappened()).thenReturn(true);
+		when(seasonGame2.wasATie()).thenReturn(true);
 		when(matchup2.getOpponentName(leagueTeamName)).thenReturn(opponent2Name);
 		
 		when(seasonGame3.getHomeTeam()).thenReturn(leagueTeam);
@@ -136,6 +140,8 @@ public class NFLSeasonTeamTest {
 				}
 				
 				expectedScheduleBuilder.append(opponentName);
+				
+				appendGameResult(expectedScheduleBuilder, seasonGame);
 			} else {
 				expectedScheduleBuilder.append("Bye");
 			}
@@ -144,6 +150,20 @@ public class NFLSeasonTeamTest {
 		}
 		
 		return expectedScheduleBuilder.toString();
+	}
+
+	private void appendGameResult(StringBuilder expectedScheduleBuilder,
+			SeasonGame seasonGame) {
+		if (seasonGame.alreadyHappened()) {
+			Team winner = seasonGame.getWinner();
+			
+			if (winner != null) {
+				String winnerName = winner.getName();
+				expectedScheduleBuilder.append(", " + winnerName);
+			} else if (seasonGame.wasATie()) {
+				expectedScheduleBuilder.append(", Tie");
+			}
+		}
 	}
 	
 }
