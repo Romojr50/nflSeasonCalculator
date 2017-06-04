@@ -36,6 +36,10 @@ public class ScoreStripMapper {
 					seasonGame.setIsDivisionGame(true);
 				}
 			}
+			
+			if (gameHasAlreadyHappened(scoreStripGame)) {
+				setGameResult(scoreStripGame, seasonGame, homeTeam, awayTeam);
+			}
 		}
 		
 		return seasonGame;
@@ -61,6 +65,30 @@ public class ScoreStripMapper {
 		}
 		
 		return seasonWeek;
+	}
+	
+	private boolean gameHasAlreadyHappened(G scoreStripGame) {
+		boolean alreadyHappened = false;
+		
+		String quarter = scoreStripGame.getQ();
+		if (quarter != null && (quarter.contains("F") || quarter.contains("f"))) {
+			alreadyHappened = true;
+		}
+		
+		return alreadyHappened;
+	}
+
+	private void setGameResult(G scoreStripGame, SeasonGame seasonGame,
+			Team homeTeam, Team awayTeam) {
+		int homeScore = scoreStripGame.getHs();
+		int awayScore = scoreStripGame.getVs();
+		if (homeScore > awayScore) {
+			seasonGame.setWinner(homeTeam);
+		} else if (awayScore > homeScore) {
+			seasonGame.setWinner(awayTeam);
+		} else {
+			seasonGame.setToTie();
+		}
 	}
 
 }

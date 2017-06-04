@@ -182,4 +182,42 @@ public class ScoreStripMapperTest {
 		assertNull(seasonWeek);
 	}
 	
+	@Test
+	public void scoreStripMapperMapsGameThatWasAlreadyPlayedAndAddsWinsAndLosses() {
+		when(scoreStripGame1_2.getQ()).thenReturn("F");
+		when(scoreStripGame1_2.getHs()).thenReturn(Byte.valueOf("" + 24));
+		when(scoreStripGame1_2.getVs()).thenReturn(Byte.valueOf("" + 21));
+		
+		SeasonGame seasonGame = mapper.mapScoreStripGameToSeasonGame(scoreStripGame1_2);
+		
+		assertTrue(seasonGame.alreadyHappened());
+		assertEquals(team1, seasonGame.getWinner());
+		assertTrue(seasonGame.wonTheGame(team1));
+		assertFalse(seasonGame.wonTheGame(team2));
+		assertFalse(seasonGame.wasATie());
+		
+		
+		when(scoreStripGame1_2.getHs()).thenReturn(Byte.valueOf("" + 21));
+		when(scoreStripGame1_2.getVs()).thenReturn(Byte.valueOf("" + 24));
+		
+		seasonGame = mapper.mapScoreStripGameToSeasonGame(scoreStripGame1_2);
+		
+		assertEquals(team2, seasonGame.getWinner());
+		assertFalse(seasonGame.wonTheGame(team1));
+		assertTrue(seasonGame.wonTheGame(team2));
+		assertFalse(seasonGame.wasATie());
+		
+		
+		when(scoreStripGame1_2.getHs()).thenReturn(Byte.valueOf("" + 21));
+		when(scoreStripGame1_2.getVs()).thenReturn(Byte.valueOf("" + 21));
+		
+		seasonGame = mapper.mapScoreStripGameToSeasonGame(scoreStripGame1_2);
+		
+		assertTrue(seasonGame.alreadyHappened());
+		assertNull(seasonGame.getWinner());
+		assertFalse(seasonGame.wonTheGame(team1));
+		assertFalse(seasonGame.wonTheGame(team2));
+		assertTrue(seasonGame.wasATie());
+	}
+	
 }
