@@ -94,7 +94,7 @@ public class NFLSeasonTeamTest {
 	public void getScheduleStringButScheduleIsEmptySoReturnEmptyMessage() {
 		String seasonTeamString = seasonTeam.getScheduleString();
 		
-		String expectedScheduleString = "Team's schedule is empty";
+		String expectedScheduleString = "Team's schedule is empty\n";
 		
 		assertEquals(expectedScheduleString, seasonTeamString);
 	}
@@ -142,7 +142,6 @@ public class NFLSeasonTeamTest {
 			expectedScheduleBuilder.append("\n");
 			weekNumber++;
 		}
-		expectedScheduleBuilder.deleteCharAt(expectedScheduleBuilder.length() - 1);
 		
 		return expectedScheduleBuilder.toString();
 	}

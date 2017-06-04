@@ -5,9 +5,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import nfl.season.input.NFLSeasonInput;
+import nfl.season.league.League;
+import nfl.season.league.Team;
 import nfl.season.scorestrip.ScoreStripMapper;
 import nfl.season.scorestrip.ScoreStripReader;
 import nfl.season.season.NFLSeason;
+import nfl.season.season.NFLSeasonTeam;
 import nfl.season.season.SeasonWeek;
 
 import org.junit.Before;
@@ -23,12 +26,27 @@ public class SeasonMenuTest {
 	
 	private static final int PRINT_WEEK = 2;
 	
-	private static final int BACK_TO_MAIN_MENU = 3;
+	private static final int PRINT_TEAM_SCHEDULE = 3;
+	
+	private static final int BACK_TO_MAIN_MENU = 4;
 	
 	private String expectedMenuMessage;
 	
 	@Mock
 	private NFLSeasonInput input;
+	
+	@Mock
+	private NFLSeasonTeam seasonTeam;
+	
+	@Mock
+	private Team leagueTeam;
+	
+	private String teamName = "Season Team";
+	
+	private String scheduleString = "Schedule String";
+	
+	@Mock
+	private League league;
 	
 	@Mock
 	private NFLSeason season;
@@ -38,6 +56,8 @@ public class SeasonMenuTest {
 	
 	@Mock
 	private SeasonWeek week3;
+	
+	private String weekString = "Week String";
 	
 	@Mock
 	private SeasonWeek week15;
@@ -55,11 +75,18 @@ public class SeasonMenuTest {
 		expectedMenuMessage = MenuOptionsUtil.MENU_INTRO + 
 				"1. Load/Refresh the current season\n" +
 				"2. Print out games in week\n" +
-				"3. Back to Main Menu";
+				"3. Print out team schedule\n" +
+				"4. Back to Main Menu";
 		
 		when(season.getWeek(1)).thenReturn(week1);
 		when(season.getWeek(3)).thenReturn(week3);
+		when(season.getWeekString(week3)).thenReturn(weekString);
 		when(season.getWeek(15)).thenReturn(week15);
+		when(season.getTeam(teamName)).thenReturn(seasonTeam);
+		when(season.getLeague()).thenReturn(league);
+		when(league.getTeam(10)).thenReturn(leagueTeam);
+		when(leagueTeam.getName()).thenReturn(teamName);
+		when(seasonTeam.getScheduleString()).thenReturn(scheduleString);
 		
 		seasonMenu = new SeasonMenu(input, season, scoreStripReader, scoreStripMapper);
 	}
@@ -98,6 +125,7 @@ public class SeasonMenuTest {
 		verify(season).getWeekString(week1);
 		
 		verify(input, times(3)).askForInt("Please enter in a number between 1-17:");
+		verify(input).askForInt(weekString + expectedMenuMessage);
 	}
 	
 	@Test
@@ -110,6 +138,32 @@ public class SeasonMenuTest {
 		verify(season).getWeekString(week3);
 		
 		verify(input, times(3)).askForInt("Please enter in a number between 1-17:");
+	}
+	
+	@Test
+	public void printOutTeamScheduleSoSelectTeamAndPrintSchedule() {
+		when(input.askForInt(anyString())).thenReturn(PRINT_TEAM_SCHEDULE, 10, 
+				MenuOptionsUtil.EXIT_FROM_TEAM_SELECT, BACK_TO_MAIN_MENU);
+		
+		seasonMenu.launchSubMenu();
+		
+		verify(seasonTeam).getScheduleString();
+		
+		String teamListMessage = MenuOptionsUtil.buildTeamListMessage();
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input).askForInt(scheduleString + teamListMessage);
+	}
+	
+	@Test
+	public void printOutTeamScheduleIgnoresInvalidInput() {
+		when(input.askForInt(anyString())).thenReturn(PRINT_TEAM_SCHEDULE, 
+				-1, 34, 10, MenuOptionsUtil.EXIT_FROM_TEAM_SELECT, BACK_TO_MAIN_MENU);
+		
+		seasonMenu.launchSubMenu();
+		
+		String teamListMessage = MenuOptionsUtil.buildTeamListMessage();
+		verify(input, times(3)).askForInt(teamListMessage);
+		verify(input).askForInt(scheduleString + teamListMessage);
 	}
 	
 }

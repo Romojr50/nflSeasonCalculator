@@ -39,7 +39,7 @@ public class NFLSeasonTeam {
 	}
 
 	public String getScheduleString() {
-		String scheduleString = "Team's schedule is empty";
+		String scheduleString = "Team's schedule is empty\n";
 		
 		if (!seasonGamesAreEmpty()) {
 			scheduleString = createScheduleString();
@@ -85,7 +85,6 @@ public class NFLSeasonTeam {
 			scheduleBuilder.append("\n");
 			weekNumber++;
 		}
-		scheduleBuilder.deleteCharAt(scheduleBuilder.length() - 1);
 		
 		return scheduleBuilder.toString();
 	}
