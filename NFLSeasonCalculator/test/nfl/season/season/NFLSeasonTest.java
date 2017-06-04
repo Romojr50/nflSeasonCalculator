@@ -150,12 +150,12 @@ public class NFLSeasonTest {
 		when(seasonGame2.getHomeTeam()).thenReturn(team1_2_1);
 		when(seasonGame2.getAwayTeam()).thenReturn(team1_3_1);
 		when(seasonGame2.isDivisionGame()).thenReturn(false);
-		when(seasonGame1.isConferenceGame()).thenReturn(true);
+		when(seasonGame2.isConferenceGame()).thenReturn(true);
 		
 		when(seasonGame3.getHomeTeam()).thenReturn(team1_1_3);
 		when(seasonGame3.getAwayTeam()).thenReturn(team2_1_1);
-		when(seasonGame2.isDivisionGame()).thenReturn(false);
-		when(seasonGame1.isConferenceGame()).thenReturn(false);
+		when(seasonGame3.isDivisionGame()).thenReturn(false);
+		when(seasonGame3.isConferenceGame()).thenReturn(false);
 		
 		seasonGames = new ArrayList<SeasonGame>();
 		seasonGames.add(seasonGame1);
@@ -295,6 +295,24 @@ public class NFLSeasonTest {
 			
 		}
 		verify(scoreStripReader, times(17)).readScoreStripURL(anyString());
+	}
+	
+	@Test
+	public void getWeekStringGetsAStringRepresentingAWeek() {
+		season.initializeNFLRegularSeason(league);
+		
+		String weekString = season.getWeekString(week);
+		
+		StringBuilder expectedWeekStringBuilder = new StringBuilder();
+		List<SeasonGame> weekGames = week.getSeasonGames();
+		for (SeasonGame weekGame : weekGames) {
+			Team homeTeam = weekGame.getHomeTeam();
+			Team awayTeam = weekGame.getAwayTeam();
+			expectedWeekStringBuilder.append(awayTeam.getName() + " at " + 
+					homeTeam.getName() + "\n");
+		}
+		
+		assertEquals(expectedWeekStringBuilder.toString(), weekString);
 	}
 	
 	private void assertSeasonHasConferencesDivisionsAndTeams(
