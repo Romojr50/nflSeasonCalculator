@@ -80,6 +80,22 @@ public class NFLTiebreakerTest {
 	
 	@Before
 	public void setUp() {
+		setUpTeamNames();
+		setUpTeamRecords();
+		setUpTeamWinsLossesTiesAgainst();
+		
+		when(season.getTeam(team1_1Name)).thenReturn(team1_1);
+		when(season.getTeam(team1_2Name)).thenReturn(team1_2);
+		when(season.getTeam(team1_3Name)).thenReturn(team1_3);
+		when(season.getTeam(team2_1Name)).thenReturn(team2_1);
+		when(season.getTeam(team2_2Name)).thenReturn(team2_2);
+		when(season.getTeam(team2_3Name)).thenReturn(team2_3);
+		when(season.getTeam(team3_1Name)).thenReturn(team3_1);
+		
+		tiebreaker = new NFLTiebreaker(season);
+	}
+
+	private void setUpTeamNames() {
 		when(team1_1.getTeam()).thenReturn(leagueTeam1_1);
 		when(leagueTeam1_1.getName()).thenReturn(team1_1Name);
 		when(team1_2.getTeam()).thenReturn(leagueTeam1_2);
@@ -94,7 +110,9 @@ public class NFLTiebreakerTest {
 		when(leagueTeam2_3.getName()).thenReturn(team2_3Name);
 		when(team3_1.getTeam()).thenReturn(leagueTeam3_1);
 		when(leagueTeam3_1.getName()).thenReturn(team3_1Name);
-		
+	}
+
+	private void setUpTeamRecords() {
 		when(team1_1.getNumberOfWins()).thenReturn(9);
 		when(team1_1.getNumberOfLosses()).thenReturn(7);
 		when(team1_1.getNumberOfDivisionWins()).thenReturn(5);
@@ -123,18 +141,6 @@ public class NFLTiebreakerTest {
 		
 		when(team3_1.getNumberOfWins()).thenReturn(9);
 		when(team3_1.getNumberOfLosses()).thenReturn(7);
-		
-		setUpTeamWinsLossesTiesAgainst();
-		
-		when(season.getTeam(team1_1Name)).thenReturn(team1_1);
-		when(season.getTeam(team1_2Name)).thenReturn(team1_2);
-		when(season.getTeam(team1_3Name)).thenReturn(team1_3);
-		when(season.getTeam(team2_1Name)).thenReturn(team2_1);
-		when(season.getTeam(team2_2Name)).thenReturn(team2_2);
-		when(season.getTeam(team2_3Name)).thenReturn(team2_3);
-		when(season.getTeam(team3_1Name)).thenReturn(team3_1);
-		
-		tiebreaker = new NFLTiebreaker(season);
 	}
 
 	private void setUpTeamWinsLossesTiesAgainst() {
@@ -145,6 +151,7 @@ public class NFLTiebreakerTest {
 		team1_1Wins.add(leagueTeam1_2.getName());
 		team1_1Wins.add(leagueTeam2_1.getName());
 		team1_1Losses.add(leagueTeam1_2.getName());
+		team1_1Losses.add(leagueTeam1_3.getName());
 		
 		when(team1_1.getWinsAgainst()).thenReturn(team1_1Wins);
 		when(team1_1.getLossesAgainst()).thenReturn(team1_1Losses);
@@ -157,6 +164,7 @@ public class NFLTiebreakerTest {
 		team1_2Wins.add(leagueTeam1_1.getName());
 		team1_2Wins.add(leagueTeam2_2.getName());
 		team1_2Losses.add(leagueTeam1_1.getName());
+		team1_2Losses.add(leagueTeam2_3.getName());
 		
 		when(team1_2.getWinsAgainst()).thenReturn(team1_2Wins);
 		when(team1_2.getLossesAgainst()).thenReturn(team1_2Losses);
@@ -315,6 +323,27 @@ public class NFLTiebreakerTest {
 		when(team2_1.getNumberOfWins()).thenReturn(10);
 		when(team2_1.getNumberOfLosses()).thenReturn(5);
 		when(team2_1.getNumberOfTies()).thenReturn(1);
+		
+		assertEquals(team1_1, tiebreaker.tiebreakTeams(team1_1, team1_2));
+	}
+	
+	@Test
+	public void divisionTieBreakBetweenTwoTeamsBrokenByStrengthOfSchedule() {
+		when(team1_3.getNumberOfWins()).thenReturn(8);
+		when(team1_3.getNumberOfLosses()).thenReturn(8);
+		
+		assertEquals(team1_2, tiebreaker.tiebreakTeams(team1_1, team1_2));
+		
+		when(team1_3.getNumberOfWins()).thenReturn(9);
+		when(team1_3.getNumberOfLosses()).thenReturn(6);
+		when(team1_3.getNumberOfTies()).thenReturn(1);
+		
+		assertEquals(team1_1, tiebreaker.tiebreakTeams(team1_1, team1_2));
+		
+		List<String> team1_1Losses = team1_1.getLossesAgainst();
+		team1_1Losses.remove(team1_3Name);
+		List<String> team1_1Ties = team1_1.getTiesAgainst();
+		team1_1Ties.add(team1_3Name);
 		
 		assertEquals(team1_1, tiebreaker.tiebreakTeams(team1_1, team1_2));
 	}

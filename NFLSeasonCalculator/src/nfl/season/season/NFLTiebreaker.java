@@ -41,6 +41,9 @@ public class NFLTiebreaker {
 			if (tieWinner == null) {
 				tieWinner = resolveStrengthOfVictoryTieBreak(team1, team2);
 			}
+			if (tieWinner == null) {
+				tieWinner = resolveStrengthOfScheduleTieBreak(team1, team2);
+			}
 		}
 		
 		return tieWinner;
@@ -176,6 +179,30 @@ public class NFLTiebreaker {
 		if (team1StrengthOfVictory > team2StrengthOfVictory) {
 			tieWinner = team1;
 		} else if (team2StrengthOfVictory > team1StrengthOfVictory) {
+			tieWinner = team2;
+		}
+		
+		return tieWinner;
+	}
+	
+	private NFLSeasonTeam resolveStrengthOfScheduleTieBreak(
+			NFLSeasonTeam team1, NFLSeasonTeam team2) {
+		NFLSeasonTeam tieWinner = null;
+		
+		double team1StrengthOfSchedule = 0.0;
+		double team2StrengthOfSchedule = 0.0;
+		
+		team1StrengthOfSchedule += getWinPercentOfTeamsInList(team1.getWinsAgainst());
+		team1StrengthOfSchedule += getWinPercentOfTeamsInList(team1.getLossesAgainst());
+		team1StrengthOfSchedule += getWinPercentOfTeamsInList(team1.getTiesAgainst());
+		
+		team2StrengthOfSchedule += getWinPercentOfTeamsInList(team2.getWinsAgainst());
+		team2StrengthOfSchedule += getWinPercentOfTeamsInList(team2.getLossesAgainst());
+		team2StrengthOfSchedule += getWinPercentOfTeamsInList(team2.getTiesAgainst());
+		
+		if (team1StrengthOfSchedule > team2StrengthOfSchedule) {
+			tieWinner = team1;
+		} else if (team2StrengthOfSchedule > team1StrengthOfSchedule) {
 			tieWinner = team2;
 		}
 		
