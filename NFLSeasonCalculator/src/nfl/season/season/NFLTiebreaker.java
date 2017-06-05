@@ -7,7 +7,13 @@ import nfl.season.league.Team;
 
 public class NFLTiebreaker {
 
-	public static NFLSeasonTeam tiebreakTeams(NFLSeasonTeam team1,
+	NFLSeason season;
+	
+	public NFLTiebreaker(NFLSeason season) {
+		this.season = season;
+	}
+	
+	public NFLSeasonTeam tiebreakTeams(NFLSeasonTeam team1,
 			NFLSeasonTeam team2) {
 		NFLSeasonTeam tieWinner = null;
 		
@@ -21,32 +27,32 @@ public class NFLTiebreaker {
 		} else if (team2WinPercent > team1WinPercent) {
 			tieWinner = team2;
 		} else {
-			Team leagueTeam1 = team1.getTeam();
-			Team leagueTeam2 = team2.getTeam();
-			String team1Name = leagueTeam1.getName();
-			String team2Name = leagueTeam2.getName();
-			
 			tieWinner = resolveHeadToHeadTiebreak(team1, team2);
 			
 			if (tieWinner == null) {
 				tieWinner = resolveDivisionWinPercentTieBreak(team1, team2);
-				
-				if (tieWinner == null) {
-					tieWinner = resolveCommonGameWinPercentTieBreak(team1, team2);
-				}
+			}
+			if (tieWinner == null) {
+				tieWinner = resolveCommonGameWinPercentTieBreak(team1, team2);
+			}
+			if (tieWinner == null) {
+				tieWinner = resolveConferenceWinPercentTieBreak(team1, team2);
+			}
+			if (tieWinner == null) {
+				tieWinner = resolveStrengthOfVictoryTieBreak(team1, team2);
 			}
 		}
 		
 		return tieWinner;
 	}
 	
-	private static double calculateWinPercentFromWinsLossesAndTies(int wins, 
+	private double calculateWinPercentFromWinsLossesAndTies(int wins, 
 			int losses, int ties) {
 		return (wins + (ties / 2.0)) / (wins + losses + ties);
 	}
 	
 
-	private static NFLSeasonTeam resolveHeadToHeadTiebreak(NFLSeasonTeam team1,
+	private NFLSeasonTeam resolveHeadToHeadTiebreak(NFLSeasonTeam team1,
 			NFLSeasonTeam team2) {
 		NFLSeasonTeam tieWinner = null;
 		
@@ -76,7 +82,7 @@ public class NFLTiebreaker {
 		return tieWinner;
 	}
 
-	private static NFLSeasonTeam resolveDivisionWinPercentTieBreak(
+	private NFLSeasonTeam resolveDivisionWinPercentTieBreak(
 			NFLSeasonTeam team1, NFLSeasonTeam team2) {
 		NFLSeasonTeam tieWinner = null;
 		
@@ -95,7 +101,7 @@ public class NFLTiebreaker {
 		return tieWinner;
 	}
 	
-	private static NFLSeasonTeam resolveCommonGameWinPercentTieBreak(
+	private NFLSeasonTeam resolveCommonGameWinPercentTieBreak(
 			NFLSeasonTeam team1, NFLSeasonTeam team2) {
 		NFLSeasonTeam tieWinner = null;
 		
@@ -137,8 +143,46 @@ public class NFLTiebreaker {
 		
 		return tieWinner;
 	}
+	
+	private NFLSeasonTeam resolveConferenceWinPercentTieBreak(
+			NFLSeasonTeam team1, NFLSeasonTeam team2) {
+		NFLSeasonTeam tieWinner = null;
+		
+		double team1ConferenceWinPercent = calculateWinPercentFromWinsLossesAndTies(
+				team1.getNumberOfConferenceWins(), team1.getNumberOfConferenceLosses(), 
+				team1.getNumberOfConferenceTies());
+		double team2ConferenceWinPercent = calculateWinPercentFromWinsLossesAndTies(
+				team2.getNumberOfConferenceWins(), team2.getNumberOfConferenceLosses(), 
+				team2.getNumberOfConferenceTies());
+		
+		if (team1ConferenceWinPercent > team2ConferenceWinPercent) {
+			tieWinner = team1;
+		} else if (team2ConferenceWinPercent > team1ConferenceWinPercent) {
+			tieWinner = team2;
+		}
+		return tieWinner;
+	}
+	
+	private NFLSeasonTeam resolveStrengthOfVictoryTieBreak(
+			NFLSeasonTeam team1, NFLSeasonTeam team2) {
+		NFLSeasonTeam tieWinner = null;
+		
+		List<String> team1WinsAgainst = team1.getWinsAgainst();
+		double team1StrengthOfVictory = getWinPercentOfTeamsInList(team1WinsAgainst);
+		
+		List<String> team2WinsAgainst = team2.getWinsAgainst();
+		double team2StrengthOfVictory = getWinPercentOfTeamsInList(team2WinsAgainst);
+		
+		if (team1StrengthOfVictory > team2StrengthOfVictory) {
+			tieWinner = team1;
+		} else if (team2StrengthOfVictory > team1StrengthOfVictory) {
+			tieWinner = team2;
+		}
+		
+		return tieWinner;
+	}
 
-	private static double getHeadToHeadWinPercent(String team2Name,
+	private double getHeadToHeadWinPercent(String team2Name,
 			List<String> team1Wins, List<String> team1Losses,
 			List<String> team1Ties) {
 		int team1HeadToHeadWins = numberOfTimesInList(team1Wins, team2Name);
@@ -149,7 +193,7 @@ public class NFLTiebreaker {
 		return team1HeadToHeadWinPercent;
 	}
 
-	private static List<String> getListOfCommonGames(NFLSeasonTeam team1,
+	private List<String> getListOfCommonGames(NFLSeasonTeam team1,
 			NFLSeasonTeam team2) {
 		List<String> commonGames = new ArrayList<String>();
 		
@@ -176,7 +220,7 @@ public class NFLTiebreaker {
 		return commonGames;
 	}
 	
-	private static boolean teamHasPlayedAgainstOpponent(NFLSeasonTeam team, 
+	private boolean teamHasPlayedAgainstOpponent(NFLSeasonTeam team, 
 			String opponentName) {
 		boolean teamHasPlayedOpponent = false;
 		
@@ -192,7 +236,7 @@ public class NFLTiebreaker {
 		return teamHasPlayedOpponent;
 	}
 	
-	private static int numberOfTimesInList(List<String> list,
+	private int numberOfTimesInList(List<String> list,
 			String element) {
 		int numberOfTimesInList = 0;
 		
@@ -203,6 +247,19 @@ public class NFLTiebreaker {
 		}
 		
 		return numberOfTimesInList;
+	}
+	
+	private double getWinPercentOfTeamsInList(List<String> teamList) {
+		double winPercent = 0.0;
+		
+		for (String teamName : teamList) {
+			NFLSeasonTeam seasonTeam = season.getTeam(teamName);
+			winPercent += calculateWinPercentFromWinsLossesAndTies(
+					seasonTeam.getNumberOfWins(), seasonTeam.getNumberOfLosses(), 
+					seasonTeam.getNumberOfTies());
+		}
+		
+		return winPercent;
 	}
 
 }
