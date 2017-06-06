@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import nfl.season.league.League;
 import nfl.season.league.Team;
 
 import org.junit.Before;
@@ -76,6 +77,9 @@ public class NFLTiebreakerTest {
 	@Mock
 	private NFLSeason season;
 	
+	@Mock
+	private League league;
+	
 	private NFLTiebreaker tiebreaker;
 	
 	@Before
@@ -91,6 +95,9 @@ public class NFLTiebreakerTest {
 		when(season.getTeam(team2_2Name)).thenReturn(team2_2);
 		when(season.getTeam(team2_3Name)).thenReturn(team2_3);
 		when(season.getTeam(team3_1Name)).thenReturn(team3_1);
+		
+		when(season.getLeague()).thenReturn(league);
+		when(league.areInSameDivision(leagueTeam1_1, leagueTeam1_2)).thenReturn(true);
 		
 		tiebreaker = new NFLTiebreaker(season);
 	}
@@ -251,6 +258,7 @@ public class NFLTiebreakerTest {
 		List<String> team1_1TempTies = new ArrayList<String>();
 		
 		team1_1TempWins.add(team1_3Name);
+		team1_1TempWins.add(team1_3Name);
 		team1_1TempWins.add(team2_1Name);
 		team1_1TempLosses.add(team2_2Name);
 		team1_1TempLosses.add(team2_3Name);
@@ -259,6 +267,7 @@ public class NFLTiebreakerTest {
 		List<String> team1_2TempLosses = new ArrayList<String>();
 		List<String> team1_2TempTies = new ArrayList<String>();
 		
+		team1_2TempWins.add(team2_2Name);
 		team1_2TempWins.add(team2_2Name);
 		team1_2TempWins.add(team3_1Name);
 		team1_2TempLosses.add(team1_3Name);
@@ -329,6 +338,109 @@ public class NFLTiebreakerTest {
 	
 	@Test
 	public void divisionTieBreakBetweenTwoTeamsBrokenByStrengthOfSchedule() {
+		testStrengthOfScheduleTieBreak();
+	}
+	
+	@Test
+	public void conferenceTieBreakBetweenTwoTeamsBrokenByConferenceTieBreaker() {
+		when(league.areInSameDivision(leagueTeam1_1, leagueTeam1_2)).thenReturn(false);
+		
+		when(team1_1.getNumberOfDivisionWins()).thenReturn(5);
+		when(team1_1.getNumberOfDivisionLosses()).thenReturn(3);
+		
+		when(team1_2.getNumberOfDivisionWins()).thenReturn(4);
+		when(team1_2.getNumberOfDivisionLosses()).thenReturn(4);
+		
+		List<String> team1_1TempWins = new ArrayList<String>();		
+		team1_1TempWins.add(team1_3Name);
+		team1_1TempWins.add(team2_1Name);
+		when(team1_1.getWinsAgainst()).thenReturn(team1_1TempWins);
+		when(team1_1.getLossesAgainst()).thenReturn(new ArrayList<String>());
+		
+		List<String> team1_2TempLosses = new ArrayList<String>();
+		team1_2TempLosses.add(team1_3Name);
+		team1_2TempLosses.add(team2_1Name);
+		when(team1_2.getWinsAgainst()).thenReturn(new ArrayList<String>());
+		when(team1_2.getLossesAgainst()).thenReturn(team1_2TempLosses);
+		
+		when(team1_1.getNumberOfConferenceWins()).thenReturn(4);
+		when(team1_1.getNumberOfConferenceLosses()).thenReturn(4);
+		
+		when(team1_2.getNumberOfConferenceWins()).thenReturn(5);
+		when(team1_2.getNumberOfConferenceLosses()).thenReturn(3);
+		
+		assertEquals(team1_2, tiebreaker.tiebreakTeams(team1_1, team1_2));
+	}
+	
+	@Test
+	public void conferenceTieBreakBetweenTwoTeamsBrokenByCommonGames() {
+		when(league.areInSameDivision(leagueTeam1_1, leagueTeam1_2)).thenReturn(false);
+		
+		List<String> team1_1TempWins = new ArrayList<String>();
+		List<String> team1_1TempLosses = new ArrayList<String>();
+		
+		team1_1TempWins.add(team1_3Name);
+		team1_1TempWins.add(team2_1Name);
+		team1_1TempLosses.add(team2_2Name);
+		team1_1TempLosses.add(team2_2Name);
+		
+		List<String> team1_2TempWins = new ArrayList<String>();
+		List<String> team1_2TempLosses = new ArrayList<String>();
+		
+		team1_2TempWins.add(team2_2Name);
+		team1_2TempLosses.add(team1_3Name);
+		team1_2TempLosses.add(team1_3Name);
+		team1_2TempLosses.add(team2_1Name);
+		
+		when(team1_1.getWinsAgainst()).thenReturn(team1_1TempWins);
+		when(team1_1.getLossesAgainst()).thenReturn(team1_1TempLosses);
+		
+		when(team1_2.getWinsAgainst()).thenReturn(team1_2TempWins);
+		when(team1_2.getLossesAgainst()).thenReturn(team1_2TempLosses);
+		
+		assertEquals(team1_1, tiebreaker.tiebreakTeams(team1_1, team1_2));
+	}
+	
+	@Test
+	public void conferenceTieBreakBetweenTwoTeamsBrokenByStrengthOfVictory() {
+		when(league.areInSameDivision(leagueTeam1_1, leagueTeam1_2)).thenReturn(false);
+		
+		List<String> team1_1TempWins = new ArrayList<String>();
+		List<String> team1_1TempLosses = new ArrayList<String>();
+		
+		team1_1TempWins.add(team1_3Name);
+		team1_1TempWins.add(team2_1Name);
+		team1_1TempLosses.add(team2_2Name);
+		
+		List<String> team1_2TempWins = new ArrayList<String>();
+		List<String> team1_2TempLosses = new ArrayList<String>();
+		
+		team1_2TempWins.add(team2_3Name);
+		team1_2TempWins.add(team2_3Name);
+		team1_2TempWins.add(team2_3Name);
+		team1_2TempLosses.add(team1_3Name);
+		team1_2TempLosses.add(team1_3Name);
+		team1_2TempLosses.add(team2_1Name);
+		
+		when(team1_1.getWinsAgainst()).thenReturn(team1_1TempWins);
+		when(team1_1.getLossesAgainst()).thenReturn(team1_1TempLosses);
+		
+		when(team1_2.getWinsAgainst()).thenReturn(team1_2TempWins);
+		when(team1_2.getLossesAgainst()).thenReturn(team1_2TempLosses);
+		
+		when(team2_2.getNumberOfWins()).thenReturn(10);
+		when(team2_2.getNumberOfLosses()).thenReturn(6);
+		
+		assertEquals(team1_2, tiebreaker.tiebreakTeams(team1_1, team1_2));
+	}
+	
+	@Test
+	public void conferenceTieBreakBetweenTwoTeamsBrokenByStrengthOfScheduleTieBreak() {
+		when(league.areInSameDivision(leagueTeam1_1, leagueTeam1_2)).thenReturn(false);
+		testStrengthOfScheduleTieBreak();
+	}
+
+	private void testStrengthOfScheduleTieBreak() {
 		when(team1_3.getNumberOfWins()).thenReturn(8);
 		when(team1_3.getNumberOfLosses()).thenReturn(8);
 		
@@ -346,6 +458,5 @@ public class NFLTiebreakerTest {
 		team1_1Ties.add(team1_3Name);
 		
 		assertEquals(team1_1, tiebreaker.tiebreakTeams(team1_1, team1_2));
-	}
-	
+	}	
 }
