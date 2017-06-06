@@ -3,6 +3,7 @@ package nfl.season.season;
 import java.util.ArrayList;
 import java.util.List;
 
+import nfl.season.league.League;
 import nfl.season.league.Team;
 
 public class NFLTiebreaker {
@@ -30,19 +31,15 @@ public class NFLTiebreaker {
 			tieWinner = resolveHeadToHeadTiebreak(team1, team2);
 			
 			if (tieWinner == null) {
-				tieWinner = resolveDivisionWinPercentTieBreak(team1, team2);
-			}
-			if (tieWinner == null) {
-				tieWinner = resolveCommonGameWinPercentTieBreak(team1, team2);
-			}
-			if (tieWinner == null) {
-				tieWinner = resolveConferenceWinPercentTieBreak(team1, team2);
-			}
-			if (tieWinner == null) {
-				tieWinner = resolveStrengthOfVictoryTieBreak(team1, team2);
-			}
-			if (tieWinner == null) {
-				tieWinner = resolveStrengthOfScheduleTieBreak(team1, team2);
+				League league = season.getLeague();
+				Team leagueTeam1 = team1.getTeam();
+				Team leagueTeam2 = team2.getTeam();
+				
+				if (league.areInSameDivision(leagueTeam1, leagueTeam2)) {
+					tieWinner = resolveDivisionalTeamTiebreakers(team1, team2);
+				} else {
+					tieWinner = resolveConferenceTeamTiebreakers(team1, team2);
+				}
 			}
 		}
 		
@@ -80,6 +77,47 @@ public class NFLTiebreaker {
 			tieWinner = team1;
 		} else if (team2HeadToHeadWinPercent > team1HeadToHeadWinPercent) {
 			tieWinner = team2;
+		}
+		
+		return tieWinner;
+	}
+	
+	private NFLSeasonTeam resolveDivisionalTeamTiebreakers(NFLSeasonTeam team1,
+			NFLSeasonTeam team2) {
+		NFLSeasonTeam tieWinner = null;
+		
+		tieWinner = resolveDivisionWinPercentTieBreak(team1, team2);
+		
+		if (tieWinner == null) {
+			tieWinner = resolveCommonGameWinPercentTieBreak(team1, team2);
+		}
+		if (tieWinner == null) {
+			tieWinner = resolveConferenceWinPercentTieBreak(team1, team2);
+		}
+		if (tieWinner == null) {
+			tieWinner = resolveStrengthOfVictoryTieBreak(team1, team2);
+		}
+		if (tieWinner == null) {
+			tieWinner = resolveStrengthOfScheduleTieBreak(team1, team2);
+		}
+		
+		return tieWinner;
+	}
+	
+	private NFLSeasonTeam resolveConferenceTeamTiebreakers(NFLSeasonTeam team1,
+			NFLSeasonTeam team2) {
+		NFLSeasonTeam tieWinner = null;
+		
+		tieWinner = resolveConferenceWinPercentTieBreak(team1, team2);
+		
+		if (tieWinner == null) {
+			tieWinner = resolveCommonGameWinPercentTieBreak(team1, team2);
+		}
+		if (tieWinner == null) {
+			tieWinner = resolveStrengthOfVictoryTieBreak(team1, team2);
+		}
+		if (tieWinner == null) {
+			tieWinner = resolveStrengthOfScheduleTieBreak(team1, team2);
 		}
 		
 		return tieWinner;
@@ -132,16 +170,19 @@ public class NFLTiebreaker {
 			team2CommonLosses += numberOfTimesInList(team2LossesAgainst, commonGame);
 			team2CommonTies += numberOfTimesInList(team2TiesAgainst, commonGame);
 		}
-		
+			
 		double team1CommonWinPercent = calculateWinPercentFromWinsLossesAndTies(
 				team1CommonWins, team1CommonLosses, team1CommonTies);
 		double team2CommonWinPercent = calculateWinPercentFromWinsLossesAndTies(
 				team2CommonWins, team2CommonLosses, team2CommonTies);
 		
-		if (team1CommonWinPercent > team2CommonWinPercent) {
-			tieWinner = team1;
-		} else if (team2CommonWinPercent > team1CommonWinPercent) {
-			tieWinner = team2;
+		if ((team1CommonWins + team1CommonLosses + team1CommonTies) >= 4 &&
+				(team2CommonWins + team2CommonLosses + team2CommonTies >= 4)) {
+			if (team1CommonWinPercent > team2CommonWinPercent) {
+				tieWinner = team1;
+			} else if (team2CommonWinPercent > team1CommonWinPercent) {
+				tieWinner = team2;
+			}
 		}
 		
 		return tieWinner;
