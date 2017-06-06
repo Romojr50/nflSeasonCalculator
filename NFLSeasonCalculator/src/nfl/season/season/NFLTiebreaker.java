@@ -1,6 +1,7 @@
 package nfl.season.season;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import nfl.season.league.League;
@@ -42,6 +43,15 @@ public class NFLTiebreaker {
 				}
 			}
 		}
+		
+		return tieWinner;
+	}
+	
+
+	public NFLSeasonTeam tiebreakManyTeams(NFLSeasonTeam... teams) {
+		NFLSeasonTeam tieWinner = null;
+		
+		tieWinner = resolveManyTeamWinPercentTieBreak(teams);
 		
 		return tieWinner;
 	}
@@ -120,6 +130,34 @@ public class NFLTiebreaker {
 			tieWinner = resolveStrengthOfScheduleTieBreak(team1, team2);
 		}
 		
+		return tieWinner;
+	}
+	
+	private NFLSeasonTeam resolveManyTeamWinPercentTieBreak(NFLSeasonTeam... teams) {
+		NFLSeasonTeam tieWinner = null;
+		
+		List<NFLSeasonTeam> remainingTeams = new ArrayList<NFLSeasonTeam>();
+		remainingTeams.addAll(Arrays.asList(teams));
+		
+		List<Double> teamWinPercents = new ArrayList<Double>();
+		for (NFLSeasonTeam team : teams) {
+			double teamWinPercent = calculateWinPercentFromWinsLossesAndTies(
+					team.getNumberOfWins(), team.getNumberOfLosses(), team.getNumberOfTies());
+			teamWinPercents.add(teamWinPercent);
+		}
+		
+		double highestWinPercent = getHighestWinPercentFromList(teamWinPercents);
+		
+		for (NFLSeasonTeam team : teams) {
+			double teamWinPercent = calculateWinPercentFromWinsLossesAndTies(
+					team.getNumberOfWins(), team.getNumberOfLosses(), team.getNumberOfTies());
+			if (teamWinPercent < highestWinPercent) {
+				remainingTeams.remove(team);
+			}
+		}
+		
+		tieWinner = resolveTieBreakOfOneOrTwoTeamsFromMany(tieWinner,
+				remainingTeams);
 		return tieWinner;
 	}
 
@@ -259,6 +297,26 @@ public class NFLTiebreaker {
 		double team1HeadToHeadWinPercent = calculateWinPercentFromWinsLossesAndTies(
 				team1HeadToHeadWins, team1HeadToHeadLosses, team1HeadToHeadTies);
 		return team1HeadToHeadWinPercent;
+	}
+
+	private double getHighestWinPercentFromList(List<Double> teamWinPercents) {
+		double highestWinPercent = 0.0;
+		for (double teamWinPercent : teamWinPercents) {
+			if (teamWinPercent > highestWinPercent) {
+				highestWinPercent = teamWinPercent;
+			}
+		}
+		return highestWinPercent;
+	}
+
+	private NFLSeasonTeam resolveTieBreakOfOneOrTwoTeamsFromMany(
+			NFLSeasonTeam tieWinner, List<NFLSeasonTeam> remainingTeams) {
+		if (remainingTeams.size() == 1) {
+			tieWinner = remainingTeams.get(0);
+		} else if (remainingTeams.size() == 2) {
+			tieWinner = tiebreakTeams(remainingTeams.get(0), remainingTeams.get(1));
+		}
+		return tieWinner;
 	}
 
 	private List<String> getListOfCommonGames(NFLSeasonTeam team1,

@@ -43,6 +43,14 @@ public class NFLTiebreakerTest {
 	private String team1_3Name = "Team 1 - 3";
 	
 	@Mock
+	private NFLSeasonTeam team1_4;
+	
+	@Mock
+	private Team leagueTeam1_4;
+	
+	private String team1_4Name = "Team 1 - 4";
+	
+	@Mock
 	private NFLSeasonTeam team2_1;
 	
 	@Mock
@@ -91,6 +99,7 @@ public class NFLTiebreakerTest {
 		when(season.getTeam(team1_1Name)).thenReturn(team1_1);
 		when(season.getTeam(team1_2Name)).thenReturn(team1_2);
 		when(season.getTeam(team1_3Name)).thenReturn(team1_3);
+		when(season.getTeam(team1_4Name)).thenReturn(team1_4);
 		when(season.getTeam(team2_1Name)).thenReturn(team2_1);
 		when(season.getTeam(team2_2Name)).thenReturn(team2_2);
 		when(season.getTeam(team2_3Name)).thenReturn(team2_3);
@@ -98,6 +107,11 @@ public class NFLTiebreakerTest {
 		
 		when(season.getLeague()).thenReturn(league);
 		when(league.areInSameDivision(leagueTeam1_1, leagueTeam1_2)).thenReturn(true);
+		when(league.areInSameDivision(leagueTeam1_1, leagueTeam1_3)).thenReturn(true);
+		when(league.areInSameDivision(leagueTeam1_1, leagueTeam1_4)).thenReturn(true);
+		when(league.areInSameDivision(leagueTeam1_2, leagueTeam1_3)).thenReturn(true);
+		when(league.areInSameDivision(leagueTeam1_2, leagueTeam1_4)).thenReturn(true);
+		when(league.areInSameDivision(leagueTeam1_3, leagueTeam1_4)).thenReturn(true);
 		
 		tiebreaker = new NFLTiebreaker(season);
 	}
@@ -109,6 +123,8 @@ public class NFLTiebreakerTest {
 		when(leagueTeam1_2.getName()).thenReturn(team1_2Name);
 		when(team1_3.getTeam()).thenReturn(leagueTeam1_3);
 		when(leagueTeam1_3.getName()).thenReturn(team1_3Name);
+		when(team1_4.getTeam()).thenReturn(leagueTeam1_4);
+		when(leagueTeam1_4.getName()).thenReturn(team1_4Name);
 		when(team2_1.getTeam()).thenReturn(leagueTeam2_1);
 		when(leagueTeam2_1.getName()).thenReturn(team2_1Name);
 		when(team2_2.getTeam()).thenReturn(leagueTeam2_2);
@@ -136,6 +152,9 @@ public class NFLTiebreakerTest {
 		
 		when(team1_3.getNumberOfWins()).thenReturn(9);
 		when(team1_3.getNumberOfLosses()).thenReturn(7);
+		
+		when(team1_4.getNumberOfWins()).thenReturn(9);
+		when(team1_4.getNumberOfLosses()).thenReturn(7);
 		
 		when(team2_1.getNumberOfWins()).thenReturn(9);
 		when(team2_1.getNumberOfLosses()).thenReturn(7);
@@ -438,6 +457,32 @@ public class NFLTiebreakerTest {
 	public void conferenceTieBreakBetweenTwoTeamsBrokenByStrengthOfScheduleTieBreak() {
 		when(league.areInSameDivision(leagueTeam1_1, leagueTeam1_2)).thenReturn(false);
 		testStrengthOfScheduleTieBreak();
+	}
+	
+	@Test
+	public void divisionTieBreakBetweenManyUnTiedTeamsGivesTeamWithBetterWinPercentOrTwoTeamTiebreaker() {
+		when(team1_1.getNumberOfWins()).thenReturn(9);
+		when(team1_1.getNumberOfLosses()).thenReturn(7);
+		when(team1_2.getNumberOfWins()).thenReturn(8);
+		when(team1_2.getNumberOfLosses()).thenReturn(8);
+		when(team1_3.getNumberOfWins()).thenReturn(8);
+		when(team1_3.getNumberOfLosses()).thenReturn(8);
+		when(team1_4.getNumberOfWins()).thenReturn(8);
+		when(team1_4.getNumberOfLosses()).thenReturn(8);
+		
+		assertEquals(team1_1, tiebreaker.tiebreakManyTeams(team1_1, team1_2, 
+				team1_3, team1_4));
+
+		when(team1_2.getNumberOfWins()).thenReturn(9);
+		when(team1_2.getNumberOfLosses()).thenReturn(7);
+		when(team1_2.getNumberOfConferenceWins()).thenReturn(6);
+		when(team1_2.getNumberOfConferenceLosses()).thenReturn(2);
+		
+		when(team1_1.getNumberOfConferenceWins()).thenReturn(5);
+		when(team1_1.getNumberOfConferenceLosses()).thenReturn(3);
+		
+		assertEquals(team1_2, tiebreaker.tiebreakManyTeams(team1_1, team1_2, 
+				team1_3, team1_4));
 	}
 
 	private void testStrengthOfScheduleTieBreak() {
