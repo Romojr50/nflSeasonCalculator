@@ -58,35 +58,16 @@ public class NFLTiebreaker {
 		
 		List<NFLSeasonTeam> remainingTeams = resolveManyTeamWinPercentTieBreak(teams);
 		
-		if (remainingTeams.size() > 2) {
-			remainingTeams = resolveManyTeamHeadToHeadTieBreak(remainingTeams);
-		}
-		if (remainingTeams.size() > 2) {
-			remainingTeams = resolveManyTeamDivisionWinPercentBreak(remainingTeams);
-		}
-		if (remainingTeams.size() > 2) {
-			remainingTeams = resolveManyTeamCommonGamesWinPercentTieBreak(remainingTeams);
-		}
-		if (remainingTeams.size() > 2) {
-			remainingTeams = resolveManyTeamConferenceWinPercentTieBreak(remainingTeams);
-		}
-		if (remainingTeams.size() > 2) {
-			remainingTeams = resolveManyTeamStrengthOfVictoryTieBreak(remainingTeams);
-		}
-		if (remainingTeams.size() > 2) {
-			remainingTeams = resolveManyTeamStrengthOfScheduleTieBreak(remainingTeams);
+		if (remainingTeamsAreInDifferentDivisions(remainingTeams)) {
+			tieWinner = resolveManyTeamConferenceTieBreakers(remainingTeams);
+		} else {
+			tieWinner = resolveManyTeamDivisionalTieBreakers(remainingTeams);
 		}
 		
-		tieWinner = resolveTieBreakOfOneOrTwoTeamsFromMany(tieWinner,
-				remainingTeams);
-		
-		if (tieWinner == null) {
-			tieWinner = chooseRandomTieWinner(remainingTeams);
-		}
 		
 		return tieWinner;
 	}
-	
+
 	private double calculateWinPercentFromWinsLossesAndTies(int wins, 
 			int losses, int ties) {
 		double returnWinPercent = 0.0;
@@ -98,7 +79,6 @@ public class NFLTiebreaker {
 		return returnWinPercent;
 	}
 	
-
 	private NFLSeasonTeam resolveHeadToHeadTiebreak(NFLSeasonTeam team1,
 			NFLSeasonTeam team2) {
 		NFLSeasonTeam tieWinner = null;
@@ -181,6 +161,108 @@ public class NFLTiebreaker {
 		return tieWinner;
 	}
 	
+	private boolean remainingTeamsAreInDifferentDivisions(
+			List<NFLSeasonTeam> remainingTeams) {
+		boolean areInDifferentDivisions = false;
+		
+		League league = season.getLeague();
+		
+		for (int i = 0; i < remainingTeams.size(); i++) {
+			NFLSeasonTeam remainingTeam = remainingTeams.get(i);
+			Team leagueRemainingTeam = remainingTeam.getTeam();
+			
+			for (int j = i + 1; j < remainingTeams.size(); j++) {
+				NFLSeasonTeam otherTeam = remainingTeams.get(j);
+				Team leagueOtherTeam = otherTeam.getTeam();
+				if (!league.areInSameDivision(leagueRemainingTeam, leagueOtherTeam)) {
+					areInDifferentDivisions = true;
+					break;
+				}
+			}
+		}
+		
+		return areInDifferentDivisions;
+	}
+	
+	private NFLSeasonTeam resolveManyTeamConferenceTieBreakers(
+			List<NFLSeasonTeam> remainingTeams) {
+		NFLSeasonTeam tieWinner = null;
+		
+		remainingTeams = eliminateAllButOneTeamFromEachDivision(remainingTeams);
+		
+		if (remainingTeams.size() > 2) {
+			remainingTeams = resolveManyTeamHeadToHeadSweepTieBreak(remainingTeams);
+		}
+		
+		tieWinner = resolveTieBreakOfOneOrTwoTeamsFromMany(tieWinner,
+				remainingTeams);
+		
+		return tieWinner;
+	}
+	
+	private NFLSeasonTeam resolveManyTeamDivisionalTieBreakers(
+			List<NFLSeasonTeam> remainingTeams) {
+		NFLSeasonTeam tieWinner = null;
+		
+		if (remainingTeams.size() > 2) {
+			remainingTeams = resolveManyTeamHeadToHeadTieBreak(remainingTeams);
+		}
+		if (remainingTeams.size() > 2) {
+			remainingTeams = resolveManyTeamDivisionWinPercentBreak(remainingTeams);
+		}
+		if (remainingTeams.size() > 2) {
+			remainingTeams = resolveManyTeamCommonGamesWinPercentTieBreak(remainingTeams);
+		}
+		if (remainingTeams.size() > 2) {
+			remainingTeams = resolveManyTeamConferenceWinPercentTieBreak(remainingTeams);
+		}
+		if (remainingTeams.size() > 2) {
+			remainingTeams = resolveManyTeamStrengthOfVictoryTieBreak(remainingTeams);
+		}
+		if (remainingTeams.size() > 2) {
+			remainingTeams = resolveManyTeamStrengthOfScheduleTieBreak(remainingTeams);
+		}
+		
+		tieWinner = resolveTieBreakOfOneOrTwoTeamsFromMany(tieWinner,
+				remainingTeams);
+		
+		if (tieWinner == null) {
+			tieWinner = chooseRandomTieWinner(remainingTeams);
+		}
+		return tieWinner;
+	}
+	
+	private List<NFLSeasonTeam> eliminateAllButOneTeamFromEachDivision(
+			List<NFLSeasonTeam> remainingTeams) {
+		List<NFLSeasonTeam> nextRemainingTeams = new ArrayList<NFLSeasonTeam>();
+		
+		List<NFLSeasonTeam> teamsYetToBeLookedAt = new ArrayList<NFLSeasonTeam>();
+		teamsYetToBeLookedAt.addAll(remainingTeams);
+		
+		League league = season.getLeague();
+		while (teamsYetToBeLookedAt.size() > 0) {
+			List<NFLSeasonTeam> currentDivisionTeams = new ArrayList<NFLSeasonTeam>();
+			NFLSeasonTeam nextTeam = teamsYetToBeLookedAt.remove(0);
+			currentDivisionTeams.add(nextTeam);
+			Team nextLeagueTeam = nextTeam.getTeam();
+			
+			for (int i = 0; i < teamsYetToBeLookedAt.size(); i++) {
+				NFLSeasonTeam teamYetToBeLookedAt= teamsYetToBeLookedAt.get(i);
+				Team leagueTeamToBeLookedAt = teamYetToBeLookedAt.getTeam();
+				if (league.areInSameDivision(nextLeagueTeam, leagueTeamToBeLookedAt)) {
+					currentDivisionTeams.add(teamsYetToBeLookedAt.remove(i));
+					i--;
+				}
+			}
+			
+			NFLSeasonTeam divisionTieWinner = resolveManyTeamDivisionalTieBreakers(
+					currentDivisionTeams);
+			nextRemainingTeams.add(divisionTieWinner);
+		}
+		
+		return nextRemainingTeams;
+	}
+	
 	private NFLSeasonTeam chooseRandomTieWinner(List<NFLSeasonTeam> teams) {
 		NFLSeasonTeam tieWinner = null;
 		
@@ -214,6 +296,19 @@ public class NFLTiebreaker {
 		}
 		
 		return remainingTeams;
+	}
+	
+	private List<NFLSeasonTeam> resolveManyTeamHeadToHeadSweepTieBreak(
+			List<NFLSeasonTeam> remainingTeams) {
+		List<NFLSeasonTeam> nextRemainingTeams = getTeamsThatSweptOthers(remainingTeams);
+		if (nextRemainingTeams.size() == 0) {
+			nextRemainingTeams.addAll(remainingTeams);
+			List<NFLSeasonTeam> teamsSweptByOthers = getTeamsThatWasSweptByOthers(
+					remainingTeams);
+			nextRemainingTeams.removeAll(teamsSweptByOthers);
+		}
+		
+		return nextRemainingTeams;
 	}
 	
 	private List<NFLSeasonTeam> resolveManyTeamHeadToHeadTieBreak(
@@ -529,6 +624,58 @@ public class NFLTiebreaker {
 			tieWinner = tiebreakTeams(remainingTeams.get(0), remainingTeams.get(1));
 		}
 		return tieWinner;
+	}
+	
+	private List<NFLSeasonTeam> getTeamsThatSweptOthers(
+			List<NFLSeasonTeam> remainingTeams) {
+		List<NFLSeasonTeam> nextRemainingTeams = new ArrayList<NFLSeasonTeam>();
+		
+		for (NFLSeasonTeam remainingTeam : remainingTeams) {
+			boolean sweptOthers = true;
+			List<String> winsAgainst = remainingTeam.getWinsAgainst();
+			
+			for (NFLSeasonTeam opponent : remainingTeams) {
+				if (!remainingTeam.equals(opponent)) {
+					Team leagueOpponent = opponent.getTeam();
+					String opponentName = leagueOpponent.getName();
+					if (!winsAgainst.contains(opponentName)) {
+						sweptOthers = false;
+						break;
+					}
+				}
+			}
+			
+			if (sweptOthers) {
+				nextRemainingTeams.add(remainingTeam);
+			}
+		}
+		return nextRemainingTeams;
+	}
+	
+	private List<NFLSeasonTeam> getTeamsThatWasSweptByOthers(
+			List<NFLSeasonTeam> remainingTeams) {
+		List<NFLSeasonTeam> teamsSweptByOthers = new ArrayList<NFLSeasonTeam>();
+		
+		for (NFLSeasonTeam remainingTeam : remainingTeams) {
+			boolean sweptByOthers = true;
+			List<String> lossesAgainst = remainingTeam.getLossesAgainst();
+			
+			for (NFLSeasonTeam opponent : remainingTeams) {
+				if (!remainingTeam.equals(opponent)) {
+					Team leagueOpponent = opponent.getTeam();
+					String opponentName = leagueOpponent.getName();
+					if (!lossesAgainst.contains(opponentName)) {
+						sweptByOthers = false;
+						break;
+					}
+				}
+			}
+			
+			if (sweptByOthers) {
+				teamsSweptByOthers.add(remainingTeam);
+			}
+		}
+		return teamsSweptByOthers;
 	}
 	
 	private double getTeamManyHeadToHeadWinPercent(List<String> teamNames,
