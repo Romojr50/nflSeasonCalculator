@@ -1,6 +1,7 @@
 package nfl.season.season;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -154,11 +155,15 @@ public class NFLTiebreakerTest {
 		when(team1_3.getNumberOfLosses()).thenReturn(7);
 		when(team1_3.getNumberOfDivisionWins()).thenReturn(5);
 		when(team1_3.getNumberOfDivisionLosses()).thenReturn(3);
+		when(team1_3.getNumberOfConferenceWins()).thenReturn(5);
+		when(team1_3.getNumberOfConferenceLosses()).thenReturn(3);
 		
 		when(team1_4.getNumberOfWins()).thenReturn(9);
 		when(team1_4.getNumberOfLosses()).thenReturn(7);
 		when(team1_4.getNumberOfDivisionWins()).thenReturn(5);
 		when(team1_4.getNumberOfDivisionLosses()).thenReturn(3);
+		when(team1_4.getNumberOfConferenceWins()).thenReturn(5);
+		when(team1_4.getNumberOfConferenceLosses()).thenReturn(3);
 		
 		when(team2_1.getNumberOfWins()).thenReturn(9);
 		when(team2_1.getNumberOfLosses()).thenReturn(7);
@@ -225,6 +230,11 @@ public class NFLTiebreakerTest {
 		when(team1_4.getWinsAgainst()).thenReturn(team1_4Wins);
 		when(team1_4.getLossesAgainst()).thenReturn(team1_4Losses);
 		when(team1_4.getTiesAgainst()).thenReturn(team1_4Ties);
+	}
+	
+	@Test
+	public void tieBreakAlwaysResolvesToSomeTeam() {
+		assertNotNull(tiebreaker.tiebreakTeams(team1_1, team1_2));
 	}
 	
 	@Test
@@ -490,6 +500,11 @@ public class NFLTiebreakerTest {
 	}
 	
 	@Test
+	public void tieBreakOfManyTeamsNeverReturnsNull() {
+		assertNotNull(tiebreaker.tiebreakManyTeams(team1_1, team1_2, team1_3, team1_4));
+	}
+	
+	@Test
 	public void divisionTieBreakBetweenManyUnTiedTeamsGivesTeamWithBetterWinPercentOrTwoTeamTiebreaker() {
 		when(team1_1.getNumberOfWins()).thenReturn(9);
 		when(team1_1.getNumberOfLosses()).thenReturn(7);
@@ -600,6 +615,95 @@ public class NFLTiebreakerTest {
 		setUpTeam1_2WithBetterConferenceRecord();
 		
 		assertEquals(team1_2, tiebreaker.tiebreakManyTeams(team1_1, team1_2, team1_3, team1_4));
+	}
+	
+	@Test
+	public void divisionTieBreakBetweenManyTeamsBrokenByConferenceTieBreak() {
+		setUpTeam1_2WithBetterConferenceRecord();
+		
+		assertEquals(team1_2, tiebreaker.tiebreakManyTeams(team1_1, team1_2, team1_3, team1_4));
+	}
+	
+	@Test
+	public void divisionTieBreakBetweenManyTeamsBrokenByStrengthOfVictory() {
+		when(team2_3.getNumberOfWins()).thenReturn(12);
+		when(team2_3.getNumberOfLosses()).thenReturn(4);
+		
+		List<String> team1_1TempWins = new ArrayList<String>();
+		List<String> team1_1TempLosses = new ArrayList<String>();
+		team1_1TempWins.add(team2_2Name);
+		team1_1TempWins.add(team3_1Name);
+		team1_1TempLosses.add(team2_1Name);
+		
+		List<String> team1_2TempWins = new ArrayList<String>();
+		List<String> team1_2TempLosses = new ArrayList<String>();
+		team1_2TempWins.add(team2_2Name);
+		team1_2TempWins.add(team3_1Name);
+		team1_2TempLosses.add(team2_1Name);
+		
+		List<String> team1_3TempWins = new ArrayList<String>();
+		List<String> team1_3TempLosses = new ArrayList<String>();
+		team1_3TempWins.add(team2_2Name);
+		team1_3TempWins.add(team2_3Name);
+		team1_3TempLosses.add(team2_1Name);
+		
+		List<String> team1_4TempWins = new ArrayList<String>();
+		List<String> team1_4TempLosses = new ArrayList<String>();
+		team1_4TempWins.add(team2_2Name);
+		team1_4TempWins.add(team3_1Name);
+		team1_4TempLosses.add(team2_1Name);
+		
+		when(team1_1.getWinsAgainst()).thenReturn(team1_1TempWins);
+		when(team1_1.getLossesAgainst()).thenReturn(team1_1TempLosses);
+		when(team1_2.getWinsAgainst()).thenReturn(team1_2TempWins);
+		when(team1_2.getLossesAgainst()).thenReturn(team1_2TempLosses);
+		when(team1_3.getWinsAgainst()).thenReturn(team1_3TempWins);
+		when(team1_3.getLossesAgainst()).thenReturn(team1_3TempLosses);
+		when(team1_4.getWinsAgainst()).thenReturn(team1_4TempWins);
+		when(team1_4.getLossesAgainst()).thenReturn(team1_4TempLosses);
+		
+		assertEquals(team1_3, tiebreaker.tiebreakManyTeams(team1_1, team1_2, team1_3, team1_4));
+	}
+	
+	@Test
+	public void divisionTieBreakBetweenManyTeamsBrokenByStrengthOfSchedule() {
+		when(team2_3.getNumberOfWins()).thenReturn(12);
+		when(team2_3.getNumberOfLosses()).thenReturn(4);
+		
+		List<String> team1_1TempWins = new ArrayList<String>();
+		List<String> team1_1TempLosses = new ArrayList<String>();
+		team1_1TempWins.add(team2_2Name);
+		team1_1TempWins.add(team3_1Name);
+		team1_1TempLosses.add(team2_1Name);
+		
+		List<String> team1_2TempWins = new ArrayList<String>();
+		List<String> team1_2TempLosses = new ArrayList<String>();
+		team1_2TempWins.add(team2_2Name);
+		team1_2TempWins.add(team3_1Name);
+		team1_2TempLosses.add(team2_1Name);
+		
+		List<String> team1_3TempWins = new ArrayList<String>();
+		List<String> team1_3TempLosses = new ArrayList<String>();
+		team1_3TempWins.add(team2_2Name);
+		team1_3TempWins.add(team3_1Name);
+		team1_3TempLosses.add(team2_1Name);
+		
+		List<String> team1_4TempWins = new ArrayList<String>();
+		List<String> team1_4TempLosses = new ArrayList<String>();
+		team1_4TempWins.add(team2_2Name);
+		team1_4TempWins.add(team3_1Name);
+		team1_4TempLosses.add(team2_3Name);
+		
+		when(team1_1.getWinsAgainst()).thenReturn(team1_1TempWins);
+		when(team1_1.getLossesAgainst()).thenReturn(team1_1TempLosses);
+		when(team1_2.getWinsAgainst()).thenReturn(team1_2TempWins);
+		when(team1_2.getLossesAgainst()).thenReturn(team1_2TempLosses);
+		when(team1_3.getWinsAgainst()).thenReturn(team1_3TempWins);
+		when(team1_3.getLossesAgainst()).thenReturn(team1_3TempLosses);
+		when(team1_4.getWinsAgainst()).thenReturn(team1_4TempWins);
+		when(team1_4.getLossesAgainst()).thenReturn(team1_4TempLosses);
+		
+		assertEquals(team1_4, tiebreaker.tiebreakManyTeams(team1_1, team1_2, team1_3, team1_4));
 	}
 
 	private void testStrengthOfScheduleTieBreak() {
