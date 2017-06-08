@@ -64,6 +64,9 @@ public class NFLTiebreaker {
 			tieWinner = resolveManyTeamDivisionalTieBreakers(remainingTeams);
 		}
 		
+		if (tieWinner == null) {
+			tieWinner = chooseRandomTieWinner(remainingTeams);
+		}
 		
 		return tieWinner;
 	}
@@ -193,6 +196,18 @@ public class NFLTiebreaker {
 		if (remainingTeams.size() > 2) {
 			remainingTeams = resolveManyTeamHeadToHeadSweepTieBreak(remainingTeams);
 		}
+		if (remainingTeams.size() > 2) {
+			remainingTeams = resolveManyTeamConferenceWinPercentTieBreak(remainingTeams);
+		}
+		if (remainingTeams.size() > 2) {
+			remainingTeams = resolveManyTeamCommonGamesWinPercentTieBreak(remainingTeams);
+		}
+		if (remainingTeams.size() > 2) {
+			remainingTeams = resolveManyTeamStrengthOfVictoryTieBreak(remainingTeams);
+		}
+		if (remainingTeams.size() > 2) {
+			remainingTeams = resolveManyTeamStrengthOfScheduleTieBreak(remainingTeams);
+		}
 		
 		tieWinner = resolveTieBreakOfOneOrTwoTeamsFromMany(tieWinner,
 				remainingTeams);
@@ -226,9 +241,6 @@ public class NFLTiebreaker {
 		tieWinner = resolveTieBreakOfOneOrTwoTeamsFromMany(tieWinner,
 				remainingTeams);
 		
-		if (tieWinner == null) {
-			tieWinner = chooseRandomTieWinner(remainingTeams);
-		}
 		return tieWinner;
 	}
 	
@@ -372,19 +384,24 @@ public class NFLTiebreaker {
 		
 		List<String> commonGames = getListOfCommonGames(remainingTeams);
 
-		List<Double> commonWinPercents = new ArrayList<Double>();
-		for (NFLSeasonTeam team : remainingTeams) {
-			double commonWinPercent = getWinPercentOfTeamAgainstOpponentList(
-					commonGames, team);
-			commonWinPercents.add(commonWinPercent);
-		}
-		
-		double highestWinPercent = getHighestWinPercentFromList(commonWinPercents);
-		for (NFLSeasonTeam team : remainingTeams) {
-			double commonWinPercent = getWinPercentOfTeamAgainstOpponentList(
-					commonGames, team);
-			if (commonWinPercent >= highestWinPercent) {
-				nextRemainingTeams.add(team);
+		if (remainingTeamsAreInDifferentDivisions(remainingTeams) &&
+				commonGames.size() < 4) {
+			nextRemainingTeams.addAll(remainingTeams);
+		} else {
+			List<Double> commonWinPercents = new ArrayList<Double>();
+			for (NFLSeasonTeam team : remainingTeams) {
+				double commonWinPercent = getWinPercentOfTeamAgainstOpponentList(
+						commonGames, team);
+				commonWinPercents.add(commonWinPercent);
+			}
+			
+			double highestWinPercent = getHighestWinPercentFromList(commonWinPercents);
+			for (NFLSeasonTeam team : remainingTeams) {
+				double commonWinPercent = getWinPercentOfTeamAgainstOpponentList(
+						commonGames, team);
+				if (commonWinPercent >= highestWinPercent) {
+					nextRemainingTeams.add(team);
+				}
 			}
 		}
 		
