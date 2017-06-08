@@ -96,10 +96,12 @@ public class NFLSeasonDivisionTest {
 	
 	@Test
 	public void getDivisionStandingsStringUsesTeamsInOrderToGiveString() {
-		division.setTeamsInOrder(tiebreaker);
+		String divisionStandings = division.getDivisionStandingsString(tiebreaker);
+		List<NFLSeasonTeam> teamsInOrder = division.getTeamsInOrder();
+		assertEquals(4, teamsInOrder.size());
+		assertEquals(team3, teamsInOrder.get(0));
 		
 		StringBuilder standingsBuilder = new StringBuilder();
-		List<NFLSeasonTeam> teamsInOrder = division.getTeamsInOrder();
 		for (int i = 1; i <= teamsInOrder.size(); i++) {
 			NFLSeasonTeam nextTeam = teamsInOrder.get(i - 1);
 			Team leagueNextTeam = nextTeam.getTeam();
@@ -108,7 +110,7 @@ public class NFLSeasonDivisionTest {
 		}
 		
 		String expectedDivisionStandings = standingsBuilder.toString();
-		assertEquals(expectedDivisionStandings, division.getDivisionStandingsString());
+		assertEquals(expectedDivisionStandings, divisionStandings);
 	}
 	
 }
