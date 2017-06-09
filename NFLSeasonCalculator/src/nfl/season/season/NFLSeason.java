@@ -21,10 +21,13 @@ public class NFLSeason {
 	
 	private List<NFLSeasonConference> conferences;
 	
+	private List<NFLSeasonTeam> bottomTeams;
+	
 	private SeasonWeek[] weeks;
 	
 	public NFLSeason() {
 		conferences = new ArrayList<NFLSeasonConference>();
+		bottomTeams = new ArrayList<NFLSeasonTeam>();
 		weeks = new SeasonWeek[NUMBER_OF_WEEKS_IN_SEASON];
 	}
 	
@@ -77,6 +80,33 @@ public class NFLSeason {
 			}
 		}
 		return returnTeam;
+	}
+	
+	public List<NFLSeasonTeam> getBottomTeams() {
+		return bottomTeams;
+	}
+	
+	public void setBottomTeams(NFLTiebreaker tiebreaker) {
+		bottomTeams = new ArrayList<NFLSeasonTeam>();
+		
+		List<NFLSeasonTeam> seededTeams = new ArrayList<NFLSeasonTeam>();
+		List<NFLSeasonTeam> nonSeededTeams = new ArrayList<NFLSeasonTeam>();
+		for (NFLSeasonConference conference : conferences) {
+			seededTeams.addAll(conference.getSeedsInOrder());
+			nonSeededTeams.addAll(conference.getTeams());
+		}
+		nonSeededTeams.removeAll(seededTeams);
+		
+		while (nonSeededTeams.size() > 5) {
+			nonSeededTeams.remove(tiebreaker.tiebreakManyTeams(nonSeededTeams));
+		}
+		
+		while (nonSeededTeams.size() > 1) {
+			NFLSeasonTeam nextTeam = tiebreaker.tiebreakManyTeams(nonSeededTeams);
+			bottomTeams.add(0, nextTeam);
+			nonSeededTeams.remove(nextTeam);
+		}
+		bottomTeams.add(0, nonSeededTeams.remove(0));
 	}
 
 	public SeasonWeek[] getWeeks() {
@@ -166,6 +196,31 @@ public class NFLSeason {
 				scheduleBuilder.append(", Tie");
 			}
 		}
+	}
+
+	public String getLeagueStandings(NFLTiebreaker tiebreaker) {
+		StringBuilder standingsBuilder = new StringBuilder();
+		for (NFLSeasonConference seasonConference : conferences) {
+			standingsBuilder.append(seasonConference.getConferenceStandingsString(
+					tiebreaker));
+			standingsBuilder.append("\n");
+		}
+		
+		setBottomTeams(tiebreaker);
+		
+		standingsBuilder.append("Bottom Teams:\n");
+		for (int i = 1; i <= bottomTeams.size(); i++) {
+			NFLSeasonTeam bottomTeam = bottomTeams.get(i - 1);
+			Team leagueBottomTeam = bottomTeam.getTeam();
+			String bottomTeamName = leagueBottomTeam.getName();
+			standingsBuilder.append(i + ". " + bottomTeamName + "\n");
+		}
+		
+		return standingsBuilder.toString();
+	}
+
+	public NFLTiebreaker createNFLTiebreaker() {
+		return new NFLTiebreaker(this);
 	}
 
 }

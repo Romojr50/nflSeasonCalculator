@@ -8,6 +8,7 @@ import nfl.season.scorestrip.ScoreStripMapper;
 import nfl.season.scorestrip.ScoreStripReader;
 import nfl.season.season.NFLSeason;
 import nfl.season.season.NFLSeasonTeam;
+import nfl.season.season.NFLTiebreaker;
 import nfl.season.season.SeasonWeek;
 
 public class SeasonMenu extends SubMenu {
@@ -16,7 +17,8 @@ public class SeasonMenu extends SubMenu {
 		LOAD_SEASON(1, "Load/Refresh the current season"),
 		PRINT_OUT_WEEK(2, "Print out games in week"),
 		PRINT_TEAM_SCHEDULE(3, "Print out team schedule"),
-		EXIT(4, "Back to Main Menu");
+		PRINT_STANDINGS(4, "Print out League Standings"),
+		EXIT(5, "Back to Main Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -71,6 +73,9 @@ public class SeasonMenu extends SubMenu {
 				seasonMenuPrefix = launchPrintWeekMenu(seasonMenuPrefix);
 			} else if (SeasonMenuOptions.PRINT_TEAM_SCHEDULE.optionNumber == selectedOption) {
 				launchPrintTeamScheduleMenu();
+			} else if (SeasonMenuOptions.PRINT_STANDINGS.optionNumber == selectedOption) {
+				NFLTiebreaker tiebreaker = season.createNFLTiebreaker();
+				seasonMenuPrefix = season.getLeagueStandings(tiebreaker);
 			}
 		}
 	}
