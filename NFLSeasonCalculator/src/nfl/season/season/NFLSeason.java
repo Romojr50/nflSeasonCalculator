@@ -223,4 +223,22 @@ public class NFLSeason {
 		return new NFLTiebreaker(this);
 	}
 
+	public void simulateSeason() {
+		for (NFLSeasonConference conference : conferences) {
+			List<NFLSeasonTeam> conferenceTeams = conference.getTeams();
+			for (NFLSeasonTeam team : conferenceTeams) {
+				team.simulateSeason();
+			}
+		}
+	}
+
+	public void clearSimulatedResults() {
+		for (NFLSeasonConference conference : conferences) {
+			List<NFLSeasonTeam> conferenceTeams = conference.getTeams();
+			for (NFLSeasonTeam team : conferenceTeams) {
+				team.clearSimulatedGames();
+			}
+		}
+	}
+
 }

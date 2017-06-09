@@ -50,6 +50,9 @@ public class NFLSeasonTest {
 	@Mock
 	private SeasonGame seasonGame3;
 	
+	@Mock
+	private Matchup matchup3;
+	
 	private List<SeasonGame> seasonGames;
 	
 	@Mock
@@ -217,6 +220,8 @@ public class NFLSeasonTest {
 		when(seasonGame3.getAwayTeam()).thenReturn(team2_1_1);
 		when(seasonGame3.isDivisionGame()).thenReturn(false);
 		when(seasonGame3.isConferenceGame()).thenReturn(false);
+		when(seasonGame3.getMatchup()).thenReturn(matchup3);
+		when(matchup3.getOpponentName(team1_1_3Name)).thenReturn(team2_1_1Name);
 		
 		seasonGames = new ArrayList<SeasonGame>();
 		seasonGames.add(seasonGame1);
@@ -487,6 +492,48 @@ public class NFLSeasonTest {
 		}
 		
 		assertEquals(standingsBuilder.toString(), leagueStandings);
+	}
+	
+	@Test
+	public void simulateSeasonSimulatesTheWholeSeasonForEveryTeam() {
+		when(seasonGame1.alreadyHappened()).thenReturn(false);
+		when(seasonGame1.getWinner()).thenReturn(null);
+		when(seasonGame1.getSimulatedWinner()).thenReturn(null, team1_1_1);
+		
+		when(seasonGame2.alreadyHappened()).thenReturn(false);
+		when(seasonGame2.wasATie()).thenReturn(false);
+		when(seasonGame2.getSimulatedWinner()).thenReturn(null, team1_2_1);
+		
+		when(seasonGame3.getSimulatedWinner()).thenReturn(null, team1_1_3);
+		
+		season.initializeNFLRegularSeason(league);
+		season.addWeek(week);
+		season.simulateSeason();
+		
+		verify(seasonGame1, times(1)).simulateGame();
+		verify(seasonGame2, times(1)).simulateGame();
+		verify(seasonGame3, times(1)).simulateGame();
+	}
+	
+	@Test
+	public void clearSimulatedResultsClearsAllTeamsSimulatedGames() {
+		when(seasonGame1.alreadyHappened()).thenReturn(false);
+		when(seasonGame1.getWinner()).thenReturn(null);
+		when(seasonGame1.getSimulatedWinner()).thenReturn(team1_1_1);
+		
+		when(seasonGame2.alreadyHappened()).thenReturn(false);
+		when(seasonGame2.wasATie()).thenReturn(false);
+		when(seasonGame2.getSimulatedWinner()).thenReturn(team1_2_1);
+		
+		when(seasonGame3.getSimulatedWinner()).thenReturn(team1_1_3);
+		
+		season.initializeNFLRegularSeason(league);
+		season.addWeek(week);
+		season.clearSimulatedResults();
+		
+		verify(seasonGame1, times(2)).clearSimulatedResult();
+		verify(seasonGame2, times(2)).clearSimulatedResult();
+		verify(seasonGame3, times(2)).clearSimulatedResult();
 	}
 	
 	private void assertSeasonHasConferencesDivisionsAndTeams(
