@@ -142,6 +142,50 @@ public class NFLSeasonTeam {
 		return numberOfDivisionTies;
 	}
 	
+	public void simulateSeason() {
+		clearSimulatedGames();
+		for (SeasonGame seasonGame : seasonGames) {
+			if (seasonGame != null) {
+				Team simulatedWinner = seasonGame.getSimulatedWinner();
+				if (simulatedWinner == null) {
+					seasonGame.simulateGame();
+				}
+				
+				simulatedWinner = seasonGame.getSimulatedWinner();
+				
+				String teamName = leagueTeam.getName();
+				Matchup matchup = seasonGame.getMatchup();
+				String opponentName = matchup.getOpponentName(teamName);
+				if (leagueTeam.equals(simulatedWinner)) {
+					tallyWin(seasonGame, opponentName);
+				} else if (simulatedWinner != null) {
+					tallyLoss(seasonGame, opponentName);
+				}
+			}
+		}
+	}
+
+	public void clearSimulatedGames() {
+		List<SeasonGame> seasonGamesCopy = new ArrayList<SeasonGame>();
+		for (SeasonGame seasonGame : seasonGames) {
+			if (seasonGame != null) {
+				if (seasonGame.getSimulatedWinner() != null) {
+					seasonGame.clearSimulatedResult();
+				}
+			}
+			seasonGamesCopy.add(seasonGame);
+		}
+		
+		resetSeasonGames();
+		
+		for (int week = 1; week <= seasonGamesCopy.size(); week++) {
+			SeasonGame seasonGame = seasonGamesCopy.get(week - 1);
+			if (seasonGame != null) {
+				addSeasonGame(week, seasonGame);
+			}
+		}
+	}
+	
 	private void tallyWin(SeasonGame seasonGame, String opponentName) {
 		numberOfWins++;
 		winsAgainst.add(opponentName);
@@ -219,6 +263,22 @@ public class NFLSeasonTeam {
 		}
 		
 		return scheduleBuilder.toString();
+	}
+	
+	private void resetSeasonGames() {
+		seasonGames = new SeasonGame[NFLSeason.NUMBER_OF_WEEKS_IN_SEASON];
+		numberOfWins = 0;
+		numberOfLosses = 0;
+		numberOfTies = 0;
+		numberOfConferenceWins = 0;
+		numberOfConferenceLosses = 0;
+		numberOfConferenceTies = 0;
+		numberOfDivisionWins = 0;
+		numberOfDivisionLosses = 0;
+		numberOfDivisionTies = 0;
+		winsAgainst = new ArrayList<String>();
+		lossesAgainst = new ArrayList<String>();
+		tiesAgainst = new ArrayList<String>();
 	}
 	
 }

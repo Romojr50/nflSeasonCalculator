@@ -70,6 +70,18 @@ public class NFLSeasonDivisionTest {
 		when(team4.getTeam()).thenReturn(leagueTeam4);
 		when(leagueTeam4.getName()).thenReturn(team4Name);
 		
+		when(team1.getNumberOfWins()).thenReturn(10);
+		when(team1.getNumberOfLosses()).thenReturn(6);
+		
+		when(team2.getNumberOfWins()).thenReturn(8);
+		when(team2.getNumberOfLosses()).thenReturn(8);
+		
+		when(team3.getNumberOfWins()).thenReturn(6);
+		when(team3.getNumberOfLosses()).thenReturn(10);
+		
+		when(team4.getNumberOfWins()).thenReturn(4);
+		when(team4.getNumberOfLosses()).thenReturn(12);
+		
 		when(tiebreaker.tiebreakManyTeams(any(List.class))).thenReturn(team3, team2, team4);
 		
 		division = new NFLSeasonDivision(leagueDivision);
@@ -109,7 +121,10 @@ public class NFLSeasonDivisionTest {
 			NFLSeasonTeam nextTeam = teamsInOrder.get(i - 1);
 			Team leagueNextTeam = nextTeam.getTeam();
 			String nextTeamName = leagueNextTeam.getName();
-			standingsBuilder.append(i + ". " + nextTeamName + "\n");
+			standingsBuilder.append(i + ". " + nextTeamName + " ");
+			standingsBuilder.append(nextTeam.getNumberOfWins() + " - ");
+			standingsBuilder.append(nextTeam.getNumberOfLosses() + " - ");
+			standingsBuilder.append(nextTeam.getNumberOfTies() + "\n");
 		}
 		
 		String expectedDivisionStandings = standingsBuilder.toString();

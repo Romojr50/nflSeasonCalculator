@@ -32,7 +32,11 @@ public class SeasonMenuTest {
 	
 	private static final int PRINT_STANDINGS = 4;
 	
-	private static final int BACK_TO_MAIN_MENU = 5;
+	private static final int SIMULATE_SEASON = 5;
+	
+	private static final int CLEAR_SIMULATIONS = 6;
+	
+	private static final int BACK_TO_MAIN_MENU = 7;
 	
 	private String expectedMenuMessage;
 	
@@ -86,7 +90,9 @@ public class SeasonMenuTest {
 				"2. Print out games in week\n" +
 				"3. Print out team schedule\n" +
 				"4. Print out League Standings\n" +
-				"5. Back to Main Menu";
+				"5. Simulate Season\n" +
+				"6. Clear Simulated Games\n" +
+				"7. Back to Main Menu";
 		
 		when(season.getWeek(1)).thenReturn(week1);
 		when(season.getWeek(3)).thenReturn(week3);
@@ -180,13 +186,32 @@ public class SeasonMenuTest {
 	
 	@Test
 	public void printOutStandingsPrintsOutStandingsFromSeason() {
-		when(input.askForInt(anyString())).thenReturn(PRINT_STANDINGS, BACK_TO_MAIN_MENU);
+		when(input.askForInt(anyString())).thenReturn(PRINT_STANDINGS, SIMULATE_SEASON, 
+				BACK_TO_MAIN_MENU);
 		
 		seasonMenu.launchSubMenu();
 		
-		verify(input).askForInt(expectedMenuMessage);
-		verify(input).askForInt(leagueStandings + expectedMenuMessage);
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input, times(1)).askForInt(leagueStandings + expectedMenuMessage);
 		verify(season).getLeagueStandings(any(NFLTiebreaker.class));
+	}
+	
+	@Test
+	public void simulateSeasonCallsOnSeasonToSimulate() {
+		when(input.askForInt(anyString())).thenReturn(SIMULATE_SEASON, BACK_TO_MAIN_MENU);
+		
+		seasonMenu.launchSubMenu();
+		
+		verify(season).simulateSeason();
+	}
+	
+	@Test
+	public void clearSimulatedResultsCallsOnSeasonToClearSimulatedGames() {
+when(input.askForInt(anyString())).thenReturn(CLEAR_SIMULATIONS, BACK_TO_MAIN_MENU);
+		
+		seasonMenu.launchSubMenu();
+		
+		verify(season).clearSimulatedResults();
 	}
 	
 }

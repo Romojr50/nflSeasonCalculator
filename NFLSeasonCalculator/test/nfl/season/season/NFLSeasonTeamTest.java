@@ -1,7 +1,13 @@
 package nfl.season.season;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.List;
+
 import nfl.season.league.Matchup;
 import nfl.season.league.Team;
 
@@ -102,6 +108,58 @@ public class NFLSeasonTeamTest {
 		
 		assertEquals(expectedScheduleString, seasonTeamString);
 	}
+	
+	@Test
+	public void simulateGamesSimulatesUnplayedAndUnsimulatedGamesAndAddsThemToTally() {
+		setUpSimulatedGames();
+		
+		addSeasonGamesToTeam();
+		
+		assertEquals(6, seasonTeam.getNumberOfWins());
+		assertEquals(0, seasonTeam.getNumberOfLosses());
+		
+		seasonTeam.simulateSeason();
+		
+		verify(seasonGame2, never()).simulateGame();
+		verify(seasonGame3, times(5)).simulateGame();
+		
+		assertEquals(13, seasonTeam.getNumberOfWins());
+		assertEquals(3, seasonTeam.getNumberOfLosses());
+		
+		setUpSimulatedGames();
+		
+		seasonTeam.simulateSeason();
+		
+		assertEquals(13, seasonTeam.getNumberOfWins());
+		assertEquals(3, seasonTeam.getNumberOfLosses());
+	}
+	
+	@Test
+	public void clearSimulatedGamesClearsSimulatedGamesAndRemovesFromTally() {
+		when(seasonGame1.alreadyHappened()).thenReturn(true);
+		when(seasonGame1.getWinner()).thenReturn(leagueTeam);
+		
+		when(seasonGame2.alreadyHappened()).thenReturn(false);
+		when(seasonGame2.getSimulatedWinner()).thenReturn(leagueTeam);
+		
+		when(seasonGame3.alreadyHappened()).thenReturn(false);
+		when(seasonGame3.getSimulatedWinner()).thenReturn(opponent3);
+		
+		addSeasonGamesToTeam();
+		
+		seasonTeam.clearSimulatedGames();
+		
+		verify(seasonGame2, times(5)).clearSimulatedResult();
+		verify(seasonGame3, times(5)).clearSimulatedResult();
+		
+		assertEquals(6, seasonTeam.getNumberOfWins());
+		assertEquals(0, seasonTeam.getNumberOfLosses());
+		
+		List<String> winsAgainst = seasonTeam.getWinsAgainst();
+		List<String> lossesAgainst = seasonTeam.getLossesAgainst();
+		assertEquals(6, winsAgainst.size());
+		assertEquals(0, lossesAgainst.size());
+	}
 
 	private void addSeasonGamesToTeam() {
 		seasonTeam.addSeasonGame(1, seasonGame1);
@@ -150,6 +208,19 @@ public class NFLSeasonTeamTest {
 		}
 		
 		return expectedScheduleBuilder.toString();
+	}
+	
+	private void setUpSimulatedGames() {
+		when(seasonGame1.alreadyHappened()).thenReturn(true);
+		when(seasonGame1.getWinner()).thenReturn(leagueTeam);
+		
+		when(seasonGame2.alreadyHappened()).thenReturn(false);
+		when(seasonGame2.getSimulatedWinner()).thenReturn(leagueTeam);
+		
+		when(seasonGame3.alreadyHappened()).thenReturn(false);
+		when(seasonGame3.getSimulatedWinner()).thenReturn(null, null, null, null, 
+				null, null, opponent3, null, leagueTeam, null, leagueTeam, null, opponent3, 
+				null, opponent3);
 	}
 
 	private void appendGameResult(StringBuilder expectedScheduleBuilder,

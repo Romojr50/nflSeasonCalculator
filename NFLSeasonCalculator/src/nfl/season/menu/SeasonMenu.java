@@ -18,7 +18,9 @@ public class SeasonMenu extends SubMenu {
 		PRINT_OUT_WEEK(2, "Print out games in week"),
 		PRINT_TEAM_SCHEDULE(3, "Print out team schedule"),
 		PRINT_STANDINGS(4, "Print out League Standings"),
-		EXIT(5, "Back to Main Menu");
+		SIMULATE_SEASON(5, "Simulate Season"),
+		CLEAR_SIMULATIONS(6, "Clear Simulated Games"),
+		EXIT(7, "Back to Main Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -65,6 +67,7 @@ public class SeasonMenu extends SubMenu {
 					SeasonMenuOptions.class); 
 			
 			selectedOption = input.askForInt(seasonMenuPrefix + seasonMenuMessage);
+			seasonMenuPrefix = "";
 			
 			if (SeasonMenuOptions.LOAD_SEASON.optionNumber == selectedOption) {
 				input.printMessage("Loading season...");
@@ -76,6 +79,10 @@ public class SeasonMenu extends SubMenu {
 			} else if (SeasonMenuOptions.PRINT_STANDINGS.optionNumber == selectedOption) {
 				NFLTiebreaker tiebreaker = season.createNFLTiebreaker();
 				seasonMenuPrefix = season.getLeagueStandings(tiebreaker);
+			} else if (SeasonMenuOptions.SIMULATE_SEASON.optionNumber == selectedOption) {
+				season.simulateSeason();
+			} else if (SeasonMenuOptions.CLEAR_SIMULATIONS.optionNumber == selectedOption) {
+				season.clearSimulatedResults();
 			}
 		}
 	}

@@ -81,7 +81,10 @@ public class NFLSeasonDivision {
 			NFLSeasonTeam nextTeam = teamsInOrder.get(i - 1);
 			Team leagueNextTeam = nextTeam.getTeam();
 			String nextTeamName = leagueNextTeam.getName();
-			standingsBuilder.append(i + ". " + nextTeamName + "\n");
+			standingsBuilder.append(i + ". " + nextTeamName + " ");
+			standingsBuilder.append(nextTeam.getNumberOfWins() + " - ");
+			standingsBuilder.append(nextTeam.getNumberOfLosses() + " - ");
+			standingsBuilder.append(nextTeam.getNumberOfTies() + "\n");
 		}
 		
 		String divisionStandings = standingsBuilder.toString();
