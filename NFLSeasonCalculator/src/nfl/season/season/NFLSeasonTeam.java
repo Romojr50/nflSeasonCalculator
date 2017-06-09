@@ -143,6 +143,7 @@ public class NFLSeasonTeam {
 	}
 	
 	public void simulateSeason() {
+		clearSimulatedGames();
 		for (SeasonGame seasonGame : seasonGames) {
 			if (seasonGame != null) {
 				Team simulatedWinner = seasonGame.getSimulatedWinner();

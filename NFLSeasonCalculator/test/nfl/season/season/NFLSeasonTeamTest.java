@@ -111,15 +111,7 @@ public class NFLSeasonTeamTest {
 	
 	@Test
 	public void simulateGamesSimulatesUnplayedAndUnsimulatedGamesAndAddsThemToTally() {
-		when(seasonGame1.alreadyHappened()).thenReturn(true);
-		when(seasonGame1.getWinner()).thenReturn(leagueTeam);
-		
-		when(seasonGame2.alreadyHappened()).thenReturn(false);
-		when(seasonGame2.getSimulatedWinner()).thenReturn(leagueTeam);
-		
-		when(seasonGame3.alreadyHappened()).thenReturn(false);
-		when(seasonGame3.getSimulatedWinner()).thenReturn(null, opponent3, 
-				null, leagueTeam, null, leagueTeam, null, opponent3, null, opponent3);
+		setUpSimulatedGames();
 		
 		addSeasonGamesToTeam();
 		
@@ -130,6 +122,13 @@ public class NFLSeasonTeamTest {
 		
 		verify(seasonGame2, never()).simulateGame();
 		verify(seasonGame3, times(5)).simulateGame();
+		
+		assertEquals(13, seasonTeam.getNumberOfWins());
+		assertEquals(3, seasonTeam.getNumberOfLosses());
+		
+		setUpSimulatedGames();
+		
+		seasonTeam.simulateSeason();
 		
 		assertEquals(13, seasonTeam.getNumberOfWins());
 		assertEquals(3, seasonTeam.getNumberOfLosses());
@@ -209,6 +208,19 @@ public class NFLSeasonTeamTest {
 		}
 		
 		return expectedScheduleBuilder.toString();
+	}
+	
+	private void setUpSimulatedGames() {
+		when(seasonGame1.alreadyHappened()).thenReturn(true);
+		when(seasonGame1.getWinner()).thenReturn(leagueTeam);
+		
+		when(seasonGame2.alreadyHappened()).thenReturn(false);
+		when(seasonGame2.getSimulatedWinner()).thenReturn(leagueTeam);
+		
+		when(seasonGame3.alreadyHappened()).thenReturn(false);
+		when(seasonGame3.getSimulatedWinner()).thenReturn(null, null, null, null, 
+				null, null, opponent3, null, leagueTeam, null, leagueTeam, null, opponent3, 
+				null, opponent3);
 	}
 
 	private void appendGameResult(StringBuilder expectedScheduleBuilder,

@@ -498,13 +498,13 @@ public class NFLSeasonTest {
 	public void simulateSeasonSimulatesTheWholeSeasonForEveryTeam() {
 		when(seasonGame1.alreadyHappened()).thenReturn(false);
 		when(seasonGame1.getWinner()).thenReturn(null);
-		when(seasonGame1.getSimulatedWinner()).thenReturn(null, team1_1_1);
+		when(seasonGame1.getSimulatedWinner()).thenReturn(null, null, team1_1_1);
 		
 		when(seasonGame2.alreadyHappened()).thenReturn(false);
 		when(seasonGame2.wasATie()).thenReturn(false);
-		when(seasonGame2.getSimulatedWinner()).thenReturn(null, team1_2_1);
+		when(seasonGame2.getSimulatedWinner()).thenReturn(null, null, team1_2_1);
 		
-		when(seasonGame3.getSimulatedWinner()).thenReturn(null, team1_1_3);
+		when(seasonGame3.getSimulatedWinner()).thenReturn(null, null, team1_1_3);
 		
 		season.initializeNFLRegularSeason(league);
 		season.addWeek(week);
