@@ -1,6 +1,9 @@
 package nfl.season.season;
 
+import java.util.Random;
+
 import nfl.season.league.Game;
+import nfl.season.league.Matchup;
 import nfl.season.league.Team;
 
 public class SeasonGame extends Game {
@@ -14,6 +17,8 @@ public class SeasonGame extends Game {
 	private Team winner;
 	
 	private boolean wasATie = false;
+	
+	private Team simulatedWinner;
 	
 	public SeasonGame(Team homeTeam, Team awayTeam) {
 		super(homeTeam, awayTeam);
@@ -68,6 +73,31 @@ public class SeasonGame extends Game {
 		alreadyHappened = true;
 		this.winner = null;
 		wasATie = true;
+	}
+
+	public void simulateGame() {
+		if (!alreadyHappened) {
+			Matchup matchup = getMatchup();
+			Team homeTeam = getHomeTeam();
+			Team awayTeam = getAwayTeam();
+			int awayTeamWinChance = matchup.getTeamAwayWinChance(awayTeam.getName());
+			
+			Random random = new Random();
+			int randomInt = random.nextInt(100) + 1;
+			if (randomInt <= awayTeamWinChance) {
+				simulatedWinner = awayTeam;
+			} else {
+				simulatedWinner = homeTeam;
+			}
+		}
+	}
+
+	public Team getSimulatedWinner() {
+		return simulatedWinner;
+	}
+
+	public void clearSimulatedResult() {
+		simulatedWinner = null;
 	}
 
 }
