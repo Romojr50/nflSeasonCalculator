@@ -31,6 +31,16 @@ public class NFLSeasonConference {
 	public void addDivision(NFLSeasonDivision seasonDivision) {
 		divisions.add(seasonDivision);
 	}
+	
+	public List<NFLSeasonTeam> getTeams() {
+		List<NFLSeasonTeam> allTeams = new ArrayList<NFLSeasonTeam>();
+		
+		for (NFLSeasonDivision division : divisions) {
+			allTeams.addAll(division.getTeams());
+		}
+		
+		return allTeams;
+	}
 
 	public List<NFLSeasonTeam> getSeedsInOrder() {
 		return seedsInOrder;

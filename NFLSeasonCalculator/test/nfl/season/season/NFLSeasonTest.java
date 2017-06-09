@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -111,12 +112,37 @@ public class NFLSeasonTest {
 	
 	private String team1_2_2Name = "Team 1 - 2 - 2";
 	
+	@Mock
+	private Team team1_2_3;
+	
+	private String team1_2_3Name = "Team 1 - 2 - 3";
+	
+	@Mock
+	private Team team1_2_4;
+	
+	private String team1_2_4Name = "Team 1 - 2 - 4";
+	
 	private List<Team> division1_2Teams;
 	
 	@Mock
 	private Team team1_3_1;
 	
 	private String team1_3_1Name = "Team 1 - 3 - 1";
+	
+	@Mock
+	private Team team1_3_2;
+	
+	private String team1_3_2Name = "Team 1 - 3 - 2";
+	
+	@Mock
+	private Team team1_3_3;
+	
+	private String team1_3_3Name = "Team 1 - 3 - 3";
+	
+	@Mock
+	private Team team1_3_4;
+	
+	private String team1_3_4Name = "Team 1 - 3 - 4";
 	
 	private List<Team> division1_3Teams;
 	
@@ -125,7 +151,24 @@ public class NFLSeasonTest {
 	
 	private String team2_1_1Name = "Team 2 - 1 - 1";
 	
+	@Mock
+	private Team team2_1_2;
+	
+	private String team2_1_2Name = "Team 2 - 1 - 2";
+	
+	@Mock
+	private Team team2_1_3;
+	
+	private String team2_1_3Name = "Team 2 - 1 - 3";
+	
 	private List<Team> division2_1Teams;
+	
+	@Mock
+	private Team team2_2_1;
+	
+	private String team2_2_1Name = "Team 2 - 2 - 1";
+	
+	private List<Team> division2_2Teams;
 	
 	@Mock
 	private ScoreStripReader scoreStripReader;
@@ -135,6 +178,9 @@ public class NFLSeasonTest {
 	
 	@Mock
 	private Ss scoreStripWeek;
+	
+	@Mock
+	private NFLTiebreaker tiebreaker;
 	
 	private NFLSeason season;
 	
@@ -208,15 +254,26 @@ public class NFLSeasonTest {
 		division1_2Teams = new ArrayList<Team>();
 		division1_2Teams.add(team1_2_1);
 		division1_2Teams.add(team1_2_2);
+		division1_2Teams.add(team1_2_3);
+		division1_2Teams.add(team1_2_4);
 		when(division1_2.getTeams()).thenReturn(division1_2Teams);
 		
 		division1_3Teams = new ArrayList<Team>();
 		division1_3Teams.add(team1_3_1);
+		division1_3Teams.add(team1_3_2);
+		division1_3Teams.add(team1_3_3);
+		division1_3Teams.add(team1_3_4);
 		when(division1_3.getTeams()).thenReturn(division1_3Teams);
 		
 		division2_1Teams = new ArrayList<Team>();
 		division2_1Teams.add(team2_1_1);
+		division2_1Teams.add(team2_1_2);
+		division2_1Teams.add(team2_1_3);
 		when(division2_1.getTeams()).thenReturn(division2_1Teams);
+		
+		division2_2Teams = new ArrayList<Team>();
+		division2_2Teams.add(team2_2_1);
+		when(division2_2.getTeams()).thenReturn(division2_2Teams);
 	}
 
 	private void setUpTeams() {
@@ -225,8 +282,16 @@ public class NFLSeasonTest {
 		when(team1_1_3.getName()).thenReturn(team1_1_3Name);
 		when(team1_2_1.getName()).thenReturn(team1_2_1Name);
 		when(team1_2_2.getName()).thenReturn(team1_2_2Name);
+		when(team1_2_3.getName()).thenReturn(team1_2_3Name);
+		when(team1_2_4.getName()).thenReturn(team1_2_4Name);
 		when(team1_3_1.getName()).thenReturn(team1_3_1Name);
+		when(team1_3_2.getName()).thenReturn(team1_3_2Name);
+		when(team1_3_3.getName()).thenReturn(team1_3_3Name);
+		when(team1_3_4.getName()).thenReturn(team1_3_4Name);
 		when(team2_1_1.getName()).thenReturn(team2_1_1Name);
+		when(team2_1_2.getName()).thenReturn(team2_1_2Name);
+		when(team2_1_3.getName()).thenReturn(team2_1_3Name);
+		when(team2_2_1.getName()).thenReturn(team2_2_1Name);
 	}
 	
 	@Test
@@ -352,6 +417,76 @@ public class NFLSeasonTest {
 		String weekString = season.getWeekString(null);
 		
 		assertEquals("This week is empty or null; please load the season", weekString);
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void getLeagueStandingsGetsStandingsFromConferencesAndBottomFive() {
+		season.initializeNFLRegularSeason(league);
+		
+		NFLSeasonTeam seasonTeam1_1_1 = season.getTeam(team1_1_1Name);
+		NFLSeasonTeam seasonTeam1_1_2 = season.getTeam(team1_1_2Name);
+		NFLSeasonTeam seasonTeam1_1_3 = season.getTeam(team1_1_3Name);
+		NFLSeasonTeam seasonTeam1_2_1 = season.getTeam(team1_2_1Name);
+		NFLSeasonTeam seasonTeam1_2_2 = season.getTeam(team1_2_2Name);
+		NFLSeasonTeam seasonTeam1_2_3 = season.getTeam(team1_2_3Name);
+		NFLSeasonTeam seasonTeam1_2_4 = season.getTeam(team1_2_4Name);
+		NFLSeasonTeam seasonTeam1_3_1 = season.getTeam(team1_3_1Name);
+		NFLSeasonTeam seasonTeam1_3_2 = season.getTeam(team1_3_2Name);
+		NFLSeasonTeam seasonTeam1_3_3 = season.getTeam(team1_3_3Name);
+		NFLSeasonTeam seasonTeam1_3_4 = season.getTeam(team1_3_4Name);
+		NFLSeasonTeam seasonTeam2_1_1 = season.getTeam(team2_1_1Name);
+		NFLSeasonTeam seasonTeam2_1_2 = season.getTeam(team2_1_2Name);
+		NFLSeasonTeam seasonTeam2_1_3 = season.getTeam(team2_1_3Name);
+				
+		when(tiebreaker.tiebreakManyTeams(any(List.class))).thenReturn(
+				seasonTeam1_1_1, seasonTeam1_1_2,					//Div1_1 Standings
+				seasonTeam1_2_1, seasonTeam1_2_2, seasonTeam1_2_3,	//Div1_2 Standings
+				seasonTeam1_3_1, seasonTeam1_3_2, seasonTeam1_3_3,	//Div1_3 Standings
+				seasonTeam1_1_1, seasonTeam1_2_1, seasonTeam1_1_2,  //Conf1 Standings
+				seasonTeam1_3_4,
+				seasonTeam2_1_1, seasonTeam2_1_2,					//Div2_1 Standings
+				seasonTeam2_1_1, seasonTeam2_1_2, seasonTeam2_1_3,	//Conf2 Standings
+				seasonTeam1_2_2, seasonTeam1_2_3, seasonTeam1_2_4,  //Leftovers
+				seasonTeam1_3_2, seasonTeam1_3_3, seasonTeam1_1_3);					
+		
+		String leagueStandings = season.getLeagueStandings(tiebreaker);
+		
+		List<NFLSeasonTeam> bottomTeams = season.getBottomTeams();
+		assertEquals(5, bottomTeams.size());
+		assertEquals(seasonTeam1_1_3, bottomTeams.get(0));
+		assertEquals(seasonTeam1_3_3, bottomTeams.get(1));
+		assertEquals(seasonTeam1_3_2, bottomTeams.get(2));
+		assertEquals(seasonTeam1_2_4, bottomTeams.get(3));
+		assertEquals(seasonTeam1_2_3, bottomTeams.get(4));
+		
+		when(tiebreaker.tiebreakManyTeams(any(List.class))).thenReturn(
+				seasonTeam1_1_1, seasonTeam1_1_2,					//Div1_1 Standings
+				seasonTeam1_2_1, seasonTeam1_2_2, seasonTeam1_2_3,	//Div1_2 Standings
+				seasonTeam1_3_1, seasonTeam1_3_2, seasonTeam1_3_3,	//Div1_3 Standings
+				seasonTeam1_1_1, seasonTeam1_2_1, seasonTeam1_1_2,  //Conf1 Standings
+				seasonTeam1_3_4,
+				seasonTeam2_1_1, seasonTeam2_1_2,					//Div2_1 Standings
+				seasonTeam2_1_1, seasonTeam2_1_2, seasonTeam2_1_3,	//Conf2 Standings
+				seasonTeam1_2_2, seasonTeam1_2_3, seasonTeam1_2_4,  //Leftovers
+				seasonTeam1_3_2, seasonTeam1_3_3, seasonTeam1_1_3);	
+		
+		StringBuilder standingsBuilder = new StringBuilder();
+		List<NFLSeasonConference> seasonConferences = season.getConferences();
+		for (NFLSeasonConference seasonConference : seasonConferences) {
+			standingsBuilder.append(seasonConference.getConferenceStandingsString(
+					tiebreaker));
+			standingsBuilder.append("\n");
+		}
+		standingsBuilder.append("BottomTeams:\n");
+		for (int i = 1; i <= bottomTeams.size(); i++) {
+			NFLSeasonTeam bottomTeam = bottomTeams.get(i - 1);
+			Team leagueBottomTeam = bottomTeam.getTeam();
+			String bottomTeamName = leagueBottomTeam.getName();
+			standingsBuilder.append(i + ". " + bottomTeamName + "\n");
+		}
+		
+		assertEquals(standingsBuilder.toString(), leagueStandings);
 	}
 	
 	private void assertSeasonHasConferencesDivisionsAndTeams(
