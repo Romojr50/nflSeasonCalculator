@@ -96,12 +96,15 @@ public class NFLSeasonDivisionTest {
 	
 	@Test
 	public void getDivisionStandingsStringUsesTeamsInOrderToGiveString() {
-		String divisionStandings = division.getDivisionStandingsString(tiebreaker);
+		String conferenceName = "Conf";
+		String divisionStandings = division.getDivisionStandingsString(conferenceName, 
+				tiebreaker);
 		List<NFLSeasonTeam> teamsInOrder = division.getTeamsInOrder();
 		assertEquals(4, teamsInOrder.size());
 		assertEquals(team3, teamsInOrder.get(0));
 		
 		StringBuilder standingsBuilder = new StringBuilder();
+		standingsBuilder.append(conferenceName + " " + leagueDivision.getName() + "\n");
 		for (int i = 1; i <= teamsInOrder.size(); i++) {
 			NFLSeasonTeam nextTeam = teamsInOrder.get(i - 1);
 			Team leagueNextTeam = nextTeam.getTeam();

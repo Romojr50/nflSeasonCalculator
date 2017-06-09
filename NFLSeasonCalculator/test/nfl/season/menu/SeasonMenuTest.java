@@ -1,5 +1,6 @@
 package nfl.season.menu;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -11,6 +12,7 @@ import nfl.season.scorestrip.ScoreStripMapper;
 import nfl.season.scorestrip.ScoreStripReader;
 import nfl.season.season.NFLSeason;
 import nfl.season.season.NFLSeasonTeam;
+import nfl.season.season.NFLTiebreaker;
 import nfl.season.season.SeasonWeek;
 
 import org.junit.Before;
@@ -28,7 +30,9 @@ public class SeasonMenuTest {
 	
 	private static final int PRINT_TEAM_SCHEDULE = 3;
 	
-	private static final int BACK_TO_MAIN_MENU = 4;
+	private static final int PRINT_STANDINGS = 4;
+	
+	private static final int BACK_TO_MAIN_MENU = 5;
 	
 	private String expectedMenuMessage;
 	
@@ -48,8 +52,13 @@ public class SeasonMenuTest {
 	@Mock
 	private League league;
 	
+	private String leagueStandings = "League Standings\n";
+	
 	@Mock
 	private NFLSeason season;
+	
+	@Mock
+	private NFLTiebreaker tiebreaker;
 	
 	@Mock
 	private SeasonWeek week1;
@@ -76,7 +85,8 @@ public class SeasonMenuTest {
 				"1. Load/Refresh the current season\n" +
 				"2. Print out games in week\n" +
 				"3. Print out team schedule\n" +
-				"4. Back to Main Menu";
+				"4. Print out League Standings\n" +
+				"5. Back to Main Menu";
 		
 		when(season.getWeek(1)).thenReturn(week1);
 		when(season.getWeek(3)).thenReturn(week3);
@@ -84,6 +94,8 @@ public class SeasonMenuTest {
 		when(season.getWeek(15)).thenReturn(week15);
 		when(season.getTeam(teamName)).thenReturn(seasonTeam);
 		when(season.getLeague()).thenReturn(league);
+		when(season.createNFLTiebreaker()).thenReturn(tiebreaker);
+		when(season.getLeagueStandings(tiebreaker)).thenReturn(leagueStandings);
 		when(league.getTeam(10)).thenReturn(leagueTeam);
 		when(leagueTeam.getName()).thenReturn(teamName);
 		when(seasonTeam.getScheduleString()).thenReturn(scheduleString);
@@ -164,6 +176,17 @@ public class SeasonMenuTest {
 		String teamListMessage = MenuOptionsUtil.buildTeamListMessage();
 		verify(input, times(3)).askForInt(teamListMessage);
 		verify(input).askForInt(scheduleString + teamListMessage);
+	}
+	
+	@Test
+	public void printOutStandingsPrintsOutStandingsFromSeason() {
+		when(input.askForInt(anyString())).thenReturn(PRINT_STANDINGS, BACK_TO_MAIN_MENU);
+		
+		seasonMenu.launchSubMenu();
+		
+		verify(input).askForInt(expectedMenuMessage);
+		verify(input).askForInt(leagueStandings + expectedMenuMessage);
+		verify(season).getLeagueStandings(any(NFLTiebreaker.class));
 	}
 	
 }

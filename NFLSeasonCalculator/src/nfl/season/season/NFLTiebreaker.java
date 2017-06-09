@@ -278,7 +278,7 @@ public class NFLTiebreaker {
 				}
 			}
 			
-			NFLSeasonTeam divisionTieWinner = resolveManyTeamDivisionalTieBreakers(
+			NFLSeasonTeam divisionTieWinner = tiebreakManyTeams(
 					currentDivisionTeams);
 			nextRemainingTeams.add(divisionTieWinner);
 		}

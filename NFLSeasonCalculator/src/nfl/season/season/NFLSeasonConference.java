@@ -46,7 +46,7 @@ public class NFLSeasonConference {
 		return seedsInOrder;
 	}
 	
-	private void setSeedsInOrder(NFLTiebreaker tiebreaker) {
+	public void setSeedsInOrder(NFLTiebreaker tiebreaker) {
 		seedsInOrder = new ArrayList<NFLSeasonTeam>();
 		
 		List<NFLSeasonTeam> divisionWinners = new ArrayList<NFLSeasonTeam>();
@@ -69,13 +69,15 @@ public class NFLSeasonConference {
 		for (int i = 0; i < 2; i++) {
 			NFLSeasonTeam nextSeed = tiebreaker.tiebreakManyTeams(nonDivisionWinners);
 			seedsInOrder.add(nextSeed);
+			nonDivisionWinners.remove(nextSeed);
 		}
 	}
 
 	public String getConferenceStandingsString(NFLTiebreaker tiebreaker) {
 		StringBuilder standingsBuilder = new StringBuilder();
 		for (NFLSeasonDivision division : divisions) {
-			standingsBuilder.append(division.getDivisionStandingsString(tiebreaker));
+			standingsBuilder.append(division.getDivisionStandingsString(
+					leagueConference.getName(), tiebreaker));
 		}
 
 		String conferenceName = leagueConference.getName();

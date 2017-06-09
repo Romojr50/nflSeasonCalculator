@@ -71,10 +71,12 @@ public class NFLSeasonDivision {
 		return divisionCellar;
 	}
 
-	public String getDivisionStandingsString(NFLTiebreaker tiebreaker) {
+	public String getDivisionStandingsString(String conferenceName, 
+			NFLTiebreaker tiebreaker) {
 		setTeamsInOrder(tiebreaker);
 		
 		StringBuilder standingsBuilder = new StringBuilder();
+		standingsBuilder.append(conferenceName + " " + leagueDivision.getName() + "\n");
 		for (int i = 1; i <= teamsInOrder.size(); i++) {
 			NFLSeasonTeam nextTeam = teamsInOrder.get(i - 1);
 			Team leagueNextTeam = nextTeam.getTeam();

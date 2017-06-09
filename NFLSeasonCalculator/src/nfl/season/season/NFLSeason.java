@@ -208,7 +208,7 @@ public class NFLSeason {
 		
 		setBottomTeams(tiebreaker);
 		
-		standingsBuilder.append("BottomTeams:\n");
+		standingsBuilder.append("Bottom Teams:\n");
 		for (int i = 1; i <= bottomTeams.size(); i++) {
 			NFLSeasonTeam bottomTeam = bottomTeams.get(i - 1);
 			Team leagueBottomTeam = bottomTeam.getTeam();
@@ -217,6 +217,10 @@ public class NFLSeason {
 		}
 		
 		return standingsBuilder.toString();
+	}
+
+	public NFLTiebreaker createNFLTiebreaker() {
+		return new NFLTiebreaker(this);
 	}
 
 }

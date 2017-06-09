@@ -158,9 +158,12 @@ public class NFLSeasonConferenceTest {
 		when(division3.getTeams()).thenReturn(division3Teams);
 		when(division3.getDivisionWinner()).thenReturn(team3_1);
 		
-		when(division1.getDivisionStandingsString(tiebreaker)).thenReturn("Div 1 Standings\n");
-		when(division2.getDivisionStandingsString(tiebreaker)).thenReturn("Div 2 Standings\n");
-		when(division3.getDivisionStandingsString(tiebreaker)).thenReturn("Div 3 Standings\n");
+		when(division1.getDivisionStandingsString(leagueConference.getName(), 
+				tiebreaker)).thenReturn("Div 1 Standings\n");
+		when(division2.getDivisionStandingsString(leagueConference.getName(), 
+				tiebreaker)).thenReturn("Div 2 Standings\n");
+		when(division3.getDivisionStandingsString(leagueConference.getName(), 
+				tiebreaker)).thenReturn("Div 3 Standings\n");
 		
 		when(leagueConference.getName()).thenReturn(conferenceName);
 		conference = new NFLSeasonConference(leagueConference);
@@ -180,7 +183,8 @@ public class NFLSeasonConferenceTest {
 		
 		List<NFLSeasonDivision> divisions = conference.getDivisions();
 		for (NFLSeasonDivision division : divisions) {
-			standingsBuilder.append(division.getDivisionStandingsString(tiebreaker));
+			standingsBuilder.append(division.getDivisionStandingsString(
+					leagueConference.getName(), tiebreaker));
 		}
 		
 		standingsBuilder.append("\n");

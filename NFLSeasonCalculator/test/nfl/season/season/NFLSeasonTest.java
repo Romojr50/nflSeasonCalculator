@@ -478,7 +478,7 @@ public class NFLSeasonTest {
 					tiebreaker));
 			standingsBuilder.append("\n");
 		}
-		standingsBuilder.append("BottomTeams:\n");
+		standingsBuilder.append("Bottom Teams:\n");
 		for (int i = 1; i <= bottomTeams.size(); i++) {
 			NFLSeasonTeam bottomTeam = bottomTeams.get(i - 1);
 			Team leagueBottomTeam = bottomTeam.getTeam();
