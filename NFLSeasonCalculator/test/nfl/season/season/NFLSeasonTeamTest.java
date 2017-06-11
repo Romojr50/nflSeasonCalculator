@@ -188,6 +188,13 @@ public class NFLSeasonTeamTest {
 		
 		assertEquals(resultsBuilder.toString(), simulatedResults);
 	}
+	
+	@Test
+	public void getSimulatedResultsButNoSimulationsDoneSoReturnNoSimulationsMessage() {
+		String simulatedResults = seasonTeam.getSimulatedResults(1000);
+		assertEquals("No simulations done yet; please run the Many Seasons Simulation\n",
+				simulatedResults);
+	}
 
 	private void addSeasonGamesToTeam() {
 		seasonTeam.addSeasonGame(1, seasonGame1);

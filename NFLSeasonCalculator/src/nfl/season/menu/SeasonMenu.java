@@ -83,15 +83,11 @@ public class SeasonMenu extends SubMenu {
 			} else if (SeasonMenuOptions.PRINT_STANDINGS.optionNumber == selectedOption) {
 				seasonMenuPrefix = season.getLeagueStandings(tiebreaker);
 			} else if (SeasonMenuOptions.SIMULATE_SEASON.optionNumber == selectedOption) {
-				season.simulateSeason();
+				seasonMenuPrefix = launchSimulateSeason();
 			} else if (SeasonMenuOptions.CLEAR_SIMULATIONS.optionNumber == selectedOption) {
 				season.clearSimulatedResults();
 			} else if (SeasonMenuOptions.SIMULATE_MANY_SEASONS.optionNumber == selectedOption) {
-				input.printMessage("Simulating " + NFLSeason.MANY_SEASONS_NUMBER + 
-						" Seasons...");
-				NFLManySeasonSimulator simulator = season.createManySeasonsSimulator();
-				simulator.clearSimulations();
-				simulator.simulateManySeasons(tiebreaker, NFLSeason.MANY_SEASONS_NUMBER);
+				seasonMenuPrefix = launchSimulateManySeasons(tiebreaker);
 			} else if (SeasonMenuOptions.PRINT_TEAM_SIMULATIONS.optionNumber == selectedOption) {
 				launchPrintTeamSimulationsMenu();
 			}
@@ -132,6 +128,32 @@ public class SeasonMenu extends SubMenu {
 				}
 			}
 		}
+	}
+
+	private String launchSimulateSeason() {
+		String seasonMenuPrefix = "";
+		
+		if (season.getWeek(1) != null) {
+			season.simulateSeason();
+		} else {
+			seasonMenuPrefix = "Season not loaded yet; Please load season\n";
+		}
+		return seasonMenuPrefix;
+	}
+
+	private String launchSimulateManySeasons(NFLTiebreaker tiebreaker) {
+		String seasonMenuPrefix = "";
+		
+		if (season.getWeek(1) != null) {
+			input.printMessage("Simulating " + NFLSeason.MANY_SEASONS_NUMBER + 
+					" Seasons...");
+			NFLManySeasonSimulator simulator = season.createManySeasonsSimulator();
+			simulator.clearSimulations();
+			simulator.simulateManySeasons(tiebreaker, NFLSeason.MANY_SEASONS_NUMBER);
+		} else {
+			seasonMenuPrefix = "Season not loaded yet; Please load season\n";
+		}
+		return seasonMenuPrefix;
 	}
 	
 	private void launchPrintTeamSimulationsMenu() {

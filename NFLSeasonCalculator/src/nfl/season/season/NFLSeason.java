@@ -167,7 +167,7 @@ public class NFLSeason {
 	}
 
 	public String getWeekString(SeasonWeek week) {
-		String weekString = "This week is empty or null; please load the season";
+		String weekString = "This week is empty or null; please load the season\n";
 		
 		if (week != null) {
 			StringBuilder weekStringBuilder = new StringBuilder();

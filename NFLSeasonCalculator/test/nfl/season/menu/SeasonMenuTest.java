@@ -2,6 +2,7 @@ package nfl.season.menu;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -221,6 +222,19 @@ public class SeasonMenuTest {
 	}
 	
 	@Test
+	public void simulateSeasonButSeasonNotLoadedSoNoSimulationDone() {
+		when(season.getWeek(1)).thenReturn(null);
+		
+		when(input.askForInt(anyString())).thenReturn(SIMULATE_SEASON, BACK_TO_MAIN_MENU);
+		
+		seasonMenu.launchSubMenu();
+		
+		verify(season, never()).simulateSeason();
+		verify(input).askForInt("Season not loaded yet; Please load season\n" + 
+				expectedMenuMessage);
+	}
+	
+	@Test
 	public void clearSimulatedResultsCallsOnSeasonToClearSimulatedGames() {
 		when(input.askForInt(anyString())).thenReturn(CLEAR_SIMULATIONS, BACK_TO_MAIN_MENU);
 		
@@ -240,6 +254,23 @@ public class SeasonMenuTest {
 		verify(simulator).simulateManySeasons(tiebreaker, NFLSeason.MANY_SEASONS_NUMBER);
 		verify(input, times(1)).printMessage("Simulating " + 
 				NFLSeason.MANY_SEASONS_NUMBER + " Seasons...");
+	}
+	
+	@Test
+	public void simulateManySeasonsButSeasonNotLoadedYetSoNoSimulationsDone() {
+		when(season.getWeek(1)).thenReturn(null);
+		
+		when(input.askForInt(anyString())).thenReturn(SIMULATE_MANY_SEASONS, 
+				BACK_TO_MAIN_MENU);
+		
+		seasonMenu.launchSubMenu();
+		
+		verify(simulator, never()).clearSimulations();
+		verify(simulator, never()).simulateManySeasons(tiebreaker, NFLSeason.MANY_SEASONS_NUMBER);
+		verify(input, never()).printMessage("Simulating " + 
+				NFLSeason.MANY_SEASONS_NUMBER + " Seasons...");
+		verify(input).askForInt("Season not loaded yet; Please load season\n" + 
+				expectedMenuMessage);
 	}
 	
 	@Test
