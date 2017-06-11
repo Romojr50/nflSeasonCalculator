@@ -30,6 +30,10 @@ public class NFLManySeasonSimulator {
 				if (hadAWinningRecord(conferenceTeam)) {
 					conferenceTeam.addHadWinningSeason();
 				}
+				int simulatedWins = conferenceTeam.getNumberOfWins();
+				int simulatedLosses = conferenceTeam.getNumberOfLosses();
+				conferenceTeam.addSimulatedWins(simulatedWins);
+				conferenceTeam.addSimulatedLosses(simulatedLosses);
 			}
 			
 			tallyDivisionTopAndBottom(conference);

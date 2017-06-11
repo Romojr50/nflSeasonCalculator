@@ -50,6 +50,10 @@ public class NFLSeasonTeam {
 	
 	private int wasBottomTeam;
 	
+	private int simulatedWins;
+	
+	private int simulatedLosses;
+	
 	public NFLSeasonTeam(Team leagueTeam) {
 		this.leagueTeam = leagueTeam;
 		seasonGames = new SeasonGame[NFLSeason.NUMBER_OF_WEEKS_IN_SEASON];
@@ -256,6 +260,22 @@ public class NFLSeasonTeam {
 		return wasBottomTeam;
 	}
 
+	public void addSimulatedWins(int simulatedWins) {
+		this.simulatedWins += simulatedWins;
+	}
+
+	public int getSimulatedWins() {
+		return simulatedWins;
+	}
+
+	public void addSimulatedLosses(int simulatedLosses) {
+		this.simulatedLosses += simulatedLosses;
+	}
+	
+	public int getSimulatedLosses() {
+		return simulatedLosses;
+	}
+
 	public void clearSimulatedResults() {
 		gotOneSeed = 0;
 		gotRoundOneBye = 0;
@@ -272,6 +292,8 @@ public class NFLSeasonTeam {
 		if (gotOneSeed > 0 || gotRoundOneBye > 0 || wonDivision > 0 || madePlayoffs > 0 || hadWinningSeason > 0 || wasInDivisionCellar > 0 || wasBottomTeam > 0) {
 			double numberOfSimulatedSeasonsDouble = numberOfSimulatedSeasons * 1.0;
 			
+			int averageWins = (int) Math.round(simulatedWins / numberOfSimulatedSeasonsDouble);
+			int averageLosses = (int) Math.round(simulatedLosses / numberOfSimulatedSeasonsDouble);
 			int chanceToGetOneSeed = (int) Math.round(gotOneSeed / numberOfSimulatedSeasonsDouble * 100.0);
 			int chanceToGetRoundOneBye = (int) Math.round(gotRoundOneBye / numberOfSimulatedSeasonsDouble * 100.0);
 			int chanceToWinDivision = (int) Math.round(wonDivision / numberOfSimulatedSeasonsDouble * 100.0);
@@ -281,6 +303,10 @@ public class NFLSeasonTeam {
 			int chanceToBeBottomTeam = (int) Math.round(wasBottomTeam / numberOfSimulatedSeasonsDouble * 100.0);
 			
 			StringBuilder resultsBuilder = new StringBuilder();
+			resultsBuilder.append("Average Wins: ");
+			resultsBuilder.append(averageWins + "\n");
+			resultsBuilder.append("Average Losses: ");
+			resultsBuilder.append(averageLosses + "\n");
 			resultsBuilder.append("Percent Chance to...\n");
 			resultsBuilder.append("Win One Seed: " + chanceToGetOneSeed + "\n");
 			resultsBuilder.append("Get Round One Bye: " + chanceToGetRoundOneBye + "\n");

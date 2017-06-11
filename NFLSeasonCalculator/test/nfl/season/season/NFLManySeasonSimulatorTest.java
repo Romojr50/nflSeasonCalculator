@@ -209,8 +209,13 @@ public class NFLManySeasonSimulatorTest {
 		verify(season).compileLeagueResults(tiebreaker);
 		
 		verifyTalliesForPlayoffTeams();
-		
 		verifyTalliesForBadTeams();
+		verify(divisionWinner1_1).addSimulatedWins(9);
+		verify(divisionWinner1_1).addSimulatedLosses(7);
+		verify(wildcard1_1).addSimulatedWins(9);
+		verify(wildcard1_1).addSimulatedLosses(7);
+		verify(divisionWinner2_1).addSimulatedWins(9);
+		verify(divisionWinner2_1).addSimulatedLosses(7);
 	}
 	
 	@Test

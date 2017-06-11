@@ -168,6 +168,8 @@ public class NFLSeasonTeamTest {
 		}
 		String simulatedResults = seasonTeam.getSimulatedResults(1000);
 		
+		int averageWins = (int) Math.round(seasonTeam.getSimulatedWins() / 1000.0);
+		int averageLosses = (int) Math.round(seasonTeam.getSimulatedLosses() / 1000.0);
 		int chanceToGetOneSeed = (int) Math.round(seasonTeam.getGotOneSeed() / 1000.0 * 100.0);
 		int chanceToGetRoundOneBye = (int) Math.round(seasonTeam.getGotRoundOneBye() / 1000.0 * 100.0);
 		int chanceToWinDivision = (int) Math.round(seasonTeam.getWonDivision() / 1000.0 * 100.0);
@@ -177,6 +179,10 @@ public class NFLSeasonTeamTest {
 		int chanceToBeBottomTeam = (int) Math.round(seasonTeam.getWasBottomTeam() / 1000.0 * 100.0);
 		
 		StringBuilder resultsBuilder = new StringBuilder();
+		resultsBuilder.append("Average Wins: ");
+		resultsBuilder.append(averageWins + "\n");
+		resultsBuilder.append("Average Losses: ");
+		resultsBuilder.append(averageLosses + "\n");
 		resultsBuilder.append("Percent Chance to...\n");
 		resultsBuilder.append("Win One Seed: " + chanceToGetOneSeed + "\n");
 		resultsBuilder.append("Get Round One Bye: " + chanceToGetRoundOneBye + "\n");
@@ -194,6 +200,24 @@ public class NFLSeasonTeamTest {
 		String simulatedResults = seasonTeam.getSimulatedResults(1000);
 		assertEquals("No simulations done yet; please run the Many Seasons Simulation\n",
 				simulatedResults);
+	}
+	
+	@Test
+	public void clearSimulatedResultsClearsSimulatedNumbers() {
+		for (int i = 0; i < 500; i++) {
+			seasonTeam.addGotOneSeed();
+		}
+		seasonTeam.clearSimulatedResults();
+		
+		assertEquals(0, seasonTeam.getGotOneSeed());
+		assertEquals(0, seasonTeam.getGotRoundOneBye());
+		assertEquals(0, seasonTeam.getWonDivision());
+		assertEquals(0, seasonTeam.getMadePlayoffs());
+		assertEquals(0, seasonTeam.getHadWinningSeason());
+		assertEquals(0, seasonTeam.getWasInDivisionCellar());
+		assertEquals(0, seasonTeam.getWasBottomTeam());
+		assertEquals(0, seasonTeam.getSimulatedWins());
+		assertEquals(0, seasonTeam.getSimulatedLosses());
 	}
 
 	private void addSeasonGamesToTeam() {
