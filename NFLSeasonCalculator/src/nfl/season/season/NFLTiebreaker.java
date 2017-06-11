@@ -82,7 +82,7 @@ public class NFLTiebreaker {
 		return tieWinner;
 	}
 
-	private double calculateWinPercentFromWinsLossesAndTies(int wins, 
+	public static double calculateWinPercentFromWinsLossesAndTies(int wins, 
 			int losses, int ties) {
 		double returnWinPercent = 0.0;
 		

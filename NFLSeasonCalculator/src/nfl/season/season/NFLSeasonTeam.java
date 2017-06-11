@@ -36,6 +36,20 @@ public class NFLSeasonTeam {
 	
 	private int numberOfDivisionTies;
 	
+	private int gotOneSeed;
+	
+	private int gotRoundOneBye;
+	
+	private int wonDivision;
+	
+	private int madePlayoffs;
+	
+	private int hadWinningSeason;
+	
+	private int wasInDivisionCellar;
+	
+	private int wasBottomTeam;
+	
 	public NFLSeasonTeam(Team leagueTeam) {
 		this.leagueTeam = leagueTeam;
 		seasonGames = new SeasonGame[NFLSeason.NUMBER_OF_WEEKS_IN_SEASON];
@@ -186,6 +200,62 @@ public class NFLSeasonTeam {
 		}
 	}
 	
+	public void addGotOneSeed() {
+		gotOneSeed++;
+	}
+	
+	public int getGotOneSeed() {
+		return gotOneSeed;
+	}
+
+	public void addGotRoundOneBye() {
+		gotRoundOneBye++;
+	}
+	
+	public int getGotRoundOneBye() {
+		return gotRoundOneBye;
+	}
+
+	public void addWonDivision() {
+		wonDivision++;
+	}
+	
+	public int getWonDivision() {
+		return wonDivision;
+	}
+
+	public void addMadePlayoffs() {
+		madePlayoffs++;
+	}
+	
+	public int getMadePlayoffs() {
+		return madePlayoffs;
+	}
+
+	public void addHadWinningSeason() {
+		hadWinningSeason++;
+	}
+	
+	public int getHadWinningSeason() {
+		return hadWinningSeason;
+	}
+	
+	public void addWasInDivisionCellar() {
+		wasInDivisionCellar++;
+	}
+	
+	public int getWasInDivisionCellar() {
+		return wasInDivisionCellar;
+	}
+
+	public void addWasBottomTeam() {
+		wasBottomTeam++;
+	}
+	
+	public int getWasBottomTeam() {
+		return wasBottomTeam;
+	}
+	
 	private void tallyWin(SeasonGame seasonGame, String opponentName) {
 		numberOfWins++;
 		winsAgainst.add(opponentName);
@@ -280,5 +350,5 @@ public class NFLSeasonTeam {
 		lossesAgainst = new ArrayList<String>();
 		tiesAgainst = new ArrayList<String>();
 	}
-	
+
 }
