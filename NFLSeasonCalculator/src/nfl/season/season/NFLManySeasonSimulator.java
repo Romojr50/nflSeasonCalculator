@@ -10,9 +10,11 @@ public class NFLManySeasonSimulator {
 		this.season = season;
 	}
 
-	public void simulateOneSeason() {
+	public void simulateOneSeason(NFLTiebreaker tiebreaker) {
 		season.clearSimulatedResults();
 		season.simulateSeason();
+		
+		season.compileLeagueResults(tiebreaker);
 		
 		List<NFLSeasonTeam> bottomTeams = season.getBottomTeams();
 		for (NFLSeasonTeam bottomTeam : bottomTeams) {
@@ -31,6 +33,24 @@ public class NFLManySeasonSimulator {
 			}
 			
 			tallyDivisionTopAndBottom(conference);
+		}
+	}
+
+	public void simulateManySeasons(NFLTiebreaker tiebreaker, int numberOfSeasons) {
+		for (int i = 0; i < numberOfSeasons; i++) {
+			simulateOneSeason(tiebreaker);
+		}
+	}
+	
+	public void clearSimulations() {
+		season.clearSimulatedResults();
+		
+		List<NFLSeasonConference> conferences = season.getConferences();
+		for (NFLSeasonConference conference : conferences) {
+			List<NFLSeasonTeam> teams = conference.getTeams();
+			for (NFLSeasonTeam team : teams) {
+				team.clearSimulatedResults();
+			}
 		}
 	}
 

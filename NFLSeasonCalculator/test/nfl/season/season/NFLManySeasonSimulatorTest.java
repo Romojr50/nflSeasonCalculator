@@ -1,5 +1,6 @@
 package nfl.season.season;
 
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -108,6 +109,9 @@ public class NFLManySeasonSimulatorTest {
 	
 	private List<NFLSeasonConference> conferences;
 	
+	@Mock
+	private NFLTiebreaker tiebreaker;
+	
 	private NFLManySeasonSimulator simulator;
 	
 	@Before
@@ -198,14 +202,39 @@ public class NFLManySeasonSimulatorTest {
 	
 	@Test
 	public void simulatorSimulatesOneSeasonAndPutsResultsOnTeams() {
-		simulator.simulateOneSeason();
+		simulator.simulateOneSeason(tiebreaker);
 		
 		verify(season).clearSimulatedResults();
 		verify(season).simulateSeason();
+		verify(season).compileLeagueResults(tiebreaker);
 		
 		verifyTalliesForPlayoffTeams();
 		
 		verifyTalliesForBadTeams();
+	}
+	
+	@Test
+	public void simulatorClearsSimulatedResults() {
+		simulator.clearSimulations();
+		
+		verify(season).clearSimulatedResults();
+		
+		verify(divisionWinner1_1).clearSimulatedResults();
+		verify(wildcard2_2).clearSimulatedResults();
+	}
+	
+	@Test
+	public void simulatorSimulatesSeveralSeasons() {
+		simulator.simulateManySeasons(tiebreaker, 100);
+		
+		verify(season, times(100)).clearSimulatedResults();
+		verify(season, times(100)).simulateSeason();
+		
+		verify(divisionWinner1_1, times(100)).addGotOneSeed();
+		verify(divisionWinner1_1, times(100)).addGotRoundOneBye();
+		verify(divisionWinner1_1, times(100)).addWonDivision();
+		verify(divisionWinner1_1, times(100)).addMadePlayoffs();
+		verify(divisionWinner1_1, times(100)).addHadWinningSeason();
 	}
 
 	private void verifyTalliesForPlayoffTeams() {

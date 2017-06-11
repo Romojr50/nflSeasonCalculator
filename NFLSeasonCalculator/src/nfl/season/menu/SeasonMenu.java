@@ -6,6 +6,7 @@ import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
 import nfl.season.scorestrip.ScoreStripMapper;
 import nfl.season.scorestrip.ScoreStripReader;
+import nfl.season.season.NFLManySeasonSimulator;
 import nfl.season.season.NFLSeason;
 import nfl.season.season.NFLSeasonTeam;
 import nfl.season.season.NFLTiebreaker;
@@ -20,7 +21,9 @@ public class SeasonMenu extends SubMenu {
 		PRINT_STANDINGS(4, "Print out League Standings"),
 		SIMULATE_SEASON(5, "Simulate Season"),
 		CLEAR_SIMULATIONS(6, "Clear Simulated Games"),
-		EXIT(7, "Back to Main Menu");
+		SIMULATE_MANY_SEASONS(7, "Simulate Many Seasons and Tally Results"),
+		PRINT_TEAM_SIMULATIONS(8, "Print Out Team Simulation Results"),
+		EXIT(9, "Back to Main Menu");
 		
 		private int optionNumber;
 		private String optionDescription;
@@ -62,6 +65,7 @@ public class SeasonMenu extends SubMenu {
 		int selectedOption = -1;
 		String seasonMenuPrefix = "";
 		
+		NFLTiebreaker tiebreaker = season.createNFLTiebreaker();
 		while (selectedOption != SeasonMenuOptions.EXIT.optionNumber) {
 			String seasonMenuMessage = MenuOptionsUtil.createMenuMessage(
 					SeasonMenuOptions.class); 
@@ -77,12 +81,19 @@ public class SeasonMenu extends SubMenu {
 			} else if (SeasonMenuOptions.PRINT_TEAM_SCHEDULE.optionNumber == selectedOption) {
 				launchPrintTeamScheduleMenu();
 			} else if (SeasonMenuOptions.PRINT_STANDINGS.optionNumber == selectedOption) {
-				NFLTiebreaker tiebreaker = season.createNFLTiebreaker();
 				seasonMenuPrefix = season.getLeagueStandings(tiebreaker);
 			} else if (SeasonMenuOptions.SIMULATE_SEASON.optionNumber == selectedOption) {
 				season.simulateSeason();
 			} else if (SeasonMenuOptions.CLEAR_SIMULATIONS.optionNumber == selectedOption) {
 				season.clearSimulatedResults();
+			} else if (SeasonMenuOptions.SIMULATE_MANY_SEASONS.optionNumber == selectedOption) {
+				input.printMessage("Simulating " + NFLSeason.MANY_SEASONS_NUMBER + 
+						" Seasons...");
+				NFLManySeasonSimulator simulator = season.createManySeasonsSimulator();
+				simulator.clearSimulations();
+				simulator.simulateManySeasons(tiebreaker, NFLSeason.MANY_SEASONS_NUMBER);
+			} else if (SeasonMenuOptions.PRINT_TEAM_SIMULATIONS.optionNumber == selectedOption) {
+				launchPrintTeamSimulationsMenu();
 			}
 		}
 	}
@@ -112,19 +123,50 @@ public class SeasonMenu extends SubMenu {
 			selectedTeamNumber = input.askForInt(scheduleString + 
 					teamListMessage);
 				
-			if (MenuOptionsUtil.EXIT_FROM_TEAM_SELECT != selectedTeamNumber
-					&& selectedTeamNumber >= 1
-					&& selectedTeamNumber <= NFLTeamEnum.values().length) {
-				League league = season.getLeague();
-				Team selectedLeagueTeam = league.getTeam(selectedTeamNumber);
-				NFLSeasonTeam selectedSeasonTeam = season.getTeam(
-						selectedLeagueTeam.getName());
+			if (inputIsValidForTeamSelect(selectedTeamNumber)) {
+				NFLSeasonTeam selectedSeasonTeam = getNFLSeasonTeamFromTeamNumber(
+						selectedTeamNumber);
 				
 				if (selectedSeasonTeam != null) {
 					scheduleString = selectedSeasonTeam.getScheduleString();
 				}
 			}
 		}
+	}
+	
+	private void launchPrintTeamSimulationsMenu() {
+		String teamListMessage = MenuOptionsUtil.buildTeamListMessage();
+		int selectedTeamNumber = -1;
+		String simulationString = "";
+		
+		while (selectedTeamNumber != MenuOptionsUtil.EXIT_FROM_TEAM_SELECT) {
+			selectedTeamNumber = input.askForInt(simulationString + 
+					teamListMessage);
+				
+			if (inputIsValidForTeamSelect(selectedTeamNumber)) {
+				NFLSeasonTeam selectedSeasonTeam = getNFLSeasonTeamFromTeamNumber(
+						selectedTeamNumber);
+				
+				if (selectedSeasonTeam != null) {
+					simulationString = selectedSeasonTeam.getSimulatedResults(
+							NFLSeason.MANY_SEASONS_NUMBER);
+				}
+			}
+		}
+	}
+
+	private boolean inputIsValidForTeamSelect(int selectedTeamNumber) {
+		return MenuOptionsUtil.EXIT_FROM_TEAM_SELECT != selectedTeamNumber
+				&& selectedTeamNumber >= 1
+				&& selectedTeamNumber <= NFLTeamEnum.values().length;
+	}
+	
+	private NFLSeasonTeam getNFLSeasonTeamFromTeamNumber(int selectedTeamNumber) {
+		League league = season.getLeague();
+		Team selectedLeagueTeam = league.getTeam(selectedTeamNumber);
+		NFLSeasonTeam selectedSeasonTeam = season.getTeam(
+				selectedLeagueTeam.getName());
+		return selectedSeasonTeam;
 	}
 	
 }
