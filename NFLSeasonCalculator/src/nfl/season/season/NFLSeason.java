@@ -1,10 +1,13 @@
 package nfl.season.season;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import nfl.season.input.NFLFileWriterFactory;
+import nfl.season.input.NFLRegularSeasonSave;
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
 import nfl.season.league.League;
@@ -148,7 +151,8 @@ public class NFLSeason {
 	}
 
 	public void loadSeason(ScoreStripReader scoreStripReader,
-			ScoreStripMapper scoreStripMapper) {
+			ScoreStripMapper scoreStripMapper, NFLRegularSeasonSave seasonSave, 
+			NFLFileWriterFactory fileWriterFactory) {
 		Calendar calendar = Calendar.getInstance();
 		int year = calendar.get(Calendar.YEAR);
 		String yearString = "" + year;
@@ -163,6 +167,12 @@ public class NFLSeason {
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}
+		}
+		
+		try {
+			seasonSave.saveToSeasonFile(this, fileWriterFactory);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

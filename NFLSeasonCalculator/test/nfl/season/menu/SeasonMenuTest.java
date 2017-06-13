@@ -6,6 +6,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import nfl.season.input.NFLFileWriterFactory;
+import nfl.season.input.NFLRegularSeasonSave;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
 import nfl.season.league.Team;
@@ -96,6 +98,12 @@ public class SeasonMenuTest {
 	@Mock
 	private ScoreStripMapper scoreStripMapper;
 	
+	@Mock
+	private NFLRegularSeasonSave seasonSave;
+	
+	@Mock
+	private NFLFileWriterFactory fileWriterFactory;
+	
 	private SeasonMenu seasonMenu;
 	
 	@Before
@@ -127,7 +135,7 @@ public class SeasonMenuTest {
 				simulationString);
 		
 		seasonMenu = new SeasonMenu(input, season, playoffs, 
-				scoreStripReader, scoreStripMapper);
+				scoreStripReader, scoreStripMapper, seasonSave, fileWriterFactory);
 	}
 	
 	@Test
@@ -145,7 +153,8 @@ public class SeasonMenuTest {
 		
 		seasonMenu.launchSubMenu();
 		
-		verify(season).loadSeason(scoreStripReader, scoreStripMapper);
+		verify(season).loadSeason(scoreStripReader, scoreStripMapper, seasonSave, 
+				fileWriterFactory);
 		verify(input, times(1)).printMessage("Loading season...");
 	}
 	

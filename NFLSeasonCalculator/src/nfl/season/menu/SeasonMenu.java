@@ -1,5 +1,7 @@
 package nfl.season.menu;
 
+import nfl.season.input.NFLFileWriterFactory;
+import nfl.season.input.NFLRegularSeasonSave;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
 import nfl.season.league.NFLTeamEnum;
@@ -55,14 +57,21 @@ public class SeasonMenu extends SubMenu {
 	
 	private ScoreStripMapper scoreStripMapper;
 	
+	private NFLRegularSeasonSave seasonSave;
+	
+	private NFLFileWriterFactory fileWriterFactory;
+	
 	public SeasonMenu(NFLSeasonInput input, NFLSeason season, 
 			NFLPlayoffs playoffs, ScoreStripReader scoreStripReader, 
-			ScoreStripMapper scoreStripMapper) {
+			ScoreStripMapper scoreStripMapper, NFLRegularSeasonSave seasonSave, 
+			NFLFileWriterFactory fileWriterFactory) {
 		this.input = input;
 		this.season = season;
 		this.playoffs = playoffs;
 		this.scoreStripReader = scoreStripReader;
 		this.scoreStripMapper = scoreStripMapper;
+		this.seasonSave = seasonSave;
+		this.fileWriterFactory = fileWriterFactory;
 	}
 	
 	@Override
@@ -80,7 +89,8 @@ public class SeasonMenu extends SubMenu {
 			
 			if (SeasonMenuOptions.LOAD_SEASON.optionNumber == selectedOption) {
 				input.printMessage("Loading season...");
-				season.loadSeason(scoreStripReader, scoreStripMapper);
+				season.loadSeason(scoreStripReader, scoreStripMapper, seasonSave, 
+						fileWriterFactory);
 			} else if (SeasonMenuOptions.PRINT_OUT_WEEK.optionNumber == selectedOption) {
 				seasonMenuPrefix = launchPrintWeekMenu(seasonMenuPrefix);
 			} else if (SeasonMenuOptions.PRINT_TEAM_SCHEDULE.optionNumber == selectedOption) {
