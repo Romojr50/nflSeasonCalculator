@@ -72,10 +72,13 @@ public class NFLSeasonCalculator {
 		NFLSeason season = new NFLSeason();
 		season.initializeNFLRegularSeason(nfl);
 		
+		NFLPlayoffs playoffs = new NFLPlayoffs(nfl);
+		playoffs.initializeNFLPlayoffs();
+		
 		ScoreStripReader scoreStripReader = new ScoreStripReader();
 		ScoreStripMapper scoreStripMapper = new ScoreStripMapper(nfl);
 		
-		SeasonMenu seasonMenu = new SeasonMenu(input, season, scoreStripReader, 
+		SeasonMenu seasonMenu = new SeasonMenu(input, season, playoffs, scoreStripReader, 
 				scoreStripMapper);
 		
 		return seasonMenu;

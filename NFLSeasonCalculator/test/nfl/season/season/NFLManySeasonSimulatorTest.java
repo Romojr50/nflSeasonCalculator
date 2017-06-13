@@ -7,6 +7,12 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import nfl.season.league.Conference;
+import nfl.season.league.Division;
+import nfl.season.league.Team;
+import nfl.season.playoffs.NFLPlayoffTeam;
+import nfl.season.playoffs.NFLPlayoffs;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,13 +37,29 @@ public class NFLManySeasonSimulatorTest {
 	private NFLSeasonConference conference1;
 	
 	@Mock
+	private Conference leagueConference1;
+	
+	private String conference1Name = "Conf 1";
+	
+	@Mock
 	private NFLSeasonDivision division1_1;
+	
+	@Mock
+	private Division leagueDivision1_1;
+	
+	private String division1_1Name = "Div 1 - 1";
 	
 	@Mock
 	private NFLSeasonDivision division1_2;
 	
 	@Mock
+	private Division leagueDivision1_2;
+	
+	@Mock
 	private NFLSeasonDivision division1_3;
+	
+	@Mock
+	private Division leagueDivision1_3;
 	
 	private List<NFLSeasonDivision> conference1Divisions;
 	
@@ -71,13 +93,25 @@ public class NFLManySeasonSimulatorTest {
 	private NFLSeasonConference conference2;
 	
 	@Mock
+	private Conference leagueConference2;
+	
+	@Mock
 	private NFLSeasonDivision division2_1;
+	
+	@Mock
+	private Division leagueDivision2_1;
 	
 	@Mock
 	private NFLSeasonDivision division2_2;
 	
 	@Mock
+	private Division leagueDivision2_2;
+	
+	@Mock
 	private NFLSeasonDivision division2_3;
+	
+	@Mock
+	private Division leagueDivision2_3;
 	
 	@Mock
 	private NFLSeasonTeam divisionCellar2_1;
@@ -112,6 +146,24 @@ public class NFLManySeasonSimulatorTest {
 	@Mock
 	private NFLTiebreaker tiebreaker;
 	
+	@Mock
+	private NFLPlayoffs playoffs;
+	
+	@Mock
+	private NFLPlayoffTeam playoffDivisionWinner1_1;
+	
+	@Mock
+	private Team leagueDivisionWinner1_1;
+	
+	@Mock
+	private NFLPlayoffTeam playoffWildcard1_2;
+	
+	@Mock
+	private NFLPlayoffTeam mockPlayoffTeam;
+	
+	@Mock
+	private Team leagueWildcard1_2;
+	
 	private NFLManySeasonSimulator simulator;
 	
 	@Before
@@ -133,6 +185,8 @@ public class NFLManySeasonSimulatorTest {
 		conference1Divisions.add(division1_2);
 		conference1Divisions.add(division1_3);
 		when(conference1.getDivisions()).thenReturn(conference1Divisions);
+		when(conference1.getConference()).thenReturn(leagueConference1);
+		when(leagueConference1.getName()).thenReturn(conference1Name);
 		
 		conference1Teams = new ArrayList<NFLSeasonTeam>();
 		conference1Teams.add(divisionWinner1_1);
@@ -148,6 +202,7 @@ public class NFLManySeasonSimulatorTest {
 		conference2Divisions.add(division2_2);
 		conference2Divisions.add(division2_3);
 		when(conference2.getDivisions()).thenReturn(conference2Divisions);
+		when(conference2.getConference()).thenReturn(leagueConference2);
 		
 		conference2Teams = new ArrayList<NFLSeasonTeam>();
 		conference2Teams.add(divisionWinner2_1);
@@ -158,13 +213,18 @@ public class NFLManySeasonSimulatorTest {
 		when(conference2.getSeedsInOrder()).thenReturn(conference2Teams);
 		when(conference2.getTeams()).thenReturn(conference2Teams);
 		
+		when(division1_1.getDivision()).thenReturn(leagueDivision1_1);
+		when(leagueDivision1_1.getName()).thenReturn(division1_1Name);
 		when(division1_1.getDivisionWinner()).thenReturn(divisionWinner1_1);
 		when(division1_1.getDivisionCellar()).thenReturn(divisionCellar1_1);
+		when(division1_2.getDivision()).thenReturn(leagueDivision1_2);
 		when(division1_2.getDivisionWinner()).thenReturn(divisionWinner1_2);
 		when(division1_2.getDivisionCellar()).thenReturn(divisionCellar1_2);
+		when(division1_3.getDivision()).thenReturn(leagueDivision1_3);
 		when(division1_3.getDivisionWinner()).thenReturn(divisionWinner1_3);
 		when(division1_3.getDivisionCellar()).thenReturn(divisionCellar1_3);
 		
+		when(divisionWinner1_1.getTeam()).thenReturn(leagueDivisionWinner1_1);
 		when(divisionWinner1_1.getNumberOfWins()).thenReturn(9);
 		when(divisionWinner1_1.getNumberOfLosses()).thenReturn(7);
 		when(divisionWinner1_2.getNumberOfWins()).thenReturn(9);
@@ -173,13 +233,17 @@ public class NFLManySeasonSimulatorTest {
 		when(divisionWinner1_3.getNumberOfLosses()).thenReturn(7);
 		when(wildcard1_1.getNumberOfWins()).thenReturn(9);
 		when(wildcard1_1.getNumberOfLosses()).thenReturn(7);
+		when(wildcard1_2.getTeam()).thenReturn(leagueWildcard1_2);
 		when(wildcard1_2.getNumberOfWins()).thenReturn(8);
 		when(wildcard1_2.getNumberOfLosses()).thenReturn(8);
 		
+		when(division2_1.getDivision()).thenReturn(leagueDivision2_1);
 		when(division2_1.getDivisionWinner()).thenReturn(divisionWinner2_1);
 		when(division2_1.getDivisionCellar()).thenReturn(divisionCellar2_1);
+		when(division2_2.getDivision()).thenReturn(leagueDivision2_2);
 		when(division2_2.getDivisionWinner()).thenReturn(divisionWinner2_2);
 		when(division2_2.getDivisionCellar()).thenReturn(divisionCellar2_2);
+		when(division2_3.getDivision()).thenReturn(leagueDivision2_3);
 		when(division2_3.getDivisionWinner()).thenReturn(divisionWinner2_3);
 		when(division2_3.getDivisionCellar()).thenReturn(divisionCellar2_3);
 		
@@ -198,11 +262,33 @@ public class NFLManySeasonSimulatorTest {
 		when(bottomTeam1.getNumberOfLosses()).thenReturn(14);
 		when(bottomTeam2.getNumberOfWins()).thenReturn(2);
 		when(bottomTeam2.getNumberOfLosses()).thenReturn(14);
+		
+		when(playoffs.createPlayoffTeam(leagueDivisionWinner1_1)).thenReturn(
+				playoffDivisionWinner1_1);
+		when(playoffs.createPlayoffTeam(leagueWildcard1_2)).thenReturn(
+				playoffWildcard1_2);
+		when(playoffs.getPlayoffVersionOfSeasonTeam(divisionWinner1_1)).thenReturn(mockPlayoffTeam);
+		when(playoffs.getPlayoffVersionOfSeasonTeam(divisionWinner1_2)).thenReturn(mockPlayoffTeam);
+		when(playoffs.getPlayoffVersionOfSeasonTeam(divisionWinner1_3)).thenReturn(mockPlayoffTeam);
+		when(playoffs.getPlayoffVersionOfSeasonTeam(wildcard1_1)).thenReturn(mockPlayoffTeam);
+		when(playoffs.getPlayoffVersionOfSeasonTeam(wildcard1_2)).thenReturn(mockPlayoffTeam);
+		when(playoffs.getPlayoffVersionOfSeasonTeam(divisionWinner2_1)).thenReturn(mockPlayoffTeam);
+		when(playoffs.getPlayoffVersionOfSeasonTeam(divisionWinner2_2)).thenReturn(mockPlayoffTeam);
+		when(playoffs.getPlayoffVersionOfSeasonTeam(divisionWinner2_3)).thenReturn(mockPlayoffTeam);
+		when(playoffs.getPlayoffVersionOfSeasonTeam(wildcard2_1)).thenReturn(mockPlayoffTeam);
+		when(playoffs.getPlayoffVersionOfSeasonTeam(wildcard2_2)).thenReturn(mockPlayoffTeam);
 	}
 	
 	@Test
 	public void simulatorSimulatesOneSeasonAndPutsResultsOnTeams() {
-		simulator.simulateOneSeason(tiebreaker);
+		when(playoffs.getPlayoffVersionOfSeasonTeam(divisionWinner1_1)).thenReturn(
+				playoffDivisionWinner1_1);
+		when(playoffDivisionWinner1_1.getChanceOfWinningSuperBowl()).thenReturn(11);
+		when(playoffDivisionWinner1_1.getChanceOfMakingSuperBowl()).thenReturn(22);
+		when(playoffDivisionWinner1_1.getChanceOfMakingConferenceRound()).thenReturn(33);
+		when(playoffDivisionWinner1_1.getChanceOfMakingDivisionalRound()).thenReturn(44);
+		
+		simulator.simulateOneSeason(tiebreaker, playoffs);
 		
 		verify(season).clearSimulatedResults();
 		verify(season).simulateSeason();
@@ -216,6 +302,17 @@ public class NFLManySeasonSimulatorTest {
 		verify(wildcard1_1).addSimulatedLosses(7);
 		verify(divisionWinner2_1).addSimulatedWins(9);
 		verify(divisionWinner2_1).addSimulatedLosses(7);
+		
+		verify(divisionWinner1_1).addToChanceToWinSuperBowl(11);
+		verify(divisionWinner1_1).addToChanceToWinConference(22);
+		verify(divisionWinner1_1).addToChanceToMakeConferenceRound(33);
+		verify(divisionWinner1_1).addToChanceToMakeDivisionalRound(44);
+		
+		verify(playoffs).clearPlayoffTeams();
+		verify(playoffs).createPlayoffTeam(leagueDivisionWinner1_1);
+		verify(playoffs).setDivisionWinner(conference1Name, division1_1Name, playoffDivisionWinner1_1);
+		verify(playoffs).addWildcardTeam(conference1Name, playoffWildcard1_2);
+		verify(playoffs).calculateChancesByRoundForAllPlayoffTeams();
 	}
 	
 	@Test
@@ -230,7 +327,7 @@ public class NFLManySeasonSimulatorTest {
 	
 	@Test
 	public void simulatorSimulatesSeveralSeasons() {
-		simulator.simulateManySeasons(tiebreaker, 100);
+		simulator.simulateManySeasons(tiebreaker, playoffs, 100);
 		
 		verify(season, times(100)).clearSimulatedResults();
 		verify(season, times(100)).simulateSeason();

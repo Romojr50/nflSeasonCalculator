@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
 import nfl.season.league.Team;
+import nfl.season.playoffs.NFLPlayoffs;
 import nfl.season.scorestrip.ScoreStripMapper;
 import nfl.season.scorestrip.ScoreStripReader;
 import nfl.season.season.NFLManySeasonSimulator;
@@ -76,6 +77,9 @@ public class SeasonMenuTest {
 	private NFLManySeasonSimulator simulator;
 	
 	@Mock
+	private NFLPlayoffs playoffs;
+	
+	@Mock
 	private SeasonWeek week1;
 	
 	@Mock
@@ -122,7 +126,8 @@ public class SeasonMenuTest {
 		when(seasonTeam.getSimulatedResults(NFLSeason.MANY_SEASONS_NUMBER)).thenReturn(
 				simulationString);
 		
-		seasonMenu = new SeasonMenu(input, season, scoreStripReader, scoreStripMapper);
+		seasonMenu = new SeasonMenu(input, season, playoffs, 
+				scoreStripReader, scoreStripMapper);
 	}
 	
 	@Test
@@ -251,7 +256,8 @@ public class SeasonMenuTest {
 		seasonMenu.launchSubMenu();
 		
 		verify(simulator).clearSimulations();
-		verify(simulator).simulateManySeasons(tiebreaker, NFLSeason.MANY_SEASONS_NUMBER);
+		verify(simulator).simulateManySeasons(tiebreaker, playoffs, 
+				NFLSeason.MANY_SEASONS_NUMBER);
 		verify(input, times(1)).printMessage("Simulating " + 
 				NFLSeason.MANY_SEASONS_NUMBER + " Seasons...");
 	}
@@ -266,7 +272,8 @@ public class SeasonMenuTest {
 		seasonMenu.launchSubMenu();
 		
 		verify(simulator, never()).clearSimulations();
-		verify(simulator, never()).simulateManySeasons(tiebreaker, NFLSeason.MANY_SEASONS_NUMBER);
+		verify(simulator, never()).simulateManySeasons(tiebreaker, playoffs,
+				NFLSeason.MANY_SEASONS_NUMBER);
 		verify(input, never()).printMessage("Simulating " + 
 				NFLSeason.MANY_SEASONS_NUMBER + " Seasons...");
 		verify(input).askForInt("Season not loaded yet; Please load season\n" + 

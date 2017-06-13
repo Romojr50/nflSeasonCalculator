@@ -2,6 +2,12 @@ package nfl.season.season;
 
 import java.util.List;
 
+import nfl.season.league.Conference;
+import nfl.season.league.Division;
+import nfl.season.league.Team;
+import nfl.season.playoffs.NFLPlayoffTeam;
+import nfl.season.playoffs.NFLPlayoffs;
+
 public class NFLManySeasonSimulator {
 
 	private NFLSeason season;
@@ -10,8 +16,9 @@ public class NFLManySeasonSimulator {
 		this.season = season;
 	}
 
-	public void simulateOneSeason(NFLTiebreaker tiebreaker) {
+	public void simulateOneSeason(NFLTiebreaker tiebreaker, NFLPlayoffs playoffs) {
 		season.clearSimulatedResults();
+		playoffs.clearPlayoffTeams();
 		season.simulateSeason();
 		
 		season.compileLeagueResults(tiebreaker);
@@ -23,7 +30,7 @@ public class NFLManySeasonSimulator {
 		
 		List<NFLSeasonConference> conferences = season.getConferences();
 		for (NFLSeasonConference conference : conferences) {
-			tallyPlayoffTeams(conference);
+			tallyPlayoffTeams(conference, playoffs);
 			
 			List<NFLSeasonTeam> conferenceTeams = conference.getTeams();
 			for (NFLSeasonTeam conferenceTeam : conferenceTeams) {
@@ -38,11 +45,14 @@ public class NFLManySeasonSimulator {
 			
 			tallyDivisionTopAndBottom(conference);
 		}
+		
+		tallyPlayoffResults(playoffs);
 	}
 
-	public void simulateManySeasons(NFLTiebreaker tiebreaker, int numberOfSeasons) {
+	public void simulateManySeasons(NFLTiebreaker tiebreaker, NFLPlayoffs playoffs,
+			int numberOfSeasons) {
 		for (int i = 0; i < numberOfSeasons; i++) {
-			simulateOneSeason(tiebreaker);
+			simulateOneSeason(tiebreaker, playoffs);
 		}
 	}
 	
@@ -68,7 +78,7 @@ public class NFLManySeasonSimulator {
 		}
 	}
 	
-	private void tallyPlayoffTeams(NFLSeasonConference conference) {
+	private void tallyPlayoffTeams(NFLSeasonConference conference, NFLPlayoffs playoffs) {
 		List<NFLSeasonTeam> seeds = conference.getSeedsInOrder();
 		for (int seed = 1; seed <= seeds.size(); seed++) {
 			NFLSeasonTeam seedTeam = seeds.get(seed - 1);
@@ -80,7 +90,10 @@ public class NFLManySeasonSimulator {
 			if (seed <= 2) {
 				seedTeam.addGotRoundOneBye();
 			}
+			
 		}
+		
+		addTeamsToNFLPlayoffs(conference, playoffs, seeds);
 	}
 
 	private boolean hadAWinningRecord(NFLSeasonTeam team) {
@@ -90,4 +103,45 @@ public class NFLManySeasonSimulator {
 		return (winPercent > 0.5);
 	}
 
+	private void tallyPlayoffResults(NFLPlayoffs playoffs) {
+		playoffs.calculateChancesByRoundForAllPlayoffTeams();
+		
+		List<NFLSeasonConference> conferences = season.getConferences();
+		for (NFLSeasonConference conference : conferences) {
+			List<NFLSeasonTeam> seeds = conference.getSeedsInOrder();
+			for (NFLSeasonTeam seed : seeds) {
+				NFLPlayoffTeam playoffSeed = playoffs.getPlayoffVersionOfSeasonTeam(seed);
+				seed.addToChanceToWinSuperBowl(playoffSeed.getChanceOfWinningSuperBowl());
+				seed.addToChanceToWinConference(playoffSeed.getChanceOfMakingSuperBowl());
+				seed.addToChanceToMakeConferenceRound(
+						playoffSeed.getChanceOfMakingConferenceRound());
+				seed.addToChanceToMakeDivisionalRound(
+						playoffSeed.getChanceOfMakingDivisionalRound());;
+			}
+		}
+	}
+	
+	private void addTeamsToNFLPlayoffs(NFLSeasonConference conference,
+			NFLPlayoffs playoffs, List<NFLSeasonTeam> seeds) {
+		Conference leagueConference = conference.getConference();
+		String conferenceName = leagueConference.getName();
+		List<NFLSeasonDivision> divisions = conference.getDivisions();
+		for (NFLSeasonDivision division : divisions) {
+			Division leagueDivision = division.getDivision();
+			String divisionName = leagueDivision.getName();
+			
+			NFLSeasonTeam divisionWinner = division.getDivisionWinner();
+			Team leagueDivisionWinner = divisionWinner.getTeam();
+			NFLPlayoffTeam playoffDivisionWinner = playoffs.createPlayoffTeam(leagueDivisionWinner);
+			playoffs.setDivisionWinner(conferenceName, divisionName, playoffDivisionWinner);
+		}
+		
+		for (int seed = 5; seed <= seeds.size(); seed++) {
+			NFLSeasonTeam wildcard = seeds.get(seed - 1);
+			Team leagueWildcard = wildcard.getTeam();
+			NFLPlayoffTeam playoffWildcard = playoffs.createPlayoffTeam(leagueWildcard);
+			playoffs.addWildcardTeam(conferenceName, playoffWildcard);
+		}
+	}
+	
 }

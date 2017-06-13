@@ -18,6 +18,7 @@ import nfl.season.league.Game;
 import nfl.season.league.League;
 import nfl.season.league.Matchup;
 import nfl.season.league.Team;
+import nfl.season.season.NFLSeasonTeam;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +27,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
+public class NFLPlayoffsTest extends TestWithMockPlayoffObjects {
 
 	@Mock
 	private League nfl;
@@ -103,6 +104,9 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 	
 	private List<Division> conference2Divisions;
 	
+	@Mock
+	private NFLSeasonTeam seasonTeam1;
+	
 	private NFLPlayoffs playoffs;
 	
 	@Before
@@ -132,6 +136,8 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		when(division2_2.getName()).thenReturn(division2_2Name);
 		
 		setUpTeams();
+		
+		when(seasonTeam1.getTeam()).thenReturn(leagueTeam1);
 		
 		super.setUpMockObjects();
 	}
@@ -619,6 +625,15 @@ public class NFLPlayoffTest extends TestWithMockPlayoffObjects {
 		boolean success = playoffs.calculateChancesByRoundForAllPlayoffTeams();
 		
 		assertFalse(success);
+	}
+	
+	@Test
+	public void getPlayoffVersionOfSeasonTeamReturnsPlayoffTeamWithSameName() {
+		playoffs.initializeNFLPlayoffs();
+		playoffs.setDivisionWinner(conference1Name, division1_1Name, playoffTeam1);
+		NFLPlayoffTeam returnTeam = playoffs.getPlayoffVersionOfSeasonTeam(seasonTeam1);
+		
+		assertEquals(playoffTeam1, returnTeam);
 	}
 
 	private void assertGameListHasCorrectMatchupsAndHomeTeams(

@@ -177,6 +177,10 @@ public class NFLSeasonTeamTest {
 		int chanceToHaveWinningSeason = (int) Math.round(seasonTeam.getHadWinningSeason() / 1000.0 * 100.0);
 		int chanceToBeInCellar = (int) Math.round(seasonTeam.getWasInDivisionCellar() / 1000.0 * 100.0);
 		int chanceToBeBottomTeam = (int) Math.round(seasonTeam.getWasBottomTeam() / 1000.0 * 100.0);
+		int chanceToWinSuperBowl = (int) Math.round(seasonTeam.getChanceToWinSuperBowl() / 1000.0);
+		int chanceToWinConference = (int) Math.round(seasonTeam.getChanceToWinConference() / 1000.0);
+		int chanceToMakeConferenceRound = (int) Math.round(seasonTeam.getChanceToMakeConferenceRound() / 1000.0);
+		int chanceToMakeDivisionalRound = (int) Math.round(seasonTeam.getChanceToMakeDivisionalRound() / 1000.0);
 		
 		StringBuilder resultsBuilder = new StringBuilder();
 		resultsBuilder.append("Average Wins: ");
@@ -184,6 +188,10 @@ public class NFLSeasonTeamTest {
 		resultsBuilder.append("Average Losses: ");
 		resultsBuilder.append(averageLosses + "\n");
 		resultsBuilder.append("Percent Chance to...\n");
+		resultsBuilder.append("Win Super Bowl: " + chanceToWinSuperBowl + "\n");
+		resultsBuilder.append("Win Conference: " + chanceToWinConference + "\n");
+		resultsBuilder.append("Get to Conference Round: " + chanceToMakeConferenceRound + "\n");
+		resultsBuilder.append("Get to Divisional Round: " + chanceToMakeDivisionalRound + "\n");
 		resultsBuilder.append("Win One Seed: " + chanceToGetOneSeed + "\n");
 		resultsBuilder.append("Get Round One Bye: " + chanceToGetRoundOneBye + "\n");
 		resultsBuilder.append("Win Division: " + chanceToWinDivision + "\n");
@@ -192,7 +200,10 @@ public class NFLSeasonTeamTest {
 		resultsBuilder.append("Be in Division Cellar: " + chanceToBeInCellar + "\n");
 		resultsBuilder.append("Be in League Bottom 5: " + chanceToBeBottomTeam + "\n");
 		
-		assertEquals(resultsBuilder.toString(), simulatedResults);
+		String expectedResults = resultsBuilder.toString();
+		expectedResults = expectedResults.replace(" 0", " < 1");
+		
+		assertEquals(expectedResults, simulatedResults);
 	}
 	
 	@Test

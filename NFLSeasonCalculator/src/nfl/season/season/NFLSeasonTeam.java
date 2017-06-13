@@ -50,6 +50,14 @@ public class NFLSeasonTeam {
 	
 	private int wasBottomTeam;
 	
+	private int chanceToWinSuperBowl;
+	
+	private int chanceToWinConference;
+	
+	private int chanceToMakeConferenceRound;
+	
+	private int chanceToMakeDivisionalRound;
+	
 	private int simulatedWins;
 	
 	private int simulatedLosses;
@@ -259,6 +267,38 @@ public class NFLSeasonTeam {
 	public int getWasBottomTeam() {
 		return wasBottomTeam;
 	}
+	
+	public void addToChanceToWinSuperBowl(int chanceToWinSuperBowl) {
+		this.chanceToWinSuperBowl += chanceToWinSuperBowl;
+	}
+	
+	public int getChanceToWinSuperBowl() {
+		return chanceToWinSuperBowl;
+	}
+
+	public void addToChanceToWinConference(int chanceToWinConference) {
+		this.chanceToWinConference += chanceToWinConference;
+	}
+	
+	public int getChanceToWinConference() {
+		return chanceToWinConference;
+	}
+
+	public void addToChanceToMakeConferenceRound(int chanceToMakeConferenceRound) {
+		this.chanceToMakeConferenceRound += chanceToMakeConferenceRound;
+	}
+	
+	public int getChanceToMakeConferenceRound() {
+		return chanceToMakeConferenceRound;
+	}
+
+	public void addToChanceToMakeDivisionalRound(int chanceToMakeDivisionalRound) {
+		this.chanceToMakeDivisionalRound += chanceToMakeDivisionalRound;
+	}
+	
+	public int getChanceToMakeDivisionalRound() {
+		return chanceToMakeDivisionalRound;
+	}
 
 	public void addSimulatedWins(int simulatedWins) {
 		this.simulatedWins += simulatedWins;
@@ -301,6 +341,10 @@ public class NFLSeasonTeam {
 			int chanceToHaveWinningSeason = (int) Math.round(hadWinningSeason / numberOfSimulatedSeasonsDouble * 100.0);
 			int chanceToBeInCellar = (int) Math.round(wasInDivisionCellar / numberOfSimulatedSeasonsDouble * 100.0);
 			int chanceToBeBottomTeam = (int) Math.round(wasBottomTeam / numberOfSimulatedSeasonsDouble * 100.0);
+			int chanceToWinSuperBowlPercent = (int) Math.round(chanceToWinSuperBowl / numberOfSimulatedSeasonsDouble);
+			int chanceToWinConferencePercent = (int) Math.round(chanceToWinConference / numberOfSimulatedSeasonsDouble);
+			int chanceToMakeConferenceRoundPercent = (int) Math.round(chanceToMakeConferenceRound / numberOfSimulatedSeasonsDouble);
+			int chanceToMakeDivisionalRoundPercent = (int) Math.round(chanceToMakeDivisionalRound / numberOfSimulatedSeasonsDouble);
 			
 			StringBuilder resultsBuilder = new StringBuilder();
 			resultsBuilder.append("Average Wins: ");
@@ -308,6 +352,10 @@ public class NFLSeasonTeam {
 			resultsBuilder.append("Average Losses: ");
 			resultsBuilder.append(averageLosses + "\n");
 			resultsBuilder.append("Percent Chance to...\n");
+			resultsBuilder.append("Win Super Bowl: " + chanceToWinSuperBowlPercent + "\n");
+			resultsBuilder.append("Win Conference: " + chanceToWinConferencePercent + "\n");
+			resultsBuilder.append("Get to Conference Round: " + chanceToMakeConferenceRoundPercent + "\n");
+			resultsBuilder.append("Get to Divisional Round: " + chanceToMakeDivisionalRoundPercent + "\n");
 			resultsBuilder.append("Win One Seed: " + chanceToGetOneSeed + "\n");
 			resultsBuilder.append("Get Round One Bye: " + chanceToGetRoundOneBye + "\n");
 			resultsBuilder.append("Win Division: " + chanceToWinDivision + "\n");
@@ -317,6 +365,7 @@ public class NFLSeasonTeam {
 			resultsBuilder.append("Be in League Bottom 5: " + chanceToBeBottomTeam + "\n");
 			
 			simulatedResults = resultsBuilder.toString();
+			simulatedResults = simulatedResults.replace(" 0", " < 1");
 		} else {
 			simulatedResults = "No simulations done yet; please run the Many Seasons Simulation\n";
 		}

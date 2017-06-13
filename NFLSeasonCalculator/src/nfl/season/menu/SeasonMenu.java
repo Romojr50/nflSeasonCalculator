@@ -4,6 +4,7 @@ import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
 import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
+import nfl.season.playoffs.NFLPlayoffs;
 import nfl.season.scorestrip.ScoreStripMapper;
 import nfl.season.scorestrip.ScoreStripReader;
 import nfl.season.season.NFLManySeasonSimulator;
@@ -48,14 +49,18 @@ public class SeasonMenu extends SubMenu {
 	
 	private NFLSeason season;
 	
+	private NFLPlayoffs playoffs;
+	
 	private ScoreStripReader scoreStripReader;
 	
 	private ScoreStripMapper scoreStripMapper;
 	
 	public SeasonMenu(NFLSeasonInput input, NFLSeason season, 
-			ScoreStripReader scoreStripReader, ScoreStripMapper scoreStripMapper) {
+			NFLPlayoffs playoffs, ScoreStripReader scoreStripReader, 
+			ScoreStripMapper scoreStripMapper) {
 		this.input = input;
 		this.season = season;
+		this.playoffs = playoffs;
 		this.scoreStripReader = scoreStripReader;
 		this.scoreStripMapper = scoreStripMapper;
 	}
@@ -149,7 +154,7 @@ public class SeasonMenu extends SubMenu {
 					" Seasons...");
 			NFLManySeasonSimulator simulator = season.createManySeasonsSimulator();
 			simulator.clearSimulations();
-			simulator.simulateManySeasons(tiebreaker, NFLSeason.MANY_SEASONS_NUMBER);
+			simulator.simulateManySeasons(tiebreaker, playoffs, NFLSeason.MANY_SEASONS_NUMBER);
 		} else {
 			seasonMenuPrefix = "Season not loaded yet; Please load season\n";
 		}
