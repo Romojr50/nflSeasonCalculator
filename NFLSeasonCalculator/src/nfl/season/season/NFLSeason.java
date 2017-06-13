@@ -17,6 +17,8 @@ public class NFLSeason {
 
 	public static final int NUMBER_OF_WEEKS_IN_SEASON = 17;
 
+	public static final int MANY_SEASONS_NUMBER = 10000;
+
 	private League league;
 	
 	private List<NFLSeasonConference> conferences;
@@ -165,7 +167,7 @@ public class NFLSeason {
 	}
 
 	public String getWeekString(SeasonWeek week) {
-		String weekString = "This week is empty or null; please load the season";
+		String weekString = "This week is empty or null; please load the season\n";
 		
 		if (week != null) {
 			StringBuilder weekStringBuilder = new StringBuilder();
@@ -197,6 +199,13 @@ public class NFLSeason {
 			}
 		}
 	}
+	
+	public void compileLeagueResults(NFLTiebreaker tiebreaker) {
+		for (NFLSeasonConference seasonConference : conferences) {
+			seasonConference.compileConferenceResults(tiebreaker);
+		}
+		setBottomTeams(tiebreaker);
+	}
 
 	public String getLeagueStandings(NFLTiebreaker tiebreaker) {
 		StringBuilder standingsBuilder = new StringBuilder();
@@ -221,6 +230,10 @@ public class NFLSeason {
 
 	public NFLTiebreaker createNFLTiebreaker() {
 		return new NFLTiebreaker(this);
+	}
+	
+	public NFLManySeasonSimulator createManySeasonsSimulator() {
+		return new NFLManySeasonSimulator(this);
 	}
 
 	public void simulateSeason() {

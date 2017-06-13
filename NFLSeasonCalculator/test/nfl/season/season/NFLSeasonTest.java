@@ -421,7 +421,7 @@ public class NFLSeasonTest {
 		
 		String weekString = season.getWeekString(null);
 		
-		assertEquals("This week is empty or null; please load the season", weekString);
+		assertEquals("This week is empty or null; please load the season\n", weekString);
 	}
 	
 	@SuppressWarnings("unchecked")

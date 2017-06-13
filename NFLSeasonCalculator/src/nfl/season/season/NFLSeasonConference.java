@@ -72,6 +72,13 @@ public class NFLSeasonConference {
 			nonDivisionWinners.remove(nextSeed);
 		}
 	}
+	
+	public void compileConferenceResults(NFLTiebreaker tiebreaker) {
+		for (NFLSeasonDivision division : divisions) {
+			division.setTeamsInOrder(tiebreaker);
+		}
+		setSeedsInOrder(tiebreaker);
+	}
 
 	public String getConferenceStandingsString(NFLTiebreaker tiebreaker) {
 		StringBuilder standingsBuilder = new StringBuilder();

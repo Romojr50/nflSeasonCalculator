@@ -36,6 +36,32 @@ public class NFLSeasonTeam {
 	
 	private int numberOfDivisionTies;
 	
+	private int gotOneSeed;
+	
+	private int gotRoundOneBye;
+	
+	private int wonDivision;
+	
+	private int madePlayoffs;
+	
+	private int hadWinningSeason;
+	
+	private int wasInDivisionCellar;
+	
+	private int wasBottomTeam;
+	
+	private int chanceToWinSuperBowl;
+	
+	private int chanceToWinConference;
+	
+	private int chanceToMakeConferenceRound;
+	
+	private int chanceToMakeDivisionalRound;
+	
+	private int simulatedWins;
+	
+	private int simulatedLosses;
+	
 	public NFLSeasonTeam(Team leagueTeam) {
 		this.leagueTeam = leagueTeam;
 		seasonGames = new SeasonGame[NFLSeason.NUMBER_OF_WEEKS_IN_SEASON];
@@ -186,6 +212,167 @@ public class NFLSeasonTeam {
 		}
 	}
 	
+	public void addGotOneSeed() {
+		gotOneSeed++;
+	}
+	
+	public int getGotOneSeed() {
+		return gotOneSeed;
+	}
+
+	public void addGotRoundOneBye() {
+		gotRoundOneBye++;
+	}
+	
+	public int getGotRoundOneBye() {
+		return gotRoundOneBye;
+	}
+
+	public void addWonDivision() {
+		wonDivision++;
+	}
+	
+	public int getWonDivision() {
+		return wonDivision;
+	}
+
+	public void addMadePlayoffs() {
+		madePlayoffs++;
+	}
+	
+	public int getMadePlayoffs() {
+		return madePlayoffs;
+	}
+
+	public void addHadWinningSeason() {
+		hadWinningSeason++;
+	}
+	
+	public int getHadWinningSeason() {
+		return hadWinningSeason;
+	}
+	
+	public void addWasInDivisionCellar() {
+		wasInDivisionCellar++;
+	}
+	
+	public int getWasInDivisionCellar() {
+		return wasInDivisionCellar;
+	}
+
+	public void addWasBottomTeam() {
+		wasBottomTeam++;
+	}
+	
+	public int getWasBottomTeam() {
+		return wasBottomTeam;
+	}
+	
+	public void addToChanceToWinSuperBowl(int chanceToWinSuperBowl) {
+		this.chanceToWinSuperBowl += chanceToWinSuperBowl;
+	}
+	
+	public int getChanceToWinSuperBowl() {
+		return chanceToWinSuperBowl;
+	}
+
+	public void addToChanceToWinConference(int chanceToWinConference) {
+		this.chanceToWinConference += chanceToWinConference;
+	}
+	
+	public int getChanceToWinConference() {
+		return chanceToWinConference;
+	}
+
+	public void addToChanceToMakeConferenceRound(int chanceToMakeConferenceRound) {
+		this.chanceToMakeConferenceRound += chanceToMakeConferenceRound;
+	}
+	
+	public int getChanceToMakeConferenceRound() {
+		return chanceToMakeConferenceRound;
+	}
+
+	public void addToChanceToMakeDivisionalRound(int chanceToMakeDivisionalRound) {
+		this.chanceToMakeDivisionalRound += chanceToMakeDivisionalRound;
+	}
+	
+	public int getChanceToMakeDivisionalRound() {
+		return chanceToMakeDivisionalRound;
+	}
+
+	public void addSimulatedWins(int simulatedWins) {
+		this.simulatedWins += simulatedWins;
+	}
+
+	public int getSimulatedWins() {
+		return simulatedWins;
+	}
+
+	public void addSimulatedLosses(int simulatedLosses) {
+		this.simulatedLosses += simulatedLosses;
+	}
+	
+	public int getSimulatedLosses() {
+		return simulatedLosses;
+	}
+
+	public void clearSimulatedResults() {
+		gotOneSeed = 0;
+		gotRoundOneBye = 0;
+		wonDivision = 0;
+		madePlayoffs = 0;
+		hadWinningSeason = 0;
+		wasInDivisionCellar = 0;
+		wasBottomTeam = 0;
+	}
+
+	public String getSimulatedResults(int numberOfSimulatedSeasons) {
+		String simulatedResults = "";
+		
+		if (gotOneSeed > 0 || gotRoundOneBye > 0 || wonDivision > 0 || madePlayoffs > 0 || hadWinningSeason > 0 || wasInDivisionCellar > 0 || wasBottomTeam > 0) {
+			double numberOfSimulatedSeasonsDouble = numberOfSimulatedSeasons * 1.0;
+			
+			int averageWins = (int) Math.round(simulatedWins / numberOfSimulatedSeasonsDouble);
+			int averageLosses = (int) Math.round(simulatedLosses / numberOfSimulatedSeasonsDouble);
+			int chanceToGetOneSeed = (int) Math.round(gotOneSeed / numberOfSimulatedSeasonsDouble * 100.0);
+			int chanceToGetRoundOneBye = (int) Math.round(gotRoundOneBye / numberOfSimulatedSeasonsDouble * 100.0);
+			int chanceToWinDivision = (int) Math.round(wonDivision / numberOfSimulatedSeasonsDouble * 100.0);
+			int chanceToMakePlayoffs = (int) Math.round(madePlayoffs / numberOfSimulatedSeasonsDouble * 100.0);
+			int chanceToHaveWinningSeason = (int) Math.round(hadWinningSeason / numberOfSimulatedSeasonsDouble * 100.0);
+			int chanceToBeInCellar = (int) Math.round(wasInDivisionCellar / numberOfSimulatedSeasonsDouble * 100.0);
+			int chanceToBeBottomTeam = (int) Math.round(wasBottomTeam / numberOfSimulatedSeasonsDouble * 100.0);
+			int chanceToWinSuperBowlPercent = (int) Math.round(chanceToWinSuperBowl / numberOfSimulatedSeasonsDouble);
+			int chanceToWinConferencePercent = (int) Math.round(chanceToWinConference / numberOfSimulatedSeasonsDouble);
+			int chanceToMakeConferenceRoundPercent = (int) Math.round(chanceToMakeConferenceRound / numberOfSimulatedSeasonsDouble);
+			int chanceToMakeDivisionalRoundPercent = (int) Math.round(chanceToMakeDivisionalRound / numberOfSimulatedSeasonsDouble);
+			
+			StringBuilder resultsBuilder = new StringBuilder();
+			resultsBuilder.append("Average Wins: ");
+			resultsBuilder.append(averageWins + "\n");
+			resultsBuilder.append("Average Losses: ");
+			resultsBuilder.append(averageLosses + "\n");
+			resultsBuilder.append("Percent Chance to...\n");
+			resultsBuilder.append("Win Super Bowl: " + chanceToWinSuperBowlPercent + "\n");
+			resultsBuilder.append("Win Conference: " + chanceToWinConferencePercent + "\n");
+			resultsBuilder.append("Get to Conference Round: " + chanceToMakeConferenceRoundPercent + "\n");
+			resultsBuilder.append("Get to Divisional Round: " + chanceToMakeDivisionalRoundPercent + "\n");
+			resultsBuilder.append("Win One Seed: " + chanceToGetOneSeed + "\n");
+			resultsBuilder.append("Get Round One Bye: " + chanceToGetRoundOneBye + "\n");
+			resultsBuilder.append("Win Division: " + chanceToWinDivision + "\n");
+			resultsBuilder.append("Make Playoffs: " + chanceToMakePlayoffs + "\n");
+			resultsBuilder.append("Have Winning Season: " + chanceToHaveWinningSeason + "\n");
+			resultsBuilder.append("Be in Division Cellar: " + chanceToBeInCellar + "\n");
+			resultsBuilder.append("Be in League Bottom 5: " + chanceToBeBottomTeam + "\n");
+			
+			simulatedResults = resultsBuilder.toString();
+			simulatedResults = simulatedResults.replace(" 0", " < 1");
+		} else {
+			simulatedResults = "No simulations done yet; please run the Many Seasons Simulation\n";
+		}
+		
+		return simulatedResults;
+	}
+	
 	private void tallyWin(SeasonGame seasonGame, String opponentName) {
 		numberOfWins++;
 		winsAgainst.add(opponentName);
@@ -280,5 +467,5 @@ public class NFLSeasonTeam {
 		lossesAgainst = new ArrayList<String>();
 		tiesAgainst = new ArrayList<String>();
 	}
-	
+
 }

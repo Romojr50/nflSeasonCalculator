@@ -2,14 +2,17 @@ package nfl.season.menu;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
 import nfl.season.league.Team;
+import nfl.season.playoffs.NFLPlayoffs;
 import nfl.season.scorestrip.ScoreStripMapper;
 import nfl.season.scorestrip.ScoreStripReader;
+import nfl.season.season.NFLManySeasonSimulator;
 import nfl.season.season.NFLSeason;
 import nfl.season.season.NFLSeasonTeam;
 import nfl.season.season.NFLTiebreaker;
@@ -36,7 +39,11 @@ public class SeasonMenuTest {
 	
 	private static final int CLEAR_SIMULATIONS = 6;
 	
-	private static final int BACK_TO_MAIN_MENU = 7;
+	private static final int SIMULATE_MANY_SEASONS = 7;
+	
+	private static final int PRINT_TEAM_SIMULATIONS = 8;
+	
+	private static final int BACK_TO_MAIN_MENU = 9;
 	
 	private String expectedMenuMessage;
 	
@@ -53,6 +60,8 @@ public class SeasonMenuTest {
 	
 	private String scheduleString = "Schedule String";
 	
+	private String simulationString = "Simulation String";
+	
 	@Mock
 	private League league;
 	
@@ -63,6 +72,12 @@ public class SeasonMenuTest {
 	
 	@Mock
 	private NFLTiebreaker tiebreaker;
+	
+	@Mock
+	private NFLManySeasonSimulator simulator;
+	
+	@Mock
+	private NFLPlayoffs playoffs;
 	
 	@Mock
 	private SeasonWeek week1;
@@ -92,7 +107,9 @@ public class SeasonMenuTest {
 				"4. Print out League Standings\n" +
 				"5. Simulate Season\n" +
 				"6. Clear Simulated Games\n" +
-				"7. Back to Main Menu";
+				"7. Simulate Many Seasons and Tally Results\n" +
+				"8. Print Out Team Simulation Results\n" +
+				"9. Back to Main Menu";
 		
 		when(season.getWeek(1)).thenReturn(week1);
 		when(season.getWeek(3)).thenReturn(week3);
@@ -101,12 +118,16 @@ public class SeasonMenuTest {
 		when(season.getTeam(teamName)).thenReturn(seasonTeam);
 		when(season.getLeague()).thenReturn(league);
 		when(season.createNFLTiebreaker()).thenReturn(tiebreaker);
+		when(season.createManySeasonsSimulator()).thenReturn(simulator);
 		when(season.getLeagueStandings(tiebreaker)).thenReturn(leagueStandings);
 		when(league.getTeam(10)).thenReturn(leagueTeam);
 		when(leagueTeam.getName()).thenReturn(teamName);
 		when(seasonTeam.getScheduleString()).thenReturn(scheduleString);
+		when(seasonTeam.getSimulatedResults(NFLSeason.MANY_SEASONS_NUMBER)).thenReturn(
+				simulationString);
 		
-		seasonMenu = new SeasonMenu(input, season, scoreStripReader, scoreStripMapper);
+		seasonMenu = new SeasonMenu(input, season, playoffs, 
+				scoreStripReader, scoreStripMapper);
 	}
 	
 	@Test
@@ -206,12 +227,69 @@ public class SeasonMenuTest {
 	}
 	
 	@Test
+	public void simulateSeasonButSeasonNotLoadedSoNoSimulationDone() {
+		when(season.getWeek(1)).thenReturn(null);
+		
+		when(input.askForInt(anyString())).thenReturn(SIMULATE_SEASON, BACK_TO_MAIN_MENU);
+		
+		seasonMenu.launchSubMenu();
+		
+		verify(season, never()).simulateSeason();
+		verify(input).askForInt("Season not loaded yet; Please load season\n" + 
+				expectedMenuMessage);
+	}
+	
+	@Test
 	public void clearSimulatedResultsCallsOnSeasonToClearSimulatedGames() {
-when(input.askForInt(anyString())).thenReturn(CLEAR_SIMULATIONS, BACK_TO_MAIN_MENU);
+		when(input.askForInt(anyString())).thenReturn(CLEAR_SIMULATIONS, BACK_TO_MAIN_MENU);
 		
 		seasonMenu.launchSubMenu();
 		
 		verify(season).clearSimulatedResults();
+	}
+	
+	@Test
+	public void simulateManySeasonsCallsOnSimulatorToSimulateManySeasons() {
+		when(input.askForInt(anyString())).thenReturn(SIMULATE_MANY_SEASONS, 
+				BACK_TO_MAIN_MENU);
+		
+		seasonMenu.launchSubMenu();
+		
+		verify(simulator).clearSimulations();
+		verify(simulator).simulateManySeasons(tiebreaker, playoffs, 
+				NFLSeason.MANY_SEASONS_NUMBER);
+		verify(input, times(1)).printMessage("Simulating " + 
+				NFLSeason.MANY_SEASONS_NUMBER + " Seasons...");
+	}
+	
+	@Test
+	public void simulateManySeasonsButSeasonNotLoadedYetSoNoSimulationsDone() {
+		when(season.getWeek(1)).thenReturn(null);
+		
+		when(input.askForInt(anyString())).thenReturn(SIMULATE_MANY_SEASONS, 
+				BACK_TO_MAIN_MENU);
+		
+		seasonMenu.launchSubMenu();
+		
+		verify(simulator, never()).clearSimulations();
+		verify(simulator, never()).simulateManySeasons(tiebreaker, playoffs,
+				NFLSeason.MANY_SEASONS_NUMBER);
+		verify(input, never()).printMessage("Simulating " + 
+				NFLSeason.MANY_SEASONS_NUMBER + " Seasons...");
+		verify(input).askForInt("Season not loaded yet; Please load season\n" + 
+				expectedMenuMessage);
+	}
+	
+	@Test
+	public void selectAndPrintOutTeamSimulatedResultsReport() {
+		when(input.askForInt(anyString())).thenReturn(PRINT_TEAM_SIMULATIONS, 10, 
+				MenuOptionsUtil.EXIT_FROM_TEAM_SELECT, BACK_TO_MAIN_MENU);
+		
+		seasonMenu.launchSubMenu();
+		
+		String teamListMessage = MenuOptionsUtil.buildTeamListMessage();
+		verify(input, times(2)).askForInt(expectedMenuMessage);
+		verify(input).askForInt(simulationString + teamListMessage);
 	}
 	
 }
