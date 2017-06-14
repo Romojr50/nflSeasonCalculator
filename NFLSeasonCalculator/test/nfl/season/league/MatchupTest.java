@@ -245,6 +245,7 @@ public class MatchupTest {
 		testHomeFieldAdvantageCalculation(10, 15);
 		testHomeFieldAdvantageCalculation(0, 35);
 		testHomeFieldAdvantageCalculation(25, 14);
+		testHomeFieldAdvantageCalculation(100, 100);
 	}
 	
 	@Test
@@ -315,8 +316,16 @@ public class MatchupTest {
 		matchup.setTeamNeutralWinChance(team1Name, team1NeutralWinChance);
 		matchup.setTeamNeutralWinChance(team2Name, team2NeutralWinChance);
 		
-		int expectedTeam1WinChance = Math.min(99, 
-				team1NeutralWinChance + Math.round(team1HomeFieldAdvantage / 2));
+		int expectedTeam1WinChance = team1NeutralWinChance + 
+				Math.round(team1HomeFieldAdvantage / 2);
+		
+		if (expectedTeam1WinChance > 99) {
+			expectedTeam1WinChance = 99;
+			int difference = expectedTeam1WinChance - team1NeutralWinChance;
+			
+			team2HomeFieldAdvantage = Math.min(team2HomeFieldAdvantage, (difference * 2));
+		}
+		
 		int expectedTeam2WinChance = 100 - expectedTeam1WinChance;
 		
 		boolean calculationSuccessful = matchup.calculateHomeWinChanceFromHomeFieldAdvantage(team1Name);
