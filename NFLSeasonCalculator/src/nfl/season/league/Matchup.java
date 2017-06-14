@@ -275,14 +275,16 @@ public class Matchup {
 			int homeFieldAdvantage = -1;
 			if (teamName.equalsIgnoreCase(team1.getName())) {
 				homeFieldAdvantage = team1.getHomeFieldAdvantage();
-				team1HomeWinChance = team1NeutralWinChance + Math.round(homeFieldAdvantage / 2);
-				team1HomeWinChance = Math.min(99, team1HomeWinChance);
+				int opponentHomeField = team2.getHomeFieldAdvantage();
+				team1HomeWinChance = calculateHomeTeamWinChance(homeFieldAdvantage, 
+						team1NeutralWinChance, opponentHomeField, team2NeutralWinChance);
 				team2AwayWinChance = 100 - team1HomeWinChance;
 				team1HomeWinChanceMode = HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE;
 			} else if (teamName.equalsIgnoreCase(team2.getName())) {
 				homeFieldAdvantage = team2.getHomeFieldAdvantage();
-				team2HomeWinChance = team2NeutralWinChance + Math.round(homeFieldAdvantage / 2);
-				team2HomeWinChance = Math.min(99, team2HomeWinChance);
+				int opponentHomeField = team1.getHomeFieldAdvantage();
+				team2HomeWinChance = calculateHomeTeamWinChance(homeFieldAdvantage, 
+						team2NeutralWinChance, opponentHomeField, team1NeutralWinChance);
 				team1AwayWinChance = 100 - team2HomeWinChance;
 				team2HomeWinChanceMode = HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE;
 			}
@@ -335,6 +337,22 @@ public class Matchup {
 				(rankingDifferenceComparedTo24Difference * WIN_CHANCE_DIFFERENCE_BY_SPOT));
 		betterWinChance = Math.min(99, betterWinChance);
 		return betterWinChance;
+	}
+
+	private int calculateHomeTeamWinChance(int homeFieldAdvantage, int neutralWinChance,
+			int opponentHomeField, int opponentNeutralWinChance) {
+		int effectiveHomeField = homeFieldAdvantage;
+		int opponentHomeTeamWinChance = opponentNeutralWinChance + 
+				Math.round(opponentHomeField / 2);
+		if (opponentHomeTeamWinChance > 99) {
+			int difference = 99 - opponentNeutralWinChance;
+			effectiveHomeField = Math.min(homeFieldAdvantage, difference * 2);
+		}
+		
+		int homeTeamWinChance = neutralWinChance + Math.round(effectiveHomeField / 2);
+		homeTeamWinChance = Math.min(99, homeTeamWinChance);
+		
+		return homeTeamWinChance;
 	}
 
 }
