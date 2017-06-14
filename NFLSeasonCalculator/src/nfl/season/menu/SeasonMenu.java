@@ -1,5 +1,10 @@
 package nfl.season.menu;
 
+import java.io.IOException;
+
+import nfl.season.input.NFLFileReaderFactory;
+import nfl.season.input.NFLFileWriterFactory;
+import nfl.season.input.NFLRegularSeasonSave;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
 import nfl.season.league.NFLTeamEnum;
@@ -55,14 +60,24 @@ public class SeasonMenu extends SubMenu {
 	
 	private ScoreStripMapper scoreStripMapper;
 	
+	private NFLRegularSeasonSave seasonSave;
+	
+	private NFLFileWriterFactory fileWriterFactory;
+	
+	private NFLFileReaderFactory fileReaderFactory;
+	
 	public SeasonMenu(NFLSeasonInput input, NFLSeason season, 
 			NFLPlayoffs playoffs, ScoreStripReader scoreStripReader, 
-			ScoreStripMapper scoreStripMapper) {
+			ScoreStripMapper scoreStripMapper, NFLRegularSeasonSave seasonSave, 
+			NFLFileWriterFactory fileWriterFactory, NFLFileReaderFactory fileReaderFactory) {
 		this.input = input;
 		this.season = season;
 		this.playoffs = playoffs;
 		this.scoreStripReader = scoreStripReader;
 		this.scoreStripMapper = scoreStripMapper;
+		this.seasonSave = seasonSave;
+		this.fileWriterFactory = fileWriterFactory;
+		this.fileReaderFactory = fileReaderFactory;
 	}
 	
 	@Override
@@ -79,8 +94,7 @@ public class SeasonMenu extends SubMenu {
 			seasonMenuPrefix = "";
 			
 			if (SeasonMenuOptions.LOAD_SEASON.optionNumber == selectedOption) {
-				input.printMessage("Loading season...");
-				season.loadSeason(scoreStripReader, scoreStripMapper);
+				loadSeasonFromNetOrFile();
 			} else if (SeasonMenuOptions.PRINT_OUT_WEEK.optionNumber == selectedOption) {
 				seasonMenuPrefix = launchPrintWeekMenu(seasonMenuPrefix);
 			} else if (SeasonMenuOptions.PRINT_TEAM_SCHEDULE.optionNumber == selectedOption) {
@@ -95,6 +109,24 @@ public class SeasonMenu extends SubMenu {
 				seasonMenuPrefix = launchSimulateManySeasons(tiebreaker);
 			} else if (SeasonMenuOptions.PRINT_TEAM_SIMULATIONS.optionNumber == selectedOption) {
 				launchPrintTeamSimulationsMenu();
+			}
+		}
+	}
+
+	private void loadSeasonFromNetOrFile() {
+		input.printMessage("Loading season...");
+		try {
+			season.loadSeason(scoreStripReader, scoreStripMapper, seasonSave, 
+					fileWriterFactory);
+		} catch (Exception e) {
+			input.printMessage(
+					"Season could not be loaded from internet; loading from saved file...");
+			String seasonString;
+			try {
+				seasonString = seasonSave.loadSeasonSave(fileReaderFactory);
+				seasonSave.populateSeasonFromSeasonString(seasonString, season);
+			} catch (IOException e1) {
+				input.printMessage("Load season FAILED!");
 			}
 		}
 	}

@@ -10,11 +10,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import nfl.season.input.NFLFileWriterFactory;
+import nfl.season.input.NFLRegularSeasonSave;
 import nfl.season.league.Conference;
 import nfl.season.league.Division;
 import nfl.season.league.League;
@@ -181,6 +182,12 @@ public class NFLSeasonTest {
 	
 	@Mock
 	private Ss scoreStripWeek;
+	
+	@Mock
+	private NFLRegularSeasonSave seasonSave;
+	
+	@Mock
+	private NFLFileWriterFactory fileWriterFactory;
 	
 	@Mock
 	private NFLTiebreaker tiebreaker;
@@ -370,7 +377,7 @@ public class NFLSeasonTest {
 	}
 	
 	@Test
-	public void loadSeasonTakesInReaderAndMapperAndLoadsWholeSeason() throws MalformedURLException {
+	public void loadSeasonTakesInReaderAndMapperAndLoadsWholeSeason() throws Exception {
 		when(week.getWeekNumber()).thenReturn(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 
 				12, 13, 14, 15, 16, 17);
 		
@@ -378,7 +385,7 @@ public class NFLSeasonTest {
 		when(scoreStripReader.readScoreStripURL(anyString())).thenReturn(scoreStripWeek);
 		
 		season.initializeNFLRegularSeason(league);
-		season.loadSeason(scoreStripReader, scoreStripMapper);
+		season.loadSeason(scoreStripReader, scoreStripMapper, seasonSave, fileWriterFactory);
 		
 		SeasonWeek[] weeks = season.getWeeks();
 		for (SeasonWeek week : weeks) {
@@ -393,6 +400,8 @@ public class NFLSeasonTest {
 			
 		}
 		verify(scoreStripReader, times(17)).readScoreStripURL(anyString());
+		
+		verify(seasonSave).saveToSeasonFile(season, fileWriterFactory);
 	}
 	
 	@Test

@@ -2,10 +2,17 @@ package nfl.season.menu;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.io.IOException;
+
+import nfl.season.input.NFLFileReaderFactory;
+import nfl.season.input.NFLFileWriterFactory;
+import nfl.season.input.NFLRegularSeasonSave;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.league.League;
 import nfl.season.league.Team;
@@ -96,10 +103,21 @@ public class SeasonMenuTest {
 	@Mock
 	private ScoreStripMapper scoreStripMapper;
 	
+	@Mock
+	private NFLRegularSeasonSave seasonSave;
+	
+	@Mock
+	private NFLFileWriterFactory fileWriterFactory;
+	
+	@Mock
+	private NFLFileReaderFactory fileReaderFactory;
+	
+	private String seasonString = "Season string";
+	
 	private SeasonMenu seasonMenu;
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws IOException {
 		expectedMenuMessage = MenuOptionsUtil.MENU_INTRO + 
 				"1. Load/Refresh the current season\n" +
 				"2. Print out games in week\n" +
@@ -126,8 +144,11 @@ public class SeasonMenuTest {
 		when(seasonTeam.getSimulatedResults(NFLSeason.MANY_SEASONS_NUMBER)).thenReturn(
 				simulationString);
 		
+		when(seasonSave.loadSeasonSave(fileReaderFactory)).thenReturn(seasonString);
+		
 		seasonMenu = new SeasonMenu(input, season, playoffs, 
-				scoreStripReader, scoreStripMapper);
+				scoreStripReader, scoreStripMapper, seasonSave, fileWriterFactory,
+				fileReaderFactory);
 	}
 	
 	@Test
@@ -140,13 +161,31 @@ public class SeasonMenuTest {
 	}
 	
 	@Test
-	public void loadSeasonIsSelectedSoSeasonIsLoaded() {
+	public void loadSeasonIsSelectedSoSeasonIsLoaded() throws Exception {
 		when(input.askForInt(anyString())).thenReturn(LOAD_SEASON, BACK_TO_MAIN_MENU);
 		
 		seasonMenu.launchSubMenu();
 		
-		verify(season).loadSeason(scoreStripReader, scoreStripMapper);
+		verify(season).loadSeason(scoreStripReader, scoreStripMapper, seasonSave, 
+				fileWriterFactory);
 		verify(input, times(1)).printMessage("Loading season...");
+	}
+	
+	@Test
+	public void loadSeasonIsSelectedButCouldNotReadScoreStripSoFileIsLoaded() throws Exception {
+		when(input.askForInt(anyString())).thenReturn(LOAD_SEASON, BACK_TO_MAIN_MENU);
+		doThrow(new Exception("Exc")).when(season).loadSeason(
+				scoreStripReader, scoreStripMapper, seasonSave, fileWriterFactory);
+		
+		seasonMenu.launchSubMenu();
+		
+		verify(season).loadSeason(scoreStripReader, scoreStripMapper, seasonSave, 
+				fileWriterFactory);
+		verify(input, times(1)).printMessage("Loading season...");
+		verify(input, times(1)).printMessage(
+				"Season could not be loaded from internet; loading from saved file...");
+		verify(seasonSave).loadSeasonSave(fileReaderFactory);
+		verify(seasonSave).populateSeasonFromSeasonString(seasonString, season);
 	}
 	
 	@Test

@@ -3,6 +3,7 @@ package nfl.season.calculator;
 import java.io.IOException;
 
 import nfl.season.input.NFLPlayoffSettings;
+import nfl.season.input.NFLRegularSeasonSave;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.input.NFLTeamSettings;
 import nfl.season.input.NFLFileReaderFactory;
@@ -78,8 +79,12 @@ public class NFLSeasonCalculator {
 		ScoreStripReader scoreStripReader = new ScoreStripReader();
 		ScoreStripMapper scoreStripMapper = new ScoreStripMapper(nfl);
 		
+		NFLRegularSeasonSave seasonSave = new NFLRegularSeasonSave();
+		NFLFileWriterFactory fileWriterFactory = new NFLFileWriterFactory();
+		NFLFileReaderFactory fileReaderFactory = new NFLFileReaderFactory();
+		
 		SeasonMenu seasonMenu = new SeasonMenu(input, season, playoffs, scoreStripReader, 
-				scoreStripMapper);
+				scoreStripMapper, seasonSave, fileWriterFactory, fileReaderFactory);
 		
 		return seasonMenu;
 	}
