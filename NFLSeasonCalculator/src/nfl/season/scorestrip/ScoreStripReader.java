@@ -18,7 +18,6 @@ public class ScoreStripReader {
 			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 			scoreStripReturn = (Ss) unmarshaller.unmarshal(url);
 		} catch (JAXBException e) {
-			e.printStackTrace();
 		}
 		
 		return scoreStripReturn;

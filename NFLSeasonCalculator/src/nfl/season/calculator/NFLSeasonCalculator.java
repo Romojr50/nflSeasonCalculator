@@ -81,9 +81,10 @@ public class NFLSeasonCalculator {
 		
 		NFLRegularSeasonSave seasonSave = new NFLRegularSeasonSave();
 		NFLFileWriterFactory fileWriterFactory = new NFLFileWriterFactory();
+		NFLFileReaderFactory fileReaderFactory = new NFLFileReaderFactory();
 		
 		SeasonMenu seasonMenu = new SeasonMenu(input, season, playoffs, scoreStripReader, 
-				scoreStripMapper, seasonSave, fileWriterFactory);
+				scoreStripMapper, seasonSave, fileWriterFactory, fileReaderFactory);
 		
 		return seasonMenu;
 	}
