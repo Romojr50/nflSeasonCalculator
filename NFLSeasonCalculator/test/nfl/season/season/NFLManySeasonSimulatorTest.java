@@ -311,6 +311,7 @@ public class NFLManySeasonSimulatorTest {
 		verify(playoffs).clearPlayoffTeams();
 		verify(playoffs).createPlayoffTeam(leagueDivisionWinner1_1);
 		verify(playoffs).setDivisionWinner(conference1Name, division1_1Name, playoffDivisionWinner1_1);
+		verify(playoffs).setTeamConferenceSeed(playoffDivisionWinner1_1, 1);
 		verify(playoffs).addWildcardTeam(conference1Name, playoffWildcard1_2);
 		verify(playoffs).calculateChancesByRoundForAllPlayoffTeams();
 	}
