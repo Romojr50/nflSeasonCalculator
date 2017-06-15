@@ -217,6 +217,8 @@ public class NFLSeasonTeamTest {
 	public void clearSimulatedResultsClearsSimulatedNumbers() {
 		for (int i = 0; i < 500; i++) {
 			seasonTeam.addGotOneSeed();
+			seasonTeam.addToChanceToWinSuperBowl(12);
+			seasonTeam.addSimulatedLosses(15);
 		}
 		seasonTeam.clearSimulatedResults();
 		
@@ -227,6 +229,12 @@ public class NFLSeasonTeamTest {
 		assertEquals(0, seasonTeam.getHadWinningSeason());
 		assertEquals(0, seasonTeam.getWasInDivisionCellar());
 		assertEquals(0, seasonTeam.getWasBottomTeam());
+		assertEquals(0, seasonTeam.getSimulatedWins());
+		assertEquals(0, seasonTeam.getSimulatedLosses());
+		assertEquals(0, seasonTeam.getChanceToWinSuperBowl());
+		assertEquals(0, seasonTeam.getChanceToWinConference());
+		assertEquals(0, seasonTeam.getChanceToMakeConferenceRound());
+		assertEquals(0, seasonTeam.getChanceToMakeDivisionalRound());
 		assertEquals(0, seasonTeam.getSimulatedWins());
 		assertEquals(0, seasonTeam.getSimulatedLosses());
 	}

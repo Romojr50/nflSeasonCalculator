@@ -324,6 +324,12 @@ public class NFLSeasonTeam {
 		hadWinningSeason = 0;
 		wasInDivisionCellar = 0;
 		wasBottomTeam = 0;
+		chanceToWinSuperBowl = 0;
+		chanceToWinConference = 0;
+		chanceToMakeConferenceRound = 0;
+		chanceToMakeDivisionalRound = 0;
+		simulatedWins = 0;
+		simulatedLosses = 0;
 	}
 
 	public String getSimulatedResults(int numberOfSimulatedSeasons) {

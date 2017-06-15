@@ -154,6 +154,7 @@ public class NFLSeason {
 			ScoreStripMapper scoreStripMapper, NFLRegularSeasonSave seasonSave, 
 			NFLFileWriterFactory fileWriterFactory) throws Exception {
 		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.MONTH, -3);
 		int year = calendar.get(Calendar.YEAR);
 		String yearString = "" + year;
 		

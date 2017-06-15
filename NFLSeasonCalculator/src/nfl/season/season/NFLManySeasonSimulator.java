@@ -123,6 +123,7 @@ public class NFLManySeasonSimulator {
 	
 	private void addTeamsToNFLPlayoffs(NFLSeasonConference conference,
 			NFLPlayoffs playoffs, List<NFLSeasonTeam> seeds) {
+		List<NFLSeasonTeam> seedsInOrder = conference.getSeedsInOrder();
 		Conference leagueConference = conference.getConference();
 		String conferenceName = leagueConference.getName();
 		List<NFLSeasonDivision> divisions = conference.getDivisions();
@@ -134,6 +135,9 @@ public class NFLManySeasonSimulator {
 			Team leagueDivisionWinner = divisionWinner.getTeam();
 			NFLPlayoffTeam playoffDivisionWinner = playoffs.createPlayoffTeam(leagueDivisionWinner);
 			playoffs.setDivisionWinner(conferenceName, divisionName, playoffDivisionWinner);
+			
+			int seed = seedsInOrder.indexOf(divisionWinner) + 1;
+			playoffs.setTeamConferenceSeed(playoffDivisionWinner, seed);
 		}
 		
 		for (int seed = 5; seed <= seeds.size(); seed++) {
