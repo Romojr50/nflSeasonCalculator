@@ -1,10 +1,13 @@
 package nfl.season.league;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class League {
+public class League implements Serializable{
 	
+	private static final long serialVersionUID = 3856013190168090496L;
+
 	public static final String NFL = "NFL";
 	
 	private String name;
