@@ -1,9 +1,12 @@
 package nfl.season.league;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Conference {
+public class Conference implements Serializable {
+
+	private static final long serialVersionUID = 4500831269582741796L;
 
 	private String name;
 	

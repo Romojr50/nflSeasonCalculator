@@ -1,12 +1,15 @@
 package nfl.season.league;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import nfl.season.league.Matchup.HomeAwayWinChanceModeEnum;
 import nfl.season.league.Matchup.WinChanceModeEnum;
 
-public class Team {
+public class Team implements Serializable {
+
+	private static final long serialVersionUID = 7940374796629178822L;
 
 	public static final int CLEAR_RANKING = -1;
 

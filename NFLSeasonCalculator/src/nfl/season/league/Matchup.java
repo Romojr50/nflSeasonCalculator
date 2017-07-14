@@ -1,7 +1,11 @@
 package nfl.season.league;
 
+import java.io.Serializable;
 
-public class Matchup {
+
+public class Matchup implements Serializable {
+
+	private static final long serialVersionUID = 4033723027647117852L;
 
 	public enum WinChanceModeEnum {
 		CUSTOM_SETTING("Custom Setting"), POWER_RANKINGS("Power Rankings"), 
