@@ -188,6 +188,21 @@ public class MatchupTest {
 	}
 	
 	@Test
+	public void calculateSingleTeamWinChanceFromPowerRankingsUsesRankingsToCalculateWinChance() {
+		when(team1.getPowerRanking()).thenReturn(1);
+		when(team2.getPowerRanking()).thenReturn(25);
+		assertEquals(90, matchup.calculateSingleTeamWinChanceFromPowerRankings(team1Name));
+		
+		when(team1.getPowerRanking()).thenReturn(24);
+		when(team2.getPowerRanking()).thenReturn(5);
+		assertEquals(18, matchup.calculateSingleTeamWinChanceFromPowerRankings(team1Name));
+		
+		when(team1.getPowerRanking()).thenReturn(1);
+		when(team2.getPowerRanking()).thenReturn(32);
+		assertEquals(99, matchup.calculateSingleTeamWinChanceFromPowerRankings(team1Name));
+	}
+	
+	@Test
 	public void calculateTeamWinChancesFromPowerRankingsButRankingsAreClearedSoNoCalculationIsDone() {
 		int initialTeam1WinChance = 49;
 		matchup.setTeamNeutralWinChance(team1Name, initialTeam1WinChance);
@@ -220,6 +235,21 @@ public class MatchupTest {
 	}
 	
 	@Test
+	public void calculateSingleWinChanceFromEloRatingUsesEloRatingsToDetermineWinChance() {
+		when(team1.getEloRating()).thenReturn(1450);
+		when(team2.getEloRating()).thenReturn(1550);
+		assertEquals(36, matchup.calculateSingleTeamWinChanceFromEloRatings(team1Name));
+		
+		when(team1.getEloRating()).thenReturn(1800);
+		when(team2.getEloRating()).thenReturn(1100);
+		assertEquals(98, matchup.calculateSingleTeamWinChanceFromEloRatings(team1Name));
+		
+		when(team1.getEloRating()).thenReturn(1490);
+		when(team2.getEloRating()).thenReturn(1515);
+		assertEquals(46, matchup.calculateSingleTeamWinChanceFromEloRatings(team1Name));
+	}
+	
+	@Test
 	public void calculateTeamWinChanceFroEloRatingButEloRatingsAreNegativeSoNoCalculationDone() {
 		int initialTeam1WinChance = 49;
 		matchup.setTeamNeutralWinChance(team1Name, initialTeam1WinChance);
@@ -246,6 +276,22 @@ public class MatchupTest {
 		testHomeFieldAdvantageCalculation(0, 35);
 		testHomeFieldAdvantageCalculation(25, 14);
 		testHomeFieldAdvantageCalculation(100, 100);
+	}
+	
+	@Test
+	public void calculateHomeWinChanceForSingleTeamSoHomeAdvantageUsedToCalculate() {
+		int team1NeutralWinChance = 55;
+		int team2NeutralWinChance = 100 - team1NeutralWinChance;
+		matchup.setTeamNeutralWinChance(team1Name, team1NeutralWinChance);
+		
+		when(team1.getHomeFieldAdvantage()).thenReturn(14);
+		assertEquals(62, matchup.calculateSingleHomeWinChanceFromHomeFieldAdvantage(team1Name));
+		
+		when(team1.getHomeFieldAdvantage()).thenReturn(21);
+		assertEquals(65, matchup.calculateSingleHomeWinChanceFromHomeFieldAdvantage(team1Name));
+		
+		when(team1.getHomeFieldAdvantage()).thenReturn(-4);
+		assertEquals(53, matchup.calculateSingleHomeWinChanceFromHomeFieldAdvantage(team1Name));
 	}
 	
 	@Test

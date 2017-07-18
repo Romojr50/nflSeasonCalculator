@@ -245,6 +245,40 @@ public class Matchup implements Serializable {
 		return success;
 	}
 	
+
+	public int calculateSingleTeamWinChanceFromPowerRankings(String teamName) {
+		int returnWinChance = 0;
+		int team1Ranking = team1.getPowerRanking();
+		int team2Ranking = team2.getPowerRanking();
+		boolean teamNameIsTeam1 = team1.getName().equals(teamName);
+
+		if (Team.CLEAR_RANKING != team1Ranking && Team.CLEAR_RANKING != team2Ranking) {
+			boolean team1IsRankedHigher = true;
+			if (team2Ranking < team1Ranking) {
+				team1IsRankedHigher = false;
+			}
+			
+			int betterWinChance = calculateBetterWinChance(team1Ranking,
+					team2Ranking);
+			
+			if (team1IsRankedHigher) {
+				if (teamNameIsTeam1) {
+					returnWinChance = betterWinChance;
+				} else {
+					returnWinChance = 100 - betterWinChance;
+				}
+			} else {
+				if (teamNameIsTeam1) {
+					returnWinChance = 100 - betterWinChance;
+				} else {
+					returnWinChance = betterWinChance;
+				}
+			}
+		}
+		
+		return returnWinChance;
+	}
+	
 	public boolean calculateTeamWinChancesFromEloRatings() {
 		// 1 / (1 + 10 ^ ((ratingA - ratingB) / 400))
 		boolean success = false;
@@ -256,13 +290,8 @@ public class Matchup implements Serializable {
 		if (team1Rating > 0 && team2Rating > 0) {
 			winChanceMode = WinChanceModeEnum.ELO_RATINGS;
 			
-			int ratingDifference = team2Rating - team1Rating;
-			double powerFor10 = ratingDifference / 400.0;
-			double tenToThePower = Math.pow(10, powerFor10);
-			double dividend = 1 + tenToThePower;
-			double winChanceAsDecimal = 1 / dividend;
-			
-			team1NeutralWinChance = (int) Math.round(winChanceAsDecimal * 100);
+			team1NeutralWinChance = 
+					calculateTeam1WinChanceFromEloRatings(team1Rating, team2Rating);
 			team2NeutralWinChance = 100 - team1NeutralWinChance;
 			success = true;
 		}
@@ -270,6 +299,23 @@ public class Matchup implements Serializable {
 		recalculateHomeWinChanceIfNeeded(team1.getName());
 		
 		return success;
+	}
+
+	public int calculateSingleTeamWinChanceFromEloRatings(String teamName) {
+		int returnWinChance = 0;
+
+		int team1Rating = team1.getEloRating();
+		int team2Rating = team2.getEloRating();
+		boolean teamNameIsTeam1 = team1.getName().equals(teamName);
+		
+		int team1WinChance = calculateTeam1WinChanceFromEloRatings(team1Rating, team2Rating);
+		if (teamNameIsTeam1) {
+			returnWinChance = team1WinChance;
+		} else {
+			returnWinChance = 100 - team1WinChance;
+		}
+		
+		return returnWinChance;
 	}
 	
 	public boolean calculateHomeWinChanceFromHomeFieldAdvantage(String teamName) {
@@ -296,6 +342,33 @@ public class Matchup implements Serializable {
 			
 		}
 		return success;
+	}
+	
+
+	public int calculateSingleHomeWinChanceFromHomeFieldAdvantage(
+			String teamName) {
+		int returnWinChance = 0;
+		
+		int homeFieldAdvantage = 0;
+		int teamNeutralWinChance = 0;
+		int opponentHomeField = 0;
+		int opponentNeutralWinChance = 0;
+		if (team1.getName().equals(teamName)) {
+			homeFieldAdvantage = team1.getHomeFieldAdvantage();
+			teamNeutralWinChance = team1NeutralWinChance;
+			opponentHomeField = team2.getHomeFieldAdvantage();
+			opponentNeutralWinChance = team2NeutralWinChance;
+		} else {
+			homeFieldAdvantage = team2.getHomeFieldAdvantage();
+			teamNeutralWinChance = team2NeutralWinChance;
+			opponentHomeField = team1.getHomeFieldAdvantage();
+			opponentNeutralWinChance = team1NeutralWinChance;
+		}
+		
+		returnWinChance = calculateHomeTeamWinChance(homeFieldAdvantage, 
+				teamNeutralWinChance, opponentHomeField, opponentNeutralWinChance);
+		
+		return returnWinChance;
 	}
 
 	public WinChanceModeEnum getWinChanceMode() {
@@ -341,6 +414,17 @@ public class Matchup implements Serializable {
 				(rankingDifferenceComparedTo24Difference * WIN_CHANCE_DIFFERENCE_BY_SPOT));
 		betterWinChance = Math.min(99, betterWinChance);
 		return betterWinChance;
+	}
+	
+	private int calculateTeam1WinChanceFromEloRatings(int team1Rating,
+			int team2Rating) {
+		int ratingDifference = team2Rating - team1Rating;
+		double powerFor10 = ratingDifference / 400.0;
+		double tenToThePower = Math.pow(10, powerFor10);
+		double dividend = 1 + tenToThePower;
+		double winChanceAsDecimal = 1 / dividend;
+		
+		return (int) Math.round(winChanceAsDecimal * 100);
 	}
 
 	private int calculateHomeTeamWinChance(int homeFieldAdvantage, int neutralWinChance,
