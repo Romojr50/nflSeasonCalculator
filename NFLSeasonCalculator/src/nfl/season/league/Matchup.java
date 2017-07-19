@@ -370,6 +370,27 @@ public class Matchup implements Serializable {
 		
 		return returnWinChance;
 	}
+	
+	public int calculateSingleHomeWinChanceFromHomeFieldAdvantage(String teamName, 
+			int neutralWinChance) {
+		int returnWinChance = 0;
+		
+		int homeFieldAdvantage = 0;
+		int opponentHomeField = 0;
+		int opponentNeutralWinChance = 100 - neutralWinChance;
+		if (team1.getName().equals(teamName)) {
+			homeFieldAdvantage = team1.getHomeFieldAdvantage();
+			opponentHomeField = team2.getHomeFieldAdvantage();
+		} else {
+			homeFieldAdvantage = team2.getHomeFieldAdvantage();
+			opponentHomeField = team1.getHomeFieldAdvantage();
+		}
+		
+		returnWinChance = calculateHomeTeamWinChance(homeFieldAdvantage, 
+				neutralWinChance, opponentHomeField, opponentNeutralWinChance);
+		
+		return returnWinChance;
+	}
 
 	public WinChanceModeEnum getWinChanceMode() {
 		return winChanceMode;

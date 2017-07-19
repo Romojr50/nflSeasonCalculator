@@ -281,7 +281,6 @@ public class MatchupTest {
 	@Test
 	public void calculateHomeWinChanceForSingleTeamSoHomeAdvantageUsedToCalculate() {
 		int team1NeutralWinChance = 55;
-		int team2NeutralWinChance = 100 - team1NeutralWinChance;
 		matchup.setTeamNeutralWinChance(team1Name, team1NeutralWinChance);
 		
 		when(team1.getHomeFieldAdvantage()).thenReturn(14);
@@ -292,6 +291,19 @@ public class MatchupTest {
 		
 		when(team1.getHomeFieldAdvantage()).thenReturn(-4);
 		assertEquals(53, matchup.calculateSingleHomeWinChanceFromHomeFieldAdvantage(team1Name));
+	}
+	
+	@Test
+	public void calculateHomeWinChanceWithInputNeutralWinChanceUsesHFAToCalculate() {
+		when(team1.getHomeFieldAdvantage()).thenReturn(14);
+		assertEquals(62, matchup.calculateSingleHomeWinChanceFromHomeFieldAdvantage(team1Name, 55));
+		assertEquals(39, matchup.calculateSingleHomeWinChanceFromHomeFieldAdvantage(team1Name, 32));
+		assertEquals(91, matchup.calculateSingleHomeWinChanceFromHomeFieldAdvantage(team1Name, 84));
+		
+		when(team1.getHomeFieldAdvantage()).thenReturn(-4);
+		assertEquals(53, matchup.calculateSingleHomeWinChanceFromHomeFieldAdvantage(team1Name, 55));
+		assertEquals(30, matchup.calculateSingleHomeWinChanceFromHomeFieldAdvantage(team1Name, 32));
+		assertEquals(82, matchup.calculateSingleHomeWinChanceFromHomeFieldAdvantage(team1Name, 84));
 	}
 	
 	@Test
