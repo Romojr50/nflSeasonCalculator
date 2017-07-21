@@ -82,6 +82,25 @@ public class NFLTeamSettings {
 		
 		return success;
 	}
+	
+	public boolean saveToSettingsFile(League league, String folderPath,
+			NFLFileWriterFactory fileWriterFactory) throws IOException {
+		boolean success = true;
+		
+		FileOutputStream fileWriter = null;
+		
+		try {
+			fileWriter = fileWriterFactory.createNFLTeamSettingsWriter(folderPath);
+			String teamSettingsFileString = createTeamSettingsFileString(league);
+			fileWriter.write(teamSettingsFileString.getBytes());
+		} catch (IOException e) {
+			success = false;
+		} finally {
+			fileWriter.close();
+		}
+		
+		return success;
+	}
 
 	public void setTeamSettingsFromTeamLine(Team team, String teamLine) {
 		String[] teamLineTokens = teamLine.split(",");
@@ -151,6 +170,29 @@ public class NFLTeamSettings {
 	public String loadSettingsFile(
 			NFLFileReaderFactory fileReaderFactory) throws IOException {
 		BufferedReader fileReader = fileReaderFactory.createNFLTeamSettingsReader();
+		
+		StringBuilder nflTeamSettingsBuilder = new StringBuilder();
+		
+		String line;
+		try {
+			line = fileReader.readLine();
+			while (line != null) {
+				nflTeamSettingsBuilder.append(line);
+				nflTeamSettingsBuilder.append("\n");
+				line = fileReader.readLine();
+			}
+		} finally {
+			fileReader.close();
+		}
+		
+		
+		return nflTeamSettingsBuilder.toString();
+	}
+	
+	public String loadSettingsFile(String folderPath,
+			NFLFileReaderFactory fileReaderFactory) throws IOException {
+		BufferedReader fileReader = fileReaderFactory.createNFLTeamSettingsReader(
+				folderPath);
 		
 		StringBuilder nflTeamSettingsBuilder = new StringBuilder();
 		
