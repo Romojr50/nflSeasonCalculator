@@ -10,15 +10,30 @@ public class NFLFileWriterFactory extends NFLFileIO {
 		createFolderIfItDoesNotExist(NFL_TEAM_SETTINGS_FOLDER_LOCATION);
 		return createNFLFileWriter(NFL_TEAM_SETTINGS_FILE_LOCATION);
 	}
+	
+	public FileOutputStream createNFLTeamSettingsWriter(String folderPath) throws FileNotFoundException {
+		createFolderIfItDoesNotExist(folderPath);
+		return createNFLFileWriter(folderPath + "/" + NFL_TEAM_SETTINGS_FILE_NAME);
+	}
 
 	public FileOutputStream createNFLPlayoffSettingsWriter() throws FileNotFoundException {
 		createFolderIfItDoesNotExist(NFL_PLAYOFF_SETTINGS_FOLDER_LOCATION);
 		return createNFLFileWriter(NFL_PLAYOFF_SETTINGS_FILE_LOCATION);
 	}
 	
+	public FileOutputStream createNFLPlayoffSettingsWriter(String folderPath) throws FileNotFoundException {
+		createFolderIfItDoesNotExist(folderPath);
+		return createNFLFileWriter(folderPath + "/" + NFL_PLAYOFF_SETTINGS_FILE_NAME);
+	}
+	
 	public FileOutputStream createNFLSeasonSaveWriter() throws FileNotFoundException {
 		createFolderIfItDoesNotExist(NFL_SEASON_SAVE_FOLDER_LOCATION);
 		return createNFLFileWriter(NFL_SEASON_SAVE_FILE_LOCATION);
+	}
+	
+	public FileOutputStream createNFLSeasonSaveWriter(String folderPath) throws FileNotFoundException {
+		createFolderIfItDoesNotExist(folderPath);
+		return createNFLFileWriter(folderPath + "/" + NFL_SEASON_SAVE_FILE_NAME);
 	}
 	
 	private void createFolderIfItDoesNotExist(String folderLocation) {
