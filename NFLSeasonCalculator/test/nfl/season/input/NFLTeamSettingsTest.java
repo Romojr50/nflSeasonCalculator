@@ -37,7 +37,7 @@ public class NFLTeamSettingsTest {
 	
 	private static final String COLTS_LINE = "12,1542,9";
 	
-	private static final String COLTS_EAGLES_LINE = "/Eagles/56,P,63,C,51,H";
+	private static final String COLTS_EAGLES_LINE = "/Eagles/56,P,63,C,51,C";
 	
 	private static final String COLTS_TEXANS_LINE = "/Texans/62,E,70,C,49,H";
 
@@ -167,6 +167,8 @@ public class NFLTeamSettingsTest {
 	private void setUpMatchups() {
 		setUpMatchupWithSettings(coltsEaglesMatchup, COLTS_NAME, EAGLES_NAME, 56, 
 				63, 51, WinChanceModeEnum.POWER_RANKINGS);
+		when(coltsEaglesMatchup.getHomeAwayWinChanceMode(EAGLES_NAME)).thenReturn(
+				HomeAwayWinChanceModeEnum.CUSTOM_SETTING);
 		when(colts.getMatchup(EAGLES_NAME)).thenReturn(coltsEaglesMatchup);
 		setUpMatchupWithSettings(coltsTexansMatchup, COLTS_NAME, texansName, 62, 
 				70, 49, WinChanceModeEnum.ELO_RATINGS);
@@ -296,7 +298,7 @@ public class NFLTeamSettingsTest {
 		nflTeamSettings.setMatchupSettingsFromMatchupLine(colts, COLTS_EAGLES_LINE);
 		verify(coltsEaglesMatchup).calculateTeamWinChancesFromPowerRankings();
 		verify(coltsEaglesMatchup).setTeamHomeWinChance(COLTS_NAME, 63);
-		verify(coltsEaglesMatchup).calculateHomeWinChanceFromHomeFieldAdvantage(EAGLES_NAME);
+		verify(coltsEaglesMatchup).setTeamAwayWinChance(COLTS_NAME, 51);
 		
 		nflTeamSettings.setMatchupSettingsFromMatchupLine(colts, COLTS_TEXANS_LINE);
 		verify(coltsTexansMatchup).calculateTeamWinChancesFromEloRatings();

@@ -136,7 +136,7 @@ public class NFLTeamSettings {
 		
 		setMatchupHomeWinChanceFromMatchupLine(teamName, matchup, homeModeCode, 
 				homeWinChanceString);
-		setMatchupHomeWinChanceFromMatchupLine(opponentName, matchup, awayModeCode, 
+		setMatchupAwayWinChanceFromMatchupLine(teamName, opponentName, matchup, awayModeCode, 
 				awayWinChanceString);
 	}
 	
@@ -232,15 +232,27 @@ public class NFLTeamSettings {
 		}
 	}
 	
-	private void setMatchupHomeWinChanceFromMatchupLine(String homeTeam, Matchup matchup, 
-			String homeModeCode, String homeWinChanceString) {
+	private void setMatchupHomeWinChanceFromMatchupLine(String teamName, Matchup matchup, 
+			String homeModeCode, String winChanceString) {
 		if (HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE.winChanceModeDescription.charAt(0) == 
 				homeModeCode.charAt(0)) {
-			matchup.calculateHomeWinChanceFromHomeFieldAdvantage(homeTeam);
+			matchup.calculateHomeWinChanceFromHomeFieldAdvantage(teamName);
 		} else if (HomeAwayWinChanceModeEnum.CUSTOM_SETTING.winChanceModeDescription.charAt(0) == 
 				homeModeCode.charAt(0)) {
-			int homeWinChance = Integer.parseInt(homeWinChanceString);
-			matchup.setTeamHomeWinChance(homeTeam, homeWinChance);
+			int winChance = Integer.parseInt(winChanceString);
+			matchup.setTeamHomeWinChance(teamName, winChance);
+		}
+	}
+	
+	private void setMatchupAwayWinChanceFromMatchupLine(String teamName, String opponent, 
+			Matchup matchup, String homeModeCode, String winChanceString) {
+		if (HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE.winChanceModeDescription.charAt(0) == 
+				homeModeCode.charAt(0)) {
+			matchup.calculateHomeWinChanceFromHomeFieldAdvantage(opponent);
+		} else if (HomeAwayWinChanceModeEnum.CUSTOM_SETTING.winChanceModeDescription.charAt(0) == 
+				homeModeCode.charAt(0)) {
+			int winChance = Integer.parseInt(winChanceString);
+			matchup.setTeamAwayWinChance(teamName, winChance);
 		}
 	}
 
