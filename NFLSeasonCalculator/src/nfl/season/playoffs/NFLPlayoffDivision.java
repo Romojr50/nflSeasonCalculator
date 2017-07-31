@@ -1,8 +1,12 @@
 package nfl.season.playoffs;
 
+import java.io.Serializable;
+
 import nfl.season.league.Division;
 
-public class NFLPlayoffDivision {
+public class NFLPlayoffDivision implements Serializable {
+
+	private static final long serialVersionUID = -5417223863649638553L;
 
 	private Division division;
 	

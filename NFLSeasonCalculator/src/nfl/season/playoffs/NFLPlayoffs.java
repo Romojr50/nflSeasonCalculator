@@ -1,5 +1,6 @@
 package nfl.season.playoffs;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -13,7 +14,9 @@ import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
 import nfl.season.season.NFLSeasonTeam;
 
-public class NFLPlayoffs {
+public class NFLPlayoffs implements Serializable {
+
+	private static final long serialVersionUID = 3772284569816305782L;
 
 	private League nfl;
 	

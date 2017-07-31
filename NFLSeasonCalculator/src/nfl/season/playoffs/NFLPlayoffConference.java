@@ -1,5 +1,6 @@
 package nfl.season.playoffs;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +8,9 @@ import nfl.season.league.Conference;
 import nfl.season.league.Division;
 import nfl.season.league.Team;
 
-public class NFLPlayoffConference {
+public class NFLPlayoffConference implements Serializable {
+
+	private static final long serialVersionUID = -7345615893931593821L;
 
 	public static final int CLEAR_SEED = -1;
 
