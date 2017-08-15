@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -139,6 +140,7 @@ public class NFLRegularSeasonSaveTest {
 		when(league.getTeam(AWAY_TEAM_2_NAME)).thenReturn(awayTeam2);
 		
 		when(fileWriterFactory.createNFLSeasonSaveWriter()).thenReturn(fileWriter);
+		when(fileWriterFactory.createNFLSeasonSaveWriter(anyString())).thenReturn(fileWriter);
 		when(fileReaderFactory.createNFLSeasonSaveReader()).thenReturn(fileReader);
 		
 		seasonSave = new NFLRegularSeasonSave();
@@ -181,6 +183,20 @@ public class NFLRegularSeasonSaveTest {
 		boolean success = seasonSave.saveToSeasonFile(season, fileWriterFactory);
 		
 		verify(fileWriterFactory).createNFLSeasonSaveWriter();
+		verify(fileWriter).write(seasonString.getBytes());
+		verify(fileWriter).close();
+		
+		assertTrue(success);
+	}
+	
+	@Test
+	public void saveToSeasonFileWritesAllWeeksToFileOnFilepath() throws IOException {
+		String folderPath = "file";
+		String seasonString = seasonSave.getSeasonString(season);
+		
+		boolean success = seasonSave.saveToSeasonFile(season, fileWriterFactory, folderPath);
+		
+		verify(fileWriterFactory).createNFLSeasonSaveWriter(folderPath);
 		verify(fileWriter).write(seasonString.getBytes());
 		verify(fileWriter).close();
 		

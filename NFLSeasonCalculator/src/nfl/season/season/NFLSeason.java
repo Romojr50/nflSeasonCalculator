@@ -1,6 +1,7 @@
 package nfl.season.season;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,7 +17,9 @@ import nfl.season.scorestrip.ScoreStripMapper;
 import nfl.season.scorestrip.ScoreStripReader;
 import nfl.season.scorestrip.Ss;
 
-public class NFLSeason {
+public class NFLSeason implements Serializable {
+
+	private static final long serialVersionUID = 621326590384617689L;
 
 	public static final int NUMBER_OF_WEEKS_IN_SEASON = 17;
 
@@ -153,25 +156,22 @@ public class NFLSeason {
 	public void loadSeason(ScoreStripReader scoreStripReader,
 			ScoreStripMapper scoreStripMapper, NFLRegularSeasonSave seasonSave, 
 			NFLFileWriterFactory fileWriterFactory) throws Exception {
-		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.MONTH, -3);
-		int year = calendar.get(Calendar.YEAR);
-		String yearString = "" + year;
-		
-		for (int i = 1; i <= NUMBER_OF_WEEKS_IN_SEASON; i++) {
-			String url = scoreStripReader.generateScoreStripURL(yearString, i);
-			try {
-				Ss scoreStripWeek = scoreStripReader.readScoreStripURL(url);
-				SeasonWeek seasonWeek = 
-						scoreStripMapper.mapScoreStripWeekToSeasonWeek(scoreStripWeek);
-				addWeek(seasonWeek);
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			}
-		}
+		loadSeasonFromScoreStrip(scoreStripReader, scoreStripMapper);
 		
 		try {
 			seasonSave.saveToSeasonFile(this, fileWriterFactory);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void loadSeason(ScoreStripReader scoreStripReader,
+			ScoreStripMapper scoreStripMapper, NFLRegularSeasonSave seasonSave, 
+			NFLFileWriterFactory fileWriterFactory, String folderPath) throws Exception {
+		loadSeasonFromScoreStrip(scoreStripReader, scoreStripMapper);
+		
+		try {
+			seasonSave.saveToSeasonFile(this, fileWriterFactory, folderPath);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -261,6 +261,26 @@ public class NFLSeason {
 			List<NFLSeasonTeam> conferenceTeams = conference.getTeams();
 			for (NFLSeasonTeam team : conferenceTeams) {
 				team.clearSimulatedGames();
+			}
+		}
+	}
+	
+	private void loadSeasonFromScoreStrip(ScoreStripReader scoreStripReader,
+			ScoreStripMapper scoreStripMapper) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.MONTH, -3);
+		int year = calendar.get(Calendar.YEAR);
+		String yearString = "" + year;
+		
+		for (int i = 1; i <= NUMBER_OF_WEEKS_IN_SEASON; i++) {
+			String url = scoreStripReader.generateScoreStripURL(yearString, i);
+			try {
+				Ss scoreStripWeek = scoreStripReader.readScoreStripURL(url);
+				SeasonWeek seasonWeek = 
+						scoreStripMapper.mapScoreStripWeekToSeasonWeek(scoreStripWeek);
+				addWeek(seasonWeek);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
 			}
 		}
 	}

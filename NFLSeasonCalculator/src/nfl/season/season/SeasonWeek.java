@@ -1,9 +1,12 @@
 package nfl.season.season;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SeasonWeek {
+public class SeasonWeek implements Serializable {
+
+	private static final long serialVersionUID = -8564854984902200611L;
 
 	private int weekNumber;
 	

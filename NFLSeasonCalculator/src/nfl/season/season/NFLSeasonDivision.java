@@ -1,12 +1,15 @@
 package nfl.season.season;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import nfl.season.league.Division;
 import nfl.season.league.Team;
 
-public class NFLSeasonDivision {
+public class NFLSeasonDivision implements Serializable {
+
+	private static final long serialVersionUID = 4448819823543086848L;
 
 	private Division leagueDivision;
 	

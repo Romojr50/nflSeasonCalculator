@@ -1,12 +1,15 @@
 package nfl.season.season;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import nfl.season.league.Game;
 import nfl.season.league.Matchup;
 import nfl.season.league.Team;
 
-public class SeasonGame extends Game {
+public class SeasonGame extends Game implements Serializable {
+
+	private static final long serialVersionUID = 5731511507544303733L;
 
 	private boolean isDivisionGame;
 	

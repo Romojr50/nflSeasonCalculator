@@ -79,6 +79,24 @@ public class NFLRegularSeasonSave {
 		
 		return success;
 	}
+	
+	public boolean saveToSeasonFile(NFLSeason season,
+			NFLFileWriterFactory fileWriterFactory, String folderPath) throws IOException {
+		boolean success = true;
+		
+		FileOutputStream fileWriter = null;
+		try {
+			fileWriter = fileWriterFactory.createNFLSeasonSaveWriter(folderPath);
+			String seasonSaveString = getSeasonString(season);
+			fileWriter.write(seasonSaveString.getBytes());
+		} catch (IOException e) {
+			success = false;
+		} finally {
+			fileWriter.close();
+		}
+		
+		return success;
+	}
 
 	public SeasonGame createGameFromGameString(String gameString, League league) {
 		SeasonGame seasonGame = null;
