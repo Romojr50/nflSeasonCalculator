@@ -4,8 +4,6 @@ import java.util.List;
 
 import nfl.season.league.League;
 import nfl.season.league.Team;
-import nfl.season.scorestrip.Ss.Gms;
-import nfl.season.scorestrip.Ss.Gms.G;
 import nfl.season.season.SeasonGame;
 import nfl.season.season.SeasonWeek;
 
@@ -49,7 +47,7 @@ public class ScoreStripMapper {
 		SeasonWeek seasonWeek = null;
 		
 		Gms scoreStripGames = scoreStripWeek.getGms();
-		byte scoreStripWeekNumber = scoreStripGames.getW();
+		int scoreStripWeekNumber = scoreStripGames.getW();
 		int weekNumber = (int) scoreStripWeekNumber;
 			
 		if (weekNumber > 0) {
@@ -80,8 +78,11 @@ public class ScoreStripMapper {
 
 	private void setGameResult(G scoreStripGame, SeasonGame seasonGame,
 			Team homeTeam, Team awayTeam) {
-		int homeScore = scoreStripGame.getHs();
-		int awayScore = scoreStripGame.getVs();
+		String homeScoreString = scoreStripGame.getHs();
+		String awayScoreString = scoreStripGame.getVs();
+		
+		int homeScore = getScoreFromString(homeScoreString);
+		int awayScore = getScoreFromString(awayScoreString);
 		if (homeScore > awayScore) {
 			seasonGame.setWinner(homeTeam);
 		} else if (awayScore > homeScore) {
@@ -89,6 +90,16 @@ public class ScoreStripMapper {
 		} else {
 			seasonGame.setToTie();
 		}
+	}
+	
+	private int getScoreFromString(String input) {
+		int score = 0;
+		
+		if (input != null && !"".equals(input)) {
+			score = Integer.parseInt(input);
+		}
+		
+		return score;
 	}
 
 }

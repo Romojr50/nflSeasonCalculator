@@ -8,9 +8,6 @@ import static org.junit.Assert.assertNull;
 import java.net.MalformedURLException;
 import java.util.List;
 
-import nfl.season.scorestrip.Ss.Gms;
-import nfl.season.scorestrip.Ss.Gms.G;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -49,7 +46,7 @@ public class ScoreStripReaderTest {
 		assertEquals("FO", falconsGame.getQ());
 		
 		String falconsScore = "37";
-		assertEquals(Byte.valueOf(falconsScore), falconsGame.getHs());
+		assertEquals(falconsScore, falconsGame.getHs());
 	}
 	
 	@Test(expected=MalformedURLException.class)

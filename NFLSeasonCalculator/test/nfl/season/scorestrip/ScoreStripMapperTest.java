@@ -12,8 +12,6 @@ import java.util.List;
 
 import nfl.season.league.League;
 import nfl.season.league.Team;
-import nfl.season.scorestrip.Ss.Gms;
-import nfl.season.scorestrip.Ss.Gms.G;
 import nfl.season.season.SeasonGame;
 import nfl.season.season.SeasonWeek;
 
@@ -96,8 +94,7 @@ public class ScoreStripMapperTest {
 		
 		when(scoreStripWeek.getGms()).thenReturn(scoreStripGames);
 		
-		String weekNumberString = "" + weekNumber;
-		when(scoreStripGames.getW()).thenReturn(Byte.valueOf(weekNumberString));
+		when(scoreStripGames.getW()).thenReturn(weekNumber);
 		
 		when(scoreStripGames.getG()).thenReturn(scoreStripGameList);
 		
@@ -175,7 +172,7 @@ public class ScoreStripMapperTest {
 	
 	@Test
 	public void scoreStripMapperHasWeekWithZeroNumberSoNullWeekIsReturned() {
-		when(scoreStripGames.getW()).thenReturn(Byte.valueOf("0"));
+		when(scoreStripGames.getW()).thenReturn(0);
 		
 		SeasonWeek seasonWeek = mapper.mapScoreStripWeekToSeasonWeek(scoreStripWeek);
 		
@@ -185,8 +182,8 @@ public class ScoreStripMapperTest {
 	@Test
 	public void scoreStripMapperMapsGameThatWasAlreadyPlayedAndAddsWinsAndLosses() {
 		when(scoreStripGame1_2.getQ()).thenReturn("F");
-		when(scoreStripGame1_2.getHs()).thenReturn(Byte.valueOf("" + 24));
-		when(scoreStripGame1_2.getVs()).thenReturn(Byte.valueOf("" + 21));
+		when(scoreStripGame1_2.getHs()).thenReturn("24");
+		when(scoreStripGame1_2.getVs()).thenReturn("21");
 		
 		SeasonGame seasonGame = mapper.mapScoreStripGameToSeasonGame(scoreStripGame1_2);
 		
@@ -197,8 +194,8 @@ public class ScoreStripMapperTest {
 		assertFalse(seasonGame.wasATie());
 		
 		
-		when(scoreStripGame1_2.getHs()).thenReturn(Byte.valueOf("" + 21));
-		when(scoreStripGame1_2.getVs()).thenReturn(Byte.valueOf("" + 24));
+		when(scoreStripGame1_2.getHs()).thenReturn("21");
+		when(scoreStripGame1_2.getVs()).thenReturn("24");
 		
 		seasonGame = mapper.mapScoreStripGameToSeasonGame(scoreStripGame1_2);
 		
@@ -208,8 +205,8 @@ public class ScoreStripMapperTest {
 		assertFalse(seasonGame.wasATie());
 		
 		
-		when(scoreStripGame1_2.getHs()).thenReturn(Byte.valueOf("" + 21));
-		when(scoreStripGame1_2.getVs()).thenReturn(Byte.valueOf("" + 21));
+		when(scoreStripGame1_2.getHs()).thenReturn("21");
+		when(scoreStripGame1_2.getVs()).thenReturn("21");
 		
 		seasonGame = mapper.mapScoreStripGameToSeasonGame(scoreStripGame1_2);
 		
