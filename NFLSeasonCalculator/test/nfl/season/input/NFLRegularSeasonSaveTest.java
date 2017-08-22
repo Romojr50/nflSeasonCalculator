@@ -142,6 +142,7 @@ public class NFLRegularSeasonSaveTest {
 		when(fileWriterFactory.createNFLSeasonSaveWriter()).thenReturn(fileWriter);
 		when(fileWriterFactory.createNFLSeasonSaveWriter(anyString())).thenReturn(fileWriter);
 		when(fileReaderFactory.createNFLSeasonSaveReader()).thenReturn(fileReader);
+		when(fileReaderFactory.createNFLSeasonSaveReader(anyString())).thenReturn(fileReader);
 		
 		seasonSave = new NFLRegularSeasonSave();
 	}
@@ -267,6 +268,29 @@ public class NFLRegularSeasonSaveTest {
 					fileReaderFactory);
 			
 			verify(fileReaderFactory).createNFLSeasonSaveReader();
+			verify(fileReader).close();
+			assertEquals(returnedTeamSettingsFileString, expectedTeamSettingsFileString);
+		} catch (IOException e) {
+			assertTrue(e.getMessage(), false);
+		}
+	}
+	
+	@Test
+	public void loadSeasonSaveFileReadsFromSeasonSaveFileAtFolderPath() {
+		String[] loadedSeasonLines = new String[3];
+		loadedSeasonLines[0] = "This is the first line";
+		loadedSeasonLines[1] = "Another line!";
+		
+		String expectedTeamSettingsFileString = loadedSeasonLines[0] + 
+				"\n" + loadedSeasonLines[1] + "\n";
+		
+		try {
+			when(fileReader.readLine()).thenReturn(loadedSeasonLines[0], 
+					loadedSeasonLines[1], loadedSeasonLines[2], null);
+			String returnedTeamSettingsFileString = seasonSave.loadSeasonSave(
+					fileReaderFactory, "folder");
+			
+			verify(fileReaderFactory).createNFLSeasonSaveReader("folder");
 			verify(fileReader).close();
 			assertEquals(returnedTeamSettingsFileString, expectedTeamSettingsFileString);
 		} catch (IOException e) {

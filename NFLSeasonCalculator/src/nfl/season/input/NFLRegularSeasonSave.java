@@ -175,5 +175,27 @@ public class NFLRegularSeasonSave {
 		
 		return nflTeamSettingsBuilder.toString();
 	}
+	
+	public String loadSeasonSave(NFLFileReaderFactory fileReaderFactory, String folderPath) 
+			throws IOException {
+		BufferedReader fileReader = fileReaderFactory.createNFLSeasonSaveReader(folderPath);
+		
+		StringBuilder nflTeamSettingsBuilder = new StringBuilder();
+		
+		String line;
+		try {
+			line = fileReader.readLine();
+			while (line != null) {
+				nflTeamSettingsBuilder.append(line);
+				nflTeamSettingsBuilder.append("\n");
+				line = fileReader.readLine();
+			}
+		} finally {
+			fileReader.close();
+		}
+		
+		
+		return nflTeamSettingsBuilder.toString();
+	}
 
 }
