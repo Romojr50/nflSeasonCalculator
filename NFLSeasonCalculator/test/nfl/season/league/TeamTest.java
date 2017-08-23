@@ -5,6 +5,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 import nfl.season.league.Matchup.HomeAwayWinChanceModeEnum;
 import nfl.season.league.Matchup.WinChanceModeEnum;
@@ -69,6 +70,7 @@ public class TeamTest {
 		assertEquals(defaultPowerRanking, team.getPowerRanking());
 		assertEquals(defaultEloRating, team.getEloRating());
 		assertEquals(defaultHomeFieldAdvantage, team.getHomeFieldAdvantage());
+		verify(matchup1, times(2)).calculateTeamWinChancesFromPowerRankings();
 	}
 	
 	@Test

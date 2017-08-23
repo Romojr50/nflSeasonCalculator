@@ -129,7 +129,7 @@ public class Team implements Serializable {
 	}
 
 	public void resetToDefaults() {
-		powerRanking = defaultPowerRanking;
+		setPowerRanking(defaultPowerRanking);
 		eloRating = defaultEloRating;
 		homeFieldAdvantage = defaultHomeFieldAdvantage;
 	}

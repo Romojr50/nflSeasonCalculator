@@ -164,6 +164,19 @@ public class League implements Serializable{
 		
 		return inSameConference;
 	}
+	
+
+	public void resetTeamToDefault(String teamName) {
+		Team teamToReset = getTeam(teamName);
+		int defaultPowerRanking = teamToReset.getDefaultPowerRanking();
+		int currentPowerRanking = teamToReset.getPowerRanking();
+		Team teamWithDefaultPowerRanking = getTeamWithPowerRanking(defaultPowerRanking);
+		
+		teamToReset.resetToDefaults();
+		if (teamWithDefaultPowerRanking != null) {
+			teamWithDefaultPowerRanking.setPowerRanking(currentPowerRanking);
+		}
+	}
 
 	private void initializeTeam(Division newDivision, NFLTeamEnum nflTeam) {
 		String newTeamName = nflTeam.getTeamName();

@@ -121,6 +121,24 @@ public class LeagueTest {
 		assertTrue(nfl.areInSameConference(dolphins, steelers));
 		assertFalse(nfl.areInSameConference(dolphins, cowboys));
 	}
+	
+	@Test
+	public void resetTeamToDefaultResetsTeamToDefaultAndSwitchesPowerRankingsAsNeeded() {
+		League nfl = new League(League.NFL);
+		nfl.initializeNFL();
+		
+		Team dolphins = nfl.getTeam("Dolphins");
+		Team teamWithSix = nfl.getTeamWithPowerRanking(6);
+		
+		int dolphinsDefaultRanking = dolphins.getDefaultPowerRanking();
+		teamWithSix.setPowerRanking(dolphinsDefaultRanking);
+		dolphins.setPowerRanking(6);
+		
+		nfl.resetTeamToDefault("Dolphins");
+		
+		assertEquals(6, teamWithSix.getPowerRanking());
+		assertEquals(dolphinsDefaultRanking, dolphins.getPowerRanking());
+	}
 
 	private void assertConferenceHasCorrectDivisions(Conference conference) {
 		Division east = conference.getDivision(NFLDivisionEnum.EAST.name());
