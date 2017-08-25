@@ -3,6 +3,7 @@ package nfl.season.calculator;
 import java.io.IOException;
 
 import nfl.season.input.NFLPlayoffSettings;
+import nfl.season.input.NFLRegularSeasonSave;
 import nfl.season.input.NFLSeasonInput;
 import nfl.season.input.NFLTeamSettings;
 import nfl.season.input.NFLFileReaderFactory;
@@ -12,10 +13,14 @@ import nfl.season.menu.MainMenu;
 import nfl.season.menu.MainMenu.MainMenuOptions;
 import nfl.season.menu.MatchupMenu;
 import nfl.season.menu.PlayoffsMenu;
+import nfl.season.menu.SeasonMenu;
 import nfl.season.menu.SingleTeamMenu;
 import nfl.season.menu.TeamsMenu;
 import nfl.season.menu.TeamsMenu.TeamsMenuOptions;
 import nfl.season.playoffs.NFLPlayoffs;
+import nfl.season.scorestrip.ScoreStripMapper;
+import nfl.season.scorestrip.ScoreStripReader;
+import nfl.season.season.NFLSeason;
 
 public class NFLSeasonCalculator {
 
@@ -36,6 +41,9 @@ public class NFLSeasonCalculator {
 		
 		TeamsMenu teamsMenu = createTeamsMenu(input, nfl);
 		mainMenu.setSubMenu(teamsMenu, MainMenuOptions.TEAMS.getOptionNumber());
+		
+		SeasonMenu seasonMenu = createSeasonMenu(input, nfl);
+		mainMenu.setSubMenu(seasonMenu, MainMenuOptions.SEASON.getOptionNumber());
 		
 		PlayoffsMenu playoffsMenu = createPlayoffsMenu(input, nfl);
 		mainMenu.setSubMenu(playoffsMenu, MainMenuOptions.PLAYOFFS.getOptionNumber());
@@ -59,6 +67,26 @@ public class NFLSeasonCalculator {
 		teamsMenu.setSubMenu(singleTeamMenu, TeamsMenuOptions.SELECT_TEAM.getOptionNumber());
 		
 		return teamsMenu;
+	}
+	
+	public static SeasonMenu createSeasonMenu(NFLSeasonInput input, League nfl) {
+		NFLSeason season = new NFLSeason();
+		season.initializeNFLRegularSeason(nfl);
+		
+		NFLPlayoffs playoffs = new NFLPlayoffs(nfl);
+		playoffs.initializeNFLPlayoffs();
+		
+		ScoreStripReader scoreStripReader = new ScoreStripReader();
+		ScoreStripMapper scoreStripMapper = new ScoreStripMapper(nfl);
+		
+		NFLRegularSeasonSave seasonSave = new NFLRegularSeasonSave();
+		NFLFileWriterFactory fileWriterFactory = new NFLFileWriterFactory();
+		NFLFileReaderFactory fileReaderFactory = new NFLFileReaderFactory();
+		
+		SeasonMenu seasonMenu = new SeasonMenu(input, season, playoffs, scoreStripReader, 
+				scoreStripMapper, seasonSave, fileWriterFactory, fileReaderFactory);
+		
+		return seasonMenu;
 	}
 	
 	public static PlayoffsMenu createPlayoffsMenu(NFLSeasonInput input,

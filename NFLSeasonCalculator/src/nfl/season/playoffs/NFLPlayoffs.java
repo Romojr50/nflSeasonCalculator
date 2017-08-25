@@ -1,5 +1,6 @@
 package nfl.season.playoffs;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -11,8 +12,11 @@ import nfl.season.league.League;
 import nfl.season.league.Matchup;
 import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
+import nfl.season.season.NFLSeasonTeam;
 
-public class NFLPlayoffs {
+public class NFLPlayoffs implements Serializable {
+
+	private static final long serialVersionUID = 3772284569816305782L;
 
 	private League nfl;
 	
@@ -100,6 +104,30 @@ public class NFLPlayoffs {
 				playoffConference.addTeam(playoffTeam);
 			}
 		}
+	}
+	
+	public NFLPlayoffTeam getPlayoffVersionOfSeasonTeam(NFLSeasonTeam seasonTeam) {
+		NFLPlayoffTeam returnTeam = null;;
+		
+		Team leagueTeam = seasonTeam.getTeam();
+		String teamName = leagueTeam.getName();
+		
+		if (teamName != null) {
+			for (NFLPlayoffConference playoffConference : conferences) {
+				List<NFLPlayoffTeam> playoffTeams = playoffConference.getTeams();
+				for (NFLPlayoffTeam playoffTeam : playoffTeams) {
+					Team leagueTeamOfPlayoff = playoffTeam.getTeam();
+					String nameOfPlayoffTeam = leagueTeamOfPlayoff.getName();
+					
+					if (teamName.equals(nameOfPlayoffTeam)) {
+						returnTeam = playoffTeam;
+						break;
+					}
+				}
+			}
+		}
+		
+		return returnTeam;
 	}
 
 	public NFLPlayoffTeam getTeamByConferenceSeed(String conferenceName, int conferenceSeed) {

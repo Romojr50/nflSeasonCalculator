@@ -126,9 +126,49 @@ public class NFLPlayoffSettings {
 		
 		return success;
 	}
+	
+	public boolean saveToSettingsFile(NFLPlayoffs playoffs,
+			String folderPath, NFLFileWriterFactory fileWriterFactory) throws IOException {
+		boolean success = true;
+		
+		FileOutputStream fileWriter = null;
+		try {
+			fileWriter = fileWriterFactory.createNFLPlayoffSettingsWriter(folderPath);
+			String playoffSettingsString = createPlayoffSettingsString(playoffs);
+			fileWriter.write(playoffSettingsString.getBytes());
+		} catch (IOException e) {
+			success = false;
+		} finally {
+			fileWriter.close();
+		}
+		
+		return success;
+	}
 
 	public String loadSettingsFile(NFLFileReaderFactory fileReaderFactory) throws IOException {
 		BufferedReader fileReader = fileReaderFactory.createNFLPlayoffSettingsReader();
+		
+		StringBuilder nflTeamSettingsBuilder = new StringBuilder();
+		
+		String line;
+		try {
+			line = fileReader.readLine();
+			while (line != null) {
+				nflTeamSettingsBuilder.append(line);
+				nflTeamSettingsBuilder.append("\n");
+				line = fileReader.readLine();
+			}
+		} finally {
+			fileReader.close();
+		}
+		
+		
+		return nflTeamSettingsBuilder.toString();
+	}
+	
+	public String loadSettingsFile(String folderPath, 
+			NFLFileReaderFactory fileReaderFactory) throws IOException {
+		BufferedReader fileReader = fileReaderFactory.createNFLPlayoffSettingsReader(folderPath);
 		
 		StringBuilder nflTeamSettingsBuilder = new StringBuilder();
 		

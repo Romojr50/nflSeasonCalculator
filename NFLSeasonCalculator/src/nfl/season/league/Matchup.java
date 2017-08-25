@@ -1,7 +1,11 @@
 package nfl.season.league;
 
+import java.io.Serializable;
 
-public class Matchup {
+
+public class Matchup implements Serializable {
+
+	private static final long serialVersionUID = 4033723027647117852L;
 
 	public enum WinChanceModeEnum {
 		CUSTOM_SETTING("Custom Setting"), POWER_RANKINGS("Power Rankings"), 
@@ -241,6 +245,40 @@ public class Matchup {
 		return success;
 	}
 	
+
+	public int calculateSingleTeamWinChanceFromPowerRankings(String teamName) {
+		int returnWinChance = 0;
+		int team1Ranking = team1.getPowerRanking();
+		int team2Ranking = team2.getPowerRanking();
+		boolean teamNameIsTeam1 = team1.getName().equals(teamName);
+
+		if (Team.CLEAR_RANKING != team1Ranking && Team.CLEAR_RANKING != team2Ranking) {
+			boolean team1IsRankedHigher = true;
+			if (team2Ranking < team1Ranking) {
+				team1IsRankedHigher = false;
+			}
+			
+			int betterWinChance = calculateBetterWinChance(team1Ranking,
+					team2Ranking);
+			
+			if (team1IsRankedHigher) {
+				if (teamNameIsTeam1) {
+					returnWinChance = betterWinChance;
+				} else {
+					returnWinChance = 100 - betterWinChance;
+				}
+			} else {
+				if (teamNameIsTeam1) {
+					returnWinChance = 100 - betterWinChance;
+				} else {
+					returnWinChance = betterWinChance;
+				}
+			}
+		}
+		
+		return returnWinChance;
+	}
+	
 	public boolean calculateTeamWinChancesFromEloRatings() {
 		// 1 / (1 + 10 ^ ((ratingA - ratingB) / 400))
 		boolean success = false;
@@ -252,13 +290,8 @@ public class Matchup {
 		if (team1Rating > 0 && team2Rating > 0) {
 			winChanceMode = WinChanceModeEnum.ELO_RATINGS;
 			
-			int ratingDifference = team2Rating - team1Rating;
-			double powerFor10 = ratingDifference / 400.0;
-			double tenToThePower = Math.pow(10, powerFor10);
-			double dividend = 1 + tenToThePower;
-			double winChanceAsDecimal = 1 / dividend;
-			
-			team1NeutralWinChance = (int) Math.round(winChanceAsDecimal * 100);
+			team1NeutralWinChance = 
+					calculateTeam1WinChanceFromEloRatings(team1Rating, team2Rating);
 			team2NeutralWinChance = 100 - team1NeutralWinChance;
 			success = true;
 		}
@@ -266,6 +299,23 @@ public class Matchup {
 		recalculateHomeWinChanceIfNeeded(team1.getName());
 		
 		return success;
+	}
+
+	public int calculateSingleTeamWinChanceFromEloRatings(String teamName) {
+		int returnWinChance = 0;
+
+		int team1Rating = team1.getEloRating();
+		int team2Rating = team2.getEloRating();
+		boolean teamNameIsTeam1 = team1.getName().equals(teamName);
+		
+		int team1WinChance = calculateTeam1WinChanceFromEloRatings(team1Rating, team2Rating);
+		if (teamNameIsTeam1) {
+			returnWinChance = team1WinChance;
+		} else {
+			returnWinChance = 100 - team1WinChance;
+		}
+		
+		return returnWinChance;
 	}
 	
 	public boolean calculateHomeWinChanceFromHomeFieldAdvantage(String teamName) {
@@ -275,14 +325,16 @@ public class Matchup {
 			int homeFieldAdvantage = -1;
 			if (teamName.equalsIgnoreCase(team1.getName())) {
 				homeFieldAdvantage = team1.getHomeFieldAdvantage();
-				team1HomeWinChance = team1NeutralWinChance + Math.round(homeFieldAdvantage / 2);
-				team1HomeWinChance = Math.min(99, team1HomeWinChance);
+				int opponentHomeField = team2.getHomeFieldAdvantage();
+				team1HomeWinChance = calculateHomeTeamWinChance(homeFieldAdvantage, 
+						team1NeutralWinChance, opponentHomeField, team2NeutralWinChance);
 				team2AwayWinChance = 100 - team1HomeWinChance;
 				team1HomeWinChanceMode = HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE;
 			} else if (teamName.equalsIgnoreCase(team2.getName())) {
 				homeFieldAdvantage = team2.getHomeFieldAdvantage();
-				team2HomeWinChance = team2NeutralWinChance + Math.round(homeFieldAdvantage / 2);
-				team2HomeWinChance = Math.min(99, team2HomeWinChance);
+				int opponentHomeField = team1.getHomeFieldAdvantage();
+				team2HomeWinChance = calculateHomeTeamWinChance(homeFieldAdvantage, 
+						team2NeutralWinChance, opponentHomeField, team1NeutralWinChance);
 				team1AwayWinChance = 100 - team2HomeWinChance;
 				team2HomeWinChanceMode = HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE;
 			}
@@ -290,6 +342,54 @@ public class Matchup {
 			
 		}
 		return success;
+	}
+	
+
+	public int calculateSingleHomeWinChanceFromHomeFieldAdvantage(
+			String teamName) {
+		int returnWinChance = 0;
+		
+		int homeFieldAdvantage = 0;
+		int teamNeutralWinChance = 0;
+		int opponentHomeField = 0;
+		int opponentNeutralWinChance = 0;
+		if (team1.getName().equals(teamName)) {
+			homeFieldAdvantage = team1.getHomeFieldAdvantage();
+			teamNeutralWinChance = team1NeutralWinChance;
+			opponentHomeField = team2.getHomeFieldAdvantage();
+			opponentNeutralWinChance = team2NeutralWinChance;
+		} else {
+			homeFieldAdvantage = team2.getHomeFieldAdvantage();
+			teamNeutralWinChance = team2NeutralWinChance;
+			opponentHomeField = team1.getHomeFieldAdvantage();
+			opponentNeutralWinChance = team1NeutralWinChance;
+		}
+		
+		returnWinChance = calculateHomeTeamWinChance(homeFieldAdvantage, 
+				teamNeutralWinChance, opponentHomeField, opponentNeutralWinChance);
+		
+		return returnWinChance;
+	}
+	
+	public int calculateSingleHomeWinChanceFromHomeFieldAdvantage(String teamName, 
+			int neutralWinChance) {
+		int returnWinChance = 0;
+		
+		int homeFieldAdvantage = 0;
+		int opponentHomeField = 0;
+		int opponentNeutralWinChance = 100 - neutralWinChance;
+		if (team1.getName().equals(teamName)) {
+			homeFieldAdvantage = team1.getHomeFieldAdvantage();
+			opponentHomeField = team2.getHomeFieldAdvantage();
+		} else {
+			homeFieldAdvantage = team2.getHomeFieldAdvantage();
+			opponentHomeField = team1.getHomeFieldAdvantage();
+		}
+		
+		returnWinChance = calculateHomeTeamWinChance(homeFieldAdvantage, 
+				neutralWinChance, opponentHomeField, opponentNeutralWinChance);
+		
+		return returnWinChance;
 	}
 
 	public WinChanceModeEnum getWinChanceMode() {
@@ -335,6 +435,33 @@ public class Matchup {
 				(rankingDifferenceComparedTo24Difference * WIN_CHANCE_DIFFERENCE_BY_SPOT));
 		betterWinChance = Math.min(99, betterWinChance);
 		return betterWinChance;
+	}
+	
+	private int calculateTeam1WinChanceFromEloRatings(int team1Rating,
+			int team2Rating) {
+		int ratingDifference = team2Rating - team1Rating;
+		double powerFor10 = ratingDifference / 400.0;
+		double tenToThePower = Math.pow(10, powerFor10);
+		double dividend = 1 + tenToThePower;
+		double winChanceAsDecimal = 1 / dividend;
+		
+		return (int) Math.round(winChanceAsDecimal * 100);
+	}
+
+	private int calculateHomeTeamWinChance(int homeFieldAdvantage, int neutralWinChance,
+			int opponentHomeField, int opponentNeutralWinChance) {
+		int effectiveHomeField = homeFieldAdvantage;
+		int opponentHomeTeamWinChance = opponentNeutralWinChance + 
+				Math.round(opponentHomeField / 2);
+		if (opponentHomeTeamWinChance > 99) {
+			int difference = 99 - opponentNeutralWinChance;
+			effectiveHomeField = Math.min(homeFieldAdvantage, difference * 2);
+		}
+		
+		int homeTeamWinChance = neutralWinChance + Math.round(effectiveHomeField / 2);
+		homeTeamWinChance = Math.min(99, homeTeamWinChance);
+		
+		return homeTeamWinChance;
 	}
 
 }

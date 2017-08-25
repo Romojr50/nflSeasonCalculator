@@ -3,18 +3,15 @@ package nfl.season.menu;
 import java.io.IOException;
 import java.util.List;
 
-import nfl.season.input.NFLSeasonInput;
-import nfl.season.input.NFLTeamSettings;
 import nfl.season.input.NFLFileReaderFactory;
 import nfl.season.input.NFLFileWriterFactory;
+import nfl.season.input.NFLSeasonInput;
+import nfl.season.input.NFLTeamSettings;
 import nfl.season.league.League;
-import nfl.season.league.NFLTeamEnum;
 import nfl.season.league.Team;
 
 public class TeamsMenu extends SubMenu {
 
-	private static final int EXIT_FROM_TEAM_SELECT = NFLTeamEnum.values().length + 1;
-	
 	private static final String SAVE_FILE_SUCCEEDED = "Team Settings Saved Successfully\n";
 
 	private static final String SAVE_FILE_FAILED = "Team Settings Save FAILED\n";
@@ -125,10 +122,10 @@ public class TeamsMenu extends SubMenu {
 	}
 	
 	private void launchTeamSelect() {
-		String teamListMessage = createTeamListMessage();
+		String teamListMessage = MenuOptionsUtil.buildTeamListMessage();
 		int selectedTeamNumber = -1;
 		
-		while (selectedTeamNumber != EXIT_FROM_TEAM_SELECT) {
+		while (selectedTeamNumber != MenuOptionsUtil.EXIT_FROM_TEAM_SELECT) {
 			selectedTeamNumber = input.askForInt(teamListMessage);
 				
 			Team selectedTeam = nfl.getTeam(selectedTeamNumber);
@@ -156,7 +153,8 @@ public class TeamsMenu extends SubMenu {
 			int currentRanking = 1;
 			List<Team> remainingTeams = nfl.getTeams();
 			
-			while (selectedTeamNumber != EXIT_FROM_TEAM_SELECT && remainingTeams.size() > 0) {
+			while (selectedTeamNumber != MenuOptionsUtil.EXIT_FROM_TEAM_SELECT && 
+					remainingTeams.size() > 0) {
 				String setAllRankingsPrefix = "Set #" + currentRanking + "\n";
 				String teamListMessage = setAllRankingsPrefix + createTeamListMessageFromList(remainingTeams);
 				selectedTeamNumber = input.askForInt(teamListMessage);
@@ -224,20 +222,6 @@ public class TeamsMenu extends SubMenu {
 			team.calculateAllMatchupsUsingEloRatings();
 		}
 	}
-
-	private String createTeamListMessage() {
-		StringBuilder teamListMessage = new StringBuilder();
-		teamListMessage.append(MenuOptionsUtil.MENU_INTRO);
-		int teamIndex = 1;
-		for (NFLTeamEnum nflTeam : NFLTeamEnum.values()) {
-			teamListMessage.append(teamIndex + ". ");
-			teamListMessage.append(nflTeam.getTeamName());
-			teamListMessage.append("\n");
-			teamIndex++;
-		}
-		teamListMessage.append(EXIT_FROM_TEAM_SELECT + ". Back to Team Menu");
-		return teamListMessage.toString();
-	}
 	
 	private String createTeamListMessageFromList(List<Team> teams) {
 		StringBuilder teamListMessage = new StringBuilder();
@@ -249,7 +233,7 @@ public class TeamsMenu extends SubMenu {
 			teamListMessage.append("\n");
 			teamIndex++;
 		}
-		teamListMessage.append(EXIT_FROM_TEAM_SELECT + ". Back to Team Menu");
+		teamListMessage.append(MenuOptionsUtil.EXIT_FROM_TEAM_SELECT + ". Back to Team Menu");
 		return teamListMessage.toString();
 	}
 

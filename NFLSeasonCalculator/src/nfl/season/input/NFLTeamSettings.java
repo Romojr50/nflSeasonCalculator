@@ -82,6 +82,25 @@ public class NFLTeamSettings {
 		
 		return success;
 	}
+	
+	public boolean saveToSettingsFile(League league, String folderPath,
+			NFLFileWriterFactory fileWriterFactory) throws IOException {
+		boolean success = true;
+		
+		FileOutputStream fileWriter = null;
+		
+		try {
+			fileWriter = fileWriterFactory.createNFLTeamSettingsWriter(folderPath);
+			String teamSettingsFileString = createTeamSettingsFileString(league);
+			fileWriter.write(teamSettingsFileString.getBytes());
+		} catch (IOException e) {
+			success = false;
+		} finally {
+			fileWriter.close();
+		}
+		
+		return success;
+	}
 
 	public void setTeamSettingsFromTeamLine(Team team, String teamLine) {
 		String[] teamLineTokens = teamLine.split(",");
@@ -117,7 +136,7 @@ public class NFLTeamSettings {
 		
 		setMatchupHomeWinChanceFromMatchupLine(teamName, matchup, homeModeCode, 
 				homeWinChanceString);
-		setMatchupHomeWinChanceFromMatchupLine(opponentName, matchup, awayModeCode, 
+		setMatchupAwayWinChanceFromMatchupLine(teamName, opponentName, matchup, awayModeCode, 
 				awayWinChanceString);
 	}
 	
@@ -169,6 +188,29 @@ public class NFLTeamSettings {
 		
 		return nflTeamSettingsBuilder.toString();
 	}
+	
+	public String loadSettingsFile(String folderPath,
+			NFLFileReaderFactory fileReaderFactory) throws IOException {
+		BufferedReader fileReader = fileReaderFactory.createNFLTeamSettingsReader(
+				folderPath);
+		
+		StringBuilder nflTeamSettingsBuilder = new StringBuilder();
+		
+		String line;
+		try {
+			line = fileReader.readLine();
+			while (line != null) {
+				nflTeamSettingsBuilder.append(line);
+				nflTeamSettingsBuilder.append("\n");
+				line = fileReader.readLine();
+			}
+		} finally {
+			fileReader.close();
+		}
+		
+		
+		return nflTeamSettingsBuilder.toString();
+	}
 
 	private void setNeutralWinChanceFromMatchupLine(String teamName,
 			Matchup matchup, String matchupLine) {
@@ -190,15 +232,27 @@ public class NFLTeamSettings {
 		}
 	}
 	
-	private void setMatchupHomeWinChanceFromMatchupLine(String homeTeam, Matchup matchup, 
-			String homeModeCode, String homeWinChanceString) {
+	private void setMatchupHomeWinChanceFromMatchupLine(String teamName, Matchup matchup, 
+			String homeModeCode, String winChanceString) {
 		if (HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE.winChanceModeDescription.charAt(0) == 
 				homeModeCode.charAt(0)) {
-			matchup.calculateHomeWinChanceFromHomeFieldAdvantage(homeTeam);
+			matchup.calculateHomeWinChanceFromHomeFieldAdvantage(teamName);
 		} else if (HomeAwayWinChanceModeEnum.CUSTOM_SETTING.winChanceModeDescription.charAt(0) == 
 				homeModeCode.charAt(0)) {
-			int homeWinChance = Integer.parseInt(homeWinChanceString);
-			matchup.setTeamHomeWinChance(homeTeam, homeWinChance);
+			int winChance = Integer.parseInt(winChanceString);
+			matchup.setTeamHomeWinChance(teamName, winChance);
+		}
+	}
+	
+	private void setMatchupAwayWinChanceFromMatchupLine(String teamName, String opponent, 
+			Matchup matchup, String homeModeCode, String winChanceString) {
+		if (HomeAwayWinChanceModeEnum.HOME_FIELD_ADVANTAGE.winChanceModeDescription.charAt(0) == 
+				homeModeCode.charAt(0)) {
+			matchup.calculateHomeWinChanceFromHomeFieldAdvantage(opponent);
+		} else if (HomeAwayWinChanceModeEnum.CUSTOM_SETTING.winChanceModeDescription.charAt(0) == 
+				homeModeCode.charAt(0)) {
+			int winChance = Integer.parseInt(winChanceString);
+			matchup.setTeamAwayWinChance(teamName, winChance);
 		}
 	}
 

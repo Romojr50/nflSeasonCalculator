@@ -6,6 +6,8 @@ public class Game {
 	
 	private Team homeTeam;
 	
+	private Team awayTeam;
+	
 	public Game(Matchup matchup) {
 		this.matchup = matchup;
 	}
@@ -14,6 +16,7 @@ public class Game {
 		Matchup matchup = homeTeam.getMatchup(awayTeam.getName());
 		this.matchup = matchup;
 		this.homeTeam = homeTeam;
+		this.awayTeam = awayTeam;
 	}
 
 	public Matchup getMatchup() {
@@ -26,6 +29,10 @@ public class Game {
 
 	public void setHomeTeam(Team homeTeam) {
 		this.homeTeam = homeTeam;
+	}
+	
+	public Team getAwayTeam() {
+		return awayTeam;
 	}
 
 }

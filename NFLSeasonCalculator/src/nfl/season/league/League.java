@@ -1,10 +1,13 @@
 package nfl.season.league;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class League {
+public class League implements Serializable{
 	
+	private static final long serialVersionUID = 3856013190168090496L;
+
 	public static final String NFL = "NFL";
 	
 	private String name;
@@ -121,6 +124,59 @@ public class League {
 		return returnTeam;
 	}
 	
+	public boolean areInSameDivision(Team team1, Team team2) {
+		boolean inSameDivision = false;
+		
+		String team1Name = team1.getName();
+		String team2Name = team2.getName();
+		
+		for (Conference conference : conferences) {
+			Team team1InConference = conference.getTeam(team1Name);
+			if (team1InConference != null) {
+				if (conference.getTeam(team2Name) != null) {
+					inSameDivision = conferenceTeamsAreInSameDivision(
+							team1Name, team2Name, conference);
+				} else {
+					break;
+				}
+			}
+		}
+		
+		return inSameDivision;
+	}
+
+	public boolean areInSameConference(Team team1, Team team2) {
+		boolean inSameConference = false;
+		
+		String team1Name = team1.getName();
+		String team2Name = team2.getName();
+		
+		for (Conference conference : conferences) {
+			Team team1InConference = conference.getTeam(team1Name);
+			if (team1InConference != null) {
+				if (conference.getTeam(team2Name) != null) {
+					inSameConference = true;
+				} else {
+					break;
+				}
+			}
+		}
+		
+		return inSameConference;
+	}
+	
+
+	public void resetTeamToDefault(String teamName) {
+		Team teamToReset = getTeam(teamName);
+		int defaultPowerRanking = teamToReset.getDefaultPowerRanking();
+		int currentPowerRanking = teamToReset.getPowerRanking();
+		Team teamWithDefaultPowerRanking = getTeamWithPowerRanking(defaultPowerRanking);
+		
+		teamToReset.resetToDefaults();
+		if (teamWithDefaultPowerRanking != null) {
+			teamWithDefaultPowerRanking.setPowerRanking(currentPowerRanking);
+		}
+	}
 
 	private void initializeTeam(Division newDivision, NFLTeamEnum nflTeam) {
 		String newTeamName = nflTeam.getTeamName();
@@ -148,6 +204,25 @@ public class League {
 				}
 			}
 		}
+	}
+
+	private boolean conferenceTeamsAreInSameDivision(String team1Name, 
+			String team2Name, Conference conference) {
+		boolean inSameDivision = false;
+		
+		List<Division> divisions = conference.getDivisions();
+		for (Division division : divisions) {
+			Team team1InDivision = division.getTeam(team1Name);
+			if (team1InDivision != null) {
+				if (division.getTeam(team2Name) != null) {
+					inSameDivision = true;
+				} else {
+					break;
+				}
+			}
+		}
+		
+		return inSameDivision;
 	}
 
 }

@@ -38,5 +38,9 @@ public class NFLSeasonInput {
 		out.println(message);
 		return scanner.nextLine();
 	}
+
+	public void printMessage(String message) {
+		out.println(message);
+	}
 	
 }

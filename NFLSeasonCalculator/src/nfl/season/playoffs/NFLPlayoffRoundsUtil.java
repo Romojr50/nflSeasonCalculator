@@ -92,10 +92,10 @@ public class NFLPlayoffRoundsUtil {
 		
 		seed1.setChanceOfMakingDivisionalRound(100);
 		seed2.setChanceOfMakingDivisionalRound(100);
-		seed3.setChanceOfMakingDivisionalRound((int) Math.round((conferenceMatrix[2][5] * 100)));
-		seed4.setChanceOfMakingDivisionalRound((int) Math.round((conferenceMatrix[3][4] * 100)));
-		seed5.setChanceOfMakingDivisionalRound((int) Math.round((conferenceMatrix[4][3] * 100)));
-		seed6.setChanceOfMakingDivisionalRound((int) Math.round((conferenceMatrix[5][2] * 100)));
+		seed3.setChanceOfMakingDivisionalRound((int) Math.round((conferenceMatrix[2][5] * 100.0)));
+		seed4.setChanceOfMakingDivisionalRound((int) Math.round((conferenceMatrix[3][4] * 100.0)));
+		seed5.setChanceOfMakingDivisionalRound((int) Math.round((conferenceMatrix[4][3] * 100.0)));
+		seed6.setChanceOfMakingDivisionalRound((int) Math.round((conferenceMatrix[5][2] * 100.0)));
 	}
 	
 	private static void setConferenceRoundChances(double[][] conferenceMatrix,
@@ -110,25 +110,25 @@ public class NFLPlayoffRoundsUtil {
 		seed1.setChanceOfMakingConferenceRound((int) Math.round((
 				(conferenceMatrix[0][3] * conferenceMatrix[2][5] * conferenceMatrix[3][4]) + 
 				(conferenceMatrix[0][4] * conferenceMatrix[2][5] * conferenceMatrix[4][3]) + 
-				(conferenceMatrix[0][5] * conferenceMatrix[5][2])) * 100));
+				(conferenceMatrix[0][5] * conferenceMatrix[5][2])) * 100.0));
 		seed2.setChanceOfMakingConferenceRound((int) Math.round((
 				(conferenceMatrix[1][2] * conferenceMatrix[2][5]) +
 				(conferenceMatrix[1][3] * conferenceMatrix[5][2] * conferenceMatrix[3][4]) +
-				(conferenceMatrix[1][4] * conferenceMatrix[5][2] * conferenceMatrix[4][3])) * 100));
+				(conferenceMatrix[1][4] * conferenceMatrix[5][2] * conferenceMatrix[4][3])) * 100.0));
 		seed3.setChanceOfMakingConferenceRound((int) Math.round((
-				(seed3.getChanceOfMakingDivisionalRound() / 100.0) *
-				conferenceMatrix[2][1]) * 100));
+				(seed3.getChanceOfMakingDivisionalRound()) *
+				conferenceMatrix[2][1])));
 		seed4.setChanceOfMakingConferenceRound((int) Math.round((
-				(seed4.getChanceOfMakingDivisionalRound() / 100.0) *
-				((conferenceMatrix[4][0] * conferenceMatrix[2][5]) +
-						(conferenceMatrix[4][1] * conferenceMatrix[5][2]))) * 100));
+				(seed4.getChanceOfMakingDivisionalRound()) *
+				((conferenceMatrix[3][0] * conferenceMatrix[2][5]) +
+						(conferenceMatrix[3][1] * conferenceMatrix[5][2])))));
 		seed5.setChanceOfMakingConferenceRound((int) Math.round((
-				(seed5.getChanceOfMakingDivisionalRound() / 100.0) * 
+				(seed5.getChanceOfMakingDivisionalRound()) * 
 				((conferenceMatrix[4][0] * conferenceMatrix[2][5]) +
-						(conferenceMatrix[4][1] * conferenceMatrix[5][2]))) * 100));
+						(conferenceMatrix[4][1] * conferenceMatrix[5][2])))));
 		seed6.setChanceOfMakingConferenceRound((int) Math.round((
-				(seed6.getChanceOfMakingDivisionalRound() / 100.0) *
-				(conferenceMatrix[5][0])) * 100));
+				(seed6.getChanceOfMakingDivisionalRound()) *
+				(conferenceMatrix[5][0]))));
 	}
 	
 	private static void setSuperBowlRoundChances(double[][] conferenceMatrix,
@@ -145,37 +145,37 @@ public class NFLPlayoffRoundsUtil {
 				((seed2.getChanceOfMakingConferenceRound() / 100.0 * conferenceMatrix[0][1]) +
 				(seed3.getChanceOfMakingConferenceRound() / 100.0 * conferenceMatrix[0][2]) +
 				(conferenceMatrix[0][3] * conferenceMatrix[5][2] * conferenceMatrix[3][4] * conferenceMatrix[3][1]) +
-				(conferenceMatrix[0][4] * conferenceMatrix[5][2] * conferenceMatrix[4][3] * conferenceMatrix[4][1]))) * 100));
+				(conferenceMatrix[0][4] * conferenceMatrix[5][2] * conferenceMatrix[4][3] * conferenceMatrix[4][1]))) * 100.0));
 		seed2.setChanceOfMakingSuperBowl((int) Math.round((
 				(seed2.getChanceOfMakingConferenceRound() / 100.0) *
 				((seed1.getChanceOfMakingConferenceRound() / 100.0 * conferenceMatrix[1][0]) +
 				(seed6.getChanceOfMakingConferenceRound() / 100.0 * conferenceMatrix[1][5]) +
 				(conferenceMatrix[1][3] * conferenceMatrix[2][5] * conferenceMatrix[3][4] * conferenceMatrix[3][0]) +
-				(conferenceMatrix[1][4] * conferenceMatrix[2][5] * conferenceMatrix[4][3] * conferenceMatrix[4][0]))) * 100));
+				(conferenceMatrix[1][4] * conferenceMatrix[2][5] * conferenceMatrix[4][3] * conferenceMatrix[4][0]))) * 100.0));
 		seed3.setChanceOfMakingSuperBowl((int) Math.round((
 				(seed3.getChanceOfMakingConferenceRound() / 100.0) *
 				((conferenceMatrix[2][0] * conferenceMatrix[0][3] * conferenceMatrix[3][4]) +
 				(conferenceMatrix[2][0] * conferenceMatrix[0][4] * conferenceMatrix[4][3]) +
 				(conferenceMatrix[2][3] * conferenceMatrix[3][0] * conferenceMatrix[3][4]) +
-				(conferenceMatrix[2][4] * conferenceMatrix[4][0] * conferenceMatrix[4][3]))) * 100));
+				(conferenceMatrix[2][4] * conferenceMatrix[4][0] * conferenceMatrix[4][3]))) * 100.0));
 		seed4.setChanceOfMakingSuperBowl((int) Math.round((
 				(seed4.getChanceOfMakingConferenceRound() / 100.0) *
 				((conferenceMatrix[3][0] * conferenceMatrix[0][5] * conferenceMatrix[5][2]) +
 				(conferenceMatrix[3][1] * conferenceMatrix[1][2] * conferenceMatrix[2][5]) +
 				(conferenceMatrix[3][2] * conferenceMatrix[2][1] * conferenceMatrix[2][5]) +
-				(conferenceMatrix[3][5] * conferenceMatrix[5][0] * conferenceMatrix[5][2]))) * 100));
+				(conferenceMatrix[3][5] * conferenceMatrix[5][0] * conferenceMatrix[5][2]))) * 100.0));
 		seed5.setChanceOfMakingSuperBowl((int) Math.round((
 				(seed5.getChanceOfMakingConferenceRound() / 100.0) *
 				((conferenceMatrix[4][0] * conferenceMatrix[0][5] * conferenceMatrix[5][2]) +
 				(conferenceMatrix[4][1] * conferenceMatrix[1][2] * conferenceMatrix[2][5]) +
 				(conferenceMatrix[4][2] * conferenceMatrix[2][1] * conferenceMatrix[2][5]) +
-				(conferenceMatrix[4][5] * conferenceMatrix[5][0] * conferenceMatrix[5][2]))) * 100));
+				(conferenceMatrix[4][5] * conferenceMatrix[5][0] * conferenceMatrix[5][2]))) * 100.0));
 		seed6.setChanceOfMakingSuperBowl((int) Math.round((
 				(seed6.getChanceOfMakingConferenceRound() / 100.0) *
 				((conferenceMatrix[5][1] * conferenceMatrix[1][3] * conferenceMatrix[3][4]) +
 				(conferenceMatrix[5][1] * conferenceMatrix[1][4] * conferenceMatrix[4][3]) +
 				(conferenceMatrix[5][3] * conferenceMatrix[3][4] * conferenceMatrix[3][1]) +
-				(conferenceMatrix[5][4] * conferenceMatrix[4][3] * conferenceMatrix[4][1]))) * 100));
+				(conferenceMatrix[5][4] * conferenceMatrix[4][3] * conferenceMatrix[4][1]))) * 100.0));
 	}
 	
 	private static void setAllSuperBowlChancesInConference(
@@ -195,7 +195,7 @@ public class NFLPlayoffRoundsUtil {
 			}
 			
 			chanceOfWinningSuperBowl = chanceOfWinningSuperBowl * (team.getChanceOfMakingSuperBowl() / 100.0);
-			team.setChanceOfWinningSuperBowl((int) Math.round(chanceOfWinningSuperBowl * 100)); 
+			team.setChanceOfWinningSuperBowl((int) Math.round(chanceOfWinningSuperBowl * 100.0)); 
 		}
 	}
 	
