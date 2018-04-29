@@ -1,2 +1,5 @@
 .metadata
 TeamSettings/
+.recommenders
+.gradle/buildOutputCleanup
+.gradle/4.0

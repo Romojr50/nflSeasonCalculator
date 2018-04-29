@@ -21,6 +21,10 @@ public class SeasonGame extends Game implements Serializable {
 	
 	private boolean wasATie = false;
 	
+	private int homeScore = 0;
+	
+	private int awayScore = 0;
+	
 	private Team simulatedWinner;
 	
 	public SeasonGame(Team homeTeam, Team awayTeam) {
@@ -77,6 +81,38 @@ public class SeasonGame extends Game implements Serializable {
 		this.winner = null;
 		wasATie = true;
 	}
+	
+	public int getHomeScore() {
+		return homeScore;
+	}
+	
+	public void setHomeScore(int homeScore) {
+		this.homeScore = homeScore;
+	}
+
+	public int getAwayScore() {
+		return awayScore;
+	}
+	
+	public void setAwayScore(int awayScore) {
+		this.awayScore = awayScore;
+	}
+
+	public int getWinningScore() {
+		int winningScore = homeScore;
+		if (awayScore > homeScore) {
+			winningScore = awayScore;
+		}
+		return winningScore;
+	}
+
+	public int getLosingScore() {
+		int losingScore = homeScore;
+		if (awayScore < homeScore) {
+			losingScore = awayScore;
+		}
+		return losingScore;
+	}
 
 	public void simulateGame() {
 		if (!alreadyHappened) {
@@ -102,5 +138,6 @@ public class SeasonGame extends Game implements Serializable {
 	public void clearSimulatedResult() {
 		simulatedWinner = null;
 	}
+
 
 }
