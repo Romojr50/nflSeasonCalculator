@@ -2,45 +2,45 @@ package nfl.season.league;
 
 public enum NFLTeamEnum {
 
-	PATRIOTS("Patriots", NFLConferenceEnum.AFC, NFLDivisionEnum.EAST, 1, 1649, 14),
-	DOLPHINS("Dolphins", NFLConferenceEnum.AFC, NFLDivisionEnum.EAST, 13, 1448, 8),
-	JETS("Jets", NFLConferenceEnum.AFC, NFLDivisionEnum.EAST, 32, 1431, 17),
-	BILLS("Bills", NFLConferenceEnum.AFC, NFLDivisionEnum.EAST, 26, 1501, 20),
+	PATRIOTS("Patriots", NFLConferenceEnum.AFC, NFLDivisionEnum.EAST, 2, 1649, 14),
+	DOLPHINS("Dolphins", NFLConferenceEnum.AFC, NFLDivisionEnum.EAST, 30, 1448, 8),
+	JETS("Jets", NFLConferenceEnum.AFC, NFLDivisionEnum.EAST, 28, 1431, 17),
+	BILLS("Bills", NFLConferenceEnum.AFC, NFLDivisionEnum.EAST, 20, 1501, 20),
 	
-	STEELERS("Steelers", NFLConferenceEnum.AFC, NFLDivisionEnum.NORTH, 3, 1594, 13),
-	RAVENS("Ravens", NFLConferenceEnum.AFC, NFLDivisionEnum.NORTH, 21, 1533, 30),
-	BENGALS("Bengals", NFLConferenceEnum.AFC, NFLDivisionEnum.NORTH, 25, 1473, 19),
-	BROWNS("Browns", NFLConferenceEnum.AFC, NFLDivisionEnum.NORTH, 29, 1300, 13),
+	STEELERS("Steelers", NFLConferenceEnum.AFC, NFLDivisionEnum.NORTH, 7, 1594, 13),
+	RAVENS("Ravens", NFLConferenceEnum.AFC, NFLDivisionEnum.NORTH, 18, 1533, 30),
+	BENGALS("Bengals", NFLConferenceEnum.AFC, NFLDivisionEnum.NORTH, 24, 1473, 19),
+	BROWNS("Browns", NFLConferenceEnum.AFC, NFLDivisionEnum.NORTH, 32, 1300, 13),
 	
 	TEXANS("Texans", NFLConferenceEnum.AFC, NFLDivisionEnum.SOUTH, 14, 1396, 19),
-	COLTS("Colts", NFLConferenceEnum.AFC, NFLDivisionEnum.SOUTH, 18, 1405, 12),
-	TITANS("Titans", NFLConferenceEnum.AFC, NFLDivisionEnum.SOUTH, 11, 1494, 8),
-	JAGUARS("Jaguars", NFLConferenceEnum.AFC, NFLDivisionEnum.SOUTH, 27, 1533, 18),
+	COLTS("Colts", NFLConferenceEnum.AFC, NFLDivisionEnum.SOUTH, 31, 1405, 12),
+	TITANS("Titans", NFLConferenceEnum.AFC, NFLDivisionEnum.SOUTH, 12, 1494, 8),
+	JAGUARS("Jaguars", NFLConferenceEnum.AFC, NFLDivisionEnum.SOUTH, 6, 1533, 18),
 	
-	BRONCOS("Broncos", NFLConferenceEnum.AFC, NFLDivisionEnum.WEST, 9, 1449, 17),
-	RAIDERS("Raiders", NFLConferenceEnum.AFC, NFLDivisionEnum.WEST, 5, 1463, 11),
-	CHIEFS("Chiefs", NFLConferenceEnum.AFC, NFLDivisionEnum.WEST, 12, 1569, 10),
-	CHARGERS("Chargers", NFLConferenceEnum.AFC, NFLDivisionEnum.WEST, 24, 1543, 14),
+	BRONCOS("Broncos", NFLConferenceEnum.AFC, NFLDivisionEnum.WEST, 25, 1449, 17),
+	RAIDERS("Raiders", NFLConferenceEnum.AFC, NFLDivisionEnum.WEST, 22, 1463, 11),
+	CHIEFS("Chiefs", NFLConferenceEnum.AFC, NFLDivisionEnum.WEST, 13, 1569, 10),
+	CHARGERS("Chargers", NFLConferenceEnum.AFC, NFLDivisionEnum.WEST, 11, 1543, 14),
 	
-	GIANTS("Giants", NFLConferenceEnum.NFC, NFLDivisionEnum.EAST, 8, 1410, 12),
-	COWBOYS("Cowboys", NFLConferenceEnum.NFC, NFLDivisionEnum.EAST, 6, 1545, -9),
-	EAGLES("Eagles", NFLConferenceEnum.NFC, NFLDivisionEnum.EAST, 16, 1645, 8),
-	REDSKINS("Redskins", NFLConferenceEnum.NFC, NFLDivisionEnum.EAST, 19, 1470, 15),
+	GIANTS("Giants", NFLConferenceEnum.NFC, NFLDivisionEnum.EAST, 23, 1410, 12),
+	COWBOYS("Cowboys", NFLConferenceEnum.NFC, NFLDivisionEnum.EAST, 19, 1545, -9),
+	EAGLES("Eagles", NFLConferenceEnum.NFC, NFLDivisionEnum.EAST, 1, 1645, 8),
+	REDSKINS("Redskins", NFLConferenceEnum.NFC, NFLDivisionEnum.EAST, 21, 1470, 15),
 	
-	PACKERS("Packers", NFLConferenceEnum.NFC, NFLDivisionEnum.NORTH, 4, 1470, 21),
-	VIKINGS("Vikings", NFLConferenceEnum.NFC, NFLDivisionEnum.NORTH, 23, 1601, 28),
-	BEARS("Bears", NFLConferenceEnum.NFC, NFLDivisionEnum.NORTH, 31, 1442, 6),
-	LIONS("Lions", NFLConferenceEnum.NFC, NFLDivisionEnum.NORTH, 17, 1522, 16),
+	PACKERS("Packers", NFLConferenceEnum.NFC, NFLDivisionEnum.NORTH, 9, 1470, 21),
+	VIKINGS("Vikings", NFLConferenceEnum.NFC, NFLDivisionEnum.NORTH, 4, 1601, 28),
+	BEARS("Bears", NFLConferenceEnum.NFC, NFLDivisionEnum.NORTH, 27, 1442, 6),
+	LIONS("Lions", NFLConferenceEnum.NFC, NFLDivisionEnum.NORTH, 15, 1522, 16),
 	
-	FALCONS("Falcons", NFLConferenceEnum.NFC, NFLDivisionEnum.SOUTH, 2, 1599, 8),
-	SAINTS("Saints", NFLConferenceEnum.NFC, NFLDivisionEnum.SOUTH, 22, 1583, 21),
-	PANTHERS("Panthers", NFLConferenceEnum.NFC, NFLDivisionEnum.SOUTH, 15, 1548, 15),
-	BUCCANEERS("Buccaneers", NFLConferenceEnum.NFC, NFLDivisionEnum.SOUTH, 10, 1468, 4),
+	FALCONS("Falcons", NFLConferenceEnum.NFC, NFLDivisionEnum.SOUTH, 8, 1599, 8),
+	SAINTS("Saints", NFLConferenceEnum.NFC, NFLDivisionEnum.SOUTH, 5, 1583, 21),
+	PANTHERS("Panthers", NFLConferenceEnum.NFC, NFLDivisionEnum.SOUTH, 10, 1548, 15),
+	BUCCANEERS("Buccaneers", NFLConferenceEnum.NFC, NFLDivisionEnum.SOUTH, 26, 1468, 4),
 	
-	SEAHAWKS("Seahawks", NFLConferenceEnum.NFC, NFLDivisionEnum.WEST, 7, 1543, 18),
-	CARDINALS("Cardinals", NFLConferenceEnum.NFC, NFLDivisionEnum.WEST, 20, 1481, 21),
-	NINERS("49ers", NFLConferenceEnum.NFC, NFLDivisionEnum.WEST, 30, 1468, 13),
-	RAMS("Rams", NFLConferenceEnum.NFC, NFLDivisionEnum.WEST, 28, 1528, 3);
+	SEAHAWKS("Seahawks", NFLConferenceEnum.NFC, NFLDivisionEnum.WEST, 17, 1543, 18),
+	CARDINALS("Cardinals", NFLConferenceEnum.NFC, NFLDivisionEnum.WEST, 29, 1481, 21),
+	NINERS("49ers", NFLConferenceEnum.NFC, NFLDivisionEnum.WEST, 16, 1468, 13),
+	RAMS("Rams", NFLConferenceEnum.NFC, NFLDivisionEnum.WEST, 3, 1528, 3);
 	
 	private String teamName;
 	private NFLConferenceEnum conference;
