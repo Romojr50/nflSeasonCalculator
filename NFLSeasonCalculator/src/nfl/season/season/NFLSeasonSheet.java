@@ -1,5 +1,7 @@
 package nfl.season.season;
 
+import java.util.List;
+
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -61,6 +63,28 @@ public class NFLSeasonSheet {
 		teamRow.createCell(11).setCellValue(Math.round(seasonTeam.getChanceToMakeConferenceRound() / numberOfSeasons));
 		teamRow.createCell(12).setCellValue(Math.round(seasonTeam.getChanceToWinConference() / numberOfSeasons));
 		teamRow.createCell(13).setCellValue(Math.round(seasonTeam.getChanceToWinSuperBowl() / numberOfSeasons));
+	}
+
+	public void createDivisionRows(Sheet sheet, NFLSeasonDivision division, int numberOfSeasons) {
+		List<NFLSeasonTeam> seasonTeams = division.getTeams();
+		for (NFLSeasonTeam seasonTeam : seasonTeams) {
+			createTeamRow(sheet, seasonTeam, numberOfSeasons);
+		}
+		Row teamRow = sheet.createRow(sheet.getLastRowNum() + 1);
+	}
+
+	public void createConferenceRows(Sheet sheet, NFLSeasonConference conference, int numberOfSeasons) {
+		List<NFLSeasonDivision> seasonDivisions = conference.getDivisions();
+		for (NFLSeasonDivision seasonDivision : seasonDivisions) {
+			createDivisionRows(sheet, seasonDivision, numberOfSeasons);
+		}
+	}
+
+	public void createLeagueRows(Sheet sheet, NFLSeason season, int numberOfSeasons) {
+		List<NFLSeasonConference> seasonConferences = season.getConferences();
+		for (NFLSeasonConference seasonConference : seasonConferences) {
+			createConferenceRows(sheet, seasonConference, numberOfSeasons);
+		}
 	}
 
 }

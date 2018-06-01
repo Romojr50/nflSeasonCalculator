@@ -6,12 +6,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.AdditionalAnswers;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -31,6 +35,9 @@ public class NFLSeasonSheetTest {
 	private Row teamRow;
 	
 	@Mock
+	private Row emptyRow;
+	
+	@Mock
 	private Cell mockCell;
 	
 	@Mock
@@ -38,6 +45,25 @@ public class NFLSeasonSheetTest {
 	
 	@Mock
 	private Team mockTeam;
+	
+	private List<NFLSeasonTeam> seasonTeamList;
+	
+	@Mock
+	private NFLSeasonDivision mockDivision;
+	
+	private List<NFLSeasonDivision> seasonDivisionList;
+	
+	@Mock
+	private NFLSeasonConference mockConference;
+	
+	private List<NFLSeasonConference> seasonConferenceList;
+	
+	@Mock
+	private NFLSeason mockSeason;
+	
+	private final int numberOfSeasons = 24;
+	
+	private final int numberOfTeamsPerDivision = 4;
 	
 	private NFLSeasonSheet seasonSheet;
 	
@@ -47,7 +73,26 @@ public class NFLSeasonSheetTest {
 		when(headerRow.createCell(anyInt())).thenReturn(mockCell);
 		when(teamRow.createCell(anyInt())).thenReturn(mockCell);
 		
-		when(mockSeasonTeam.getTeam()).thenReturn(mockTeam);
+		setUpMockTeam();
+		
+		seasonTeamList = new ArrayList<NFLSeasonTeam>();
+		seasonTeamList.add(mockSeasonTeam);
+		seasonTeamList.add(mockSeasonTeam);
+		seasonTeamList.add(mockSeasonTeam);
+		seasonTeamList.add(mockSeasonTeam);
+		when(mockDivision.getTeams()).thenReturn(seasonTeamList);
+		
+		seasonDivisionList = new ArrayList<NFLSeasonDivision>();
+		seasonDivisionList.add(mockDivision);
+		seasonDivisionList.add(mockDivision);
+		seasonDivisionList.add(mockDivision);
+		seasonDivisionList.add(mockDivision);
+		when(mockConference.getDivisions()).thenReturn(seasonDivisionList);
+		
+		seasonConferenceList = new ArrayList<NFLSeasonConference>();
+		seasonConferenceList.add(mockConference);
+		seasonConferenceList.add(mockConference);
+		when(mockSeason.getConferences()).thenReturn(seasonConferenceList);
 		
 		seasonSheet = new NFLSeasonSheet();
 	}
@@ -77,24 +122,8 @@ public class NFLSeasonSheetTest {
 	
 	@Test
 	public void seasonSheetCreatesATeamRow() {
-		int numberOfSeasons = 24;
-		
+		when(mockSheet.getLastRowNum()).thenReturn(0);
 		when(mockSheet.createRow(1)).thenReturn(teamRow);
-		
-		when(mockTeam.getName()).thenReturn("MockTeam");
-		when(mockSeasonTeam.getNumberOfWins()).thenReturn(10 * numberOfSeasons);
-		when(mockSeasonTeam.getNumberOfLosses()).thenReturn(6 * numberOfSeasons);
-		when(mockSeasonTeam.getWasBottomTeam()).thenReturn(5 * numberOfSeasons);
-		when(mockSeasonTeam.getWasInDivisionCellar()).thenReturn(8 * numberOfSeasons);
-		when(mockSeasonTeam.getHadWinningSeason()).thenReturn(70 * numberOfSeasons);
-		when(mockSeasonTeam.getMadePlayoffs()).thenReturn(66 * numberOfSeasons);
-		when(mockSeasonTeam.getWonDivision()).thenReturn(49 * numberOfSeasons);
-		when(mockSeasonTeam.getGotRoundOneBye()).thenReturn(30 * numberOfSeasons);
-		when(mockSeasonTeam.getGotOneSeed()).thenReturn(18 * numberOfSeasons);
-		when(mockSeasonTeam.getChanceToMakeDivisionalRound()).thenReturn(68 * numberOfSeasons);
-		when(mockSeasonTeam.getChanceToMakeConferenceRound()).thenReturn(34 * numberOfSeasons);
-		when(mockSeasonTeam.getChanceToWinConference()).thenReturn(17 * numberOfSeasons);
-		when(mockSeasonTeam.getChanceToWinSuperBowl()).thenReturn(8 * numberOfSeasons);
 		
 		seasonSheet.createTeamRow(mockSheet, mockSeasonTeam, numberOfSeasons);
 		
@@ -115,6 +144,78 @@ public class NFLSeasonSheetTest {
 		inOrder.verify(mockCell).setCellValue(34);
 		inOrder.verify(mockCell).setCellValue(17);
 		inOrder.verify(mockCell).setCellValue(8);
+	}
+	
+	@Test
+	public void seasonSheetCreatesRowsForTeamsInDivision() {
+		int numberOfDivisions = 1;
+		int numberOfTeams = 4;
+		
+		setUpTestForNumberOfTeamsInDivisions(numberOfDivisions);
+		seasonSheet.createDivisionRows(mockSheet, mockDivision, numberOfSeasons);
+		verifyCreateRowCalledForNumberOfTeamsAndDivisions(numberOfTeams, numberOfDivisions);
+	}
+	
+	@Test
+	public void seasonSheetCreatesRowsForTeamsInConference() {
+		int numberOfDivisions = 4;
+		int numberOfTeams = 4 * numberOfDivisions;
+		
+		setUpTestForNumberOfTeamsInDivisions(numberOfDivisions);
+		seasonSheet.createConferenceRows(mockSheet, mockConference, numberOfSeasons);
+		verifyCreateRowCalledForNumberOfTeamsAndDivisions(numberOfTeams, numberOfDivisions);
+	}
+	
+	@Test
+	public void seasonSheetCreatesRowsForTeamsInLeague() {
+		int numberOfConferences = 2;
+		int numberOfDivisions = 4 * numberOfConferences;
+		int numberOfTeams = 4 * numberOfDivisions;
+		
+		setUpTestForNumberOfTeamsInDivisions(numberOfDivisions);
+		seasonSheet.createLeagueRows(mockSheet, mockSeason, numberOfSeasons);
+		verifyCreateRowCalledForNumberOfTeamsAndDivisions(numberOfTeams, numberOfDivisions);
+	}
+
+	private void setUpMockTeam() {
+		when(mockSeasonTeam.getTeam()).thenReturn(mockTeam);
+		when(mockTeam.getName()).thenReturn("MockTeam");
+		when(mockSeasonTeam.getNumberOfWins()).thenReturn(10 * numberOfSeasons);
+		when(mockSeasonTeam.getNumberOfLosses()).thenReturn(6 * numberOfSeasons);
+		when(mockSeasonTeam.getWasBottomTeam()).thenReturn(5 * numberOfSeasons);
+		when(mockSeasonTeam.getWasInDivisionCellar()).thenReturn(8 * numberOfSeasons);
+		when(mockSeasonTeam.getHadWinningSeason()).thenReturn(70 * numberOfSeasons);
+		when(mockSeasonTeam.getMadePlayoffs()).thenReturn(66 * numberOfSeasons);
+		when(mockSeasonTeam.getWonDivision()).thenReturn(49 * numberOfSeasons);
+		when(mockSeasonTeam.getGotRoundOneBye()).thenReturn(30 * numberOfSeasons);
+		when(mockSeasonTeam.getGotOneSeed()).thenReturn(18 * numberOfSeasons);
+		when(mockSeasonTeam.getChanceToMakeDivisionalRound()).thenReturn(68 * numberOfSeasons);
+		when(mockSeasonTeam.getChanceToMakeConferenceRound()).thenReturn(34 * numberOfSeasons);
+		when(mockSeasonTeam.getChanceToWinConference()).thenReturn(17 * numberOfSeasons);
+		when(mockSeasonTeam.getChanceToWinSuperBowl()).thenReturn(8 * numberOfSeasons);
+	}
+	
+	private void setUpTestForNumberOfTeamsInDivisions(int numberOfDivisions) {
+		List<Integer> lastRowNumReturns = new ArrayList<Integer>();
+		int currentRow = 0;
+		for (int i = 0; i < numberOfDivisions; i++) {
+			for (int j = 0; j < numberOfTeamsPerDivision; j++) {
+				lastRowNumReturns.add(currentRow);
+				when(mockSheet.createRow(currentRow + 1)).thenReturn(teamRow);
+				currentRow++;
+			}
+			lastRowNumReturns.add(currentRow);
+			when(mockSheet.createRow(currentRow + 1)).thenReturn(emptyRow);
+			currentRow++;
+		}
+		when(mockSheet.getLastRowNum()).thenAnswer(AdditionalAnswers.returnsElementsOf(lastRowNumReturns));
+	}
+	
+	private void verifyCreateRowCalledForNumberOfTeamsAndDivisions(int numberOfTeams, int numberOfDivisions) {
+		int totalRows = numberOfTeams + numberOfDivisions;
+		for (int i = 1; i <= totalRows; i++) {
+			verify(mockSheet).createRow(i);
+		}
 	}
 	
 }
