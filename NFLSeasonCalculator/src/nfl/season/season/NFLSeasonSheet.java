@@ -3,6 +3,8 @@ package nfl.season.season;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import nfl.season.league.Team;
+
 public class NFLSeasonSheet {
 
 	public static final int NUMBER_OF_COLUMNS = 14;
@@ -39,6 +41,26 @@ public class NFLSeasonSheet {
 		headerRow.createCell(11).setCellValue(COLUMN_CONFERENCE_ROUND);
 		headerRow.createCell(12).setCellValue(COLUMN_CONFERENCE_CHAMPS);
 		headerRow.createCell(13).setCellValue(COLUMN_SUPER_BOWL_CHAMPS);
+	}
+
+	public void createTeamRow(Sheet sheet, NFLSeasonTeam seasonTeam, int numberOfSeasons) {
+		Row teamRow = sheet.createRow(sheet.getLastRowNum() + 1);
+		
+		Team team = seasonTeam.getTeam();
+		teamRow.createCell(0).setCellValue(team.getName());
+		teamRow.createCell(1).setCellValue(Math.round(seasonTeam.getNumberOfWins() / numberOfSeasons));
+		teamRow.createCell(2).setCellValue(Math.round(seasonTeam.getNumberOfLosses() / numberOfSeasons));
+		teamRow.createCell(3).setCellValue(Math.round(seasonTeam.getWasBottomTeam() / numberOfSeasons));
+		teamRow.createCell(4).setCellValue(Math.round(seasonTeam.getWasInDivisionCellar() / numberOfSeasons));
+		teamRow.createCell(5).setCellValue(Math.round(seasonTeam.getHadWinningSeason() / numberOfSeasons));
+		teamRow.createCell(6).setCellValue(Math.round(seasonTeam.getMadePlayoffs() / numberOfSeasons));
+		teamRow.createCell(7).setCellValue(Math.round(seasonTeam.getWonDivision() / numberOfSeasons));
+		teamRow.createCell(8).setCellValue(Math.round(seasonTeam.getGotRoundOneBye() / numberOfSeasons));
+		teamRow.createCell(9).setCellValue(Math.round(seasonTeam.getGotOneSeed() / numberOfSeasons));
+		teamRow.createCell(10).setCellValue(Math.round(seasonTeam.getChanceToMakeDivisionalRound() / numberOfSeasons));
+		teamRow.createCell(11).setCellValue(Math.round(seasonTeam.getChanceToMakeConferenceRound() / numberOfSeasons));
+		teamRow.createCell(12).setCellValue(Math.round(seasonTeam.getChanceToWinConference() / numberOfSeasons));
+		teamRow.createCell(13).setCellValue(Math.round(seasonTeam.getChanceToWinSuperBowl() / numberOfSeasons));
 	}
 
 }
