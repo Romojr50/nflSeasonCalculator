@@ -2,8 +2,11 @@ package nfl.season.input;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
@@ -25,9 +28,14 @@ public class NFLFileWriterFactoryTest {
 	}
 	
 	@Test
-	public void fileWriterFactoryCreatesNFLSeasonEstimatesWriter() throws FileNotFoundException {
-		FileOutputStream outputStream = fileWriterFactory.createNFLSeasonEstimatesWriter("someFolder");
+	public void fileWriterFactoryCreatesNFLSeasonEstimatesWriter() throws IOException {
+		String folderPath = "someFolder";
+		FileOutputStream outputStream = fileWriterFactory.createNFLSeasonEstimatesWriter(folderPath);
 		assertNotNull(outputStream);
+		
+		outputStream.close();
+		File file = new File(folderPath + "/" + NFLFileWriterFactory.NFL_SEASON_ESTIMATES_FILE_NAME);
+		Files.deleteIfExists(file.toPath());
 	}
 	
 	@Test
