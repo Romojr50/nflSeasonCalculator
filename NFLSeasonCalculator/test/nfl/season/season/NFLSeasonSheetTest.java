@@ -1,17 +1,22 @@
 package nfl.season.season;
 
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +25,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import nfl.season.input.NFLFileWriterFactory;
 import nfl.season.league.Team;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -61,6 +67,15 @@ public class NFLSeasonSheetTest {
 	@Mock
 	private NFLSeason mockSeason;
 	
+	@Mock
+	private NFLFileWriterFactory mockFileWriterFactory;
+	
+	@Mock
+	private FileOutputStream mockFileWriter;
+	
+	@Mock
+	private Workbook mockWorkbook;
+	
 	private final int numberOfSeasons = 24;
 	
 	private final int numberOfTeamsPerDivision = 4;
@@ -68,7 +83,7 @@ public class NFLSeasonSheetTest {
 	private NFLSeasonSheet seasonSheet;
 	
 	@Before
-	public void beforeEach() {
+	public void beforeEach() throws FileNotFoundException {
 		when(mockSheet.createRow(0)).thenReturn(headerRow);
 		when(headerRow.createCell(anyInt())).thenReturn(mockCell);
 		when(teamRow.createCell(anyInt())).thenReturn(mockCell);
@@ -94,7 +109,11 @@ public class NFLSeasonSheetTest {
 		seasonConferenceList.add(mockConference);
 		when(mockSeason.getConferences()).thenReturn(seasonConferenceList);
 		
-		seasonSheet = new NFLSeasonSheet();
+		when(mockFileWriterFactory.createNFLSeasonEstimatesWriter(anyString())).thenReturn(mockFileWriter);
+		when(mockFileWriterFactory.createNFLSeasonEstimatesWorkbook()).thenReturn(mockWorkbook);
+		when(mockWorkbook.createSheet()).thenReturn(mockSheet);
+		
+		seasonSheet = new NFLSeasonSheet(mockFileWriterFactory);
 	}
 	
 	@Test
@@ -174,6 +193,23 @@ public class NFLSeasonSheetTest {
 		
 		setUpTestForNumberOfTeamsInDivisions(numberOfDivisions);
 		seasonSheet.createLeagueRows(mockSheet, mockSeason, numberOfSeasons);
+		verifyCreateRowCalledForNumberOfTeamsAndDivisions(numberOfTeams, numberOfDivisions);
+	}
+	
+	@Test
+	public void seasonSheetCreatesAWorkbookWithSeasonEstimates() throws IOException {
+		int numberOfConferences = 2;
+		int numberOfDivisions = 4 * numberOfConferences;
+		int numberOfTeams = 4 * numberOfDivisions;
+		
+		setUpTestForNumberOfTeamsInDivisions(numberOfDivisions);
+		
+		String folderPath = "someFolder";
+		seasonSheet.createSeasonEstimatesWorkbook(folderPath, mockSeason, numberOfSeasons);
+		
+		verify(mockWorkbook).write(mockFileWriter);
+		verify(mockWorkbook).close();
+		verify(mockFileWriter).close();
 		verifyCreateRowCalledForNumberOfTeamsAndDivisions(numberOfTeams, numberOfDivisions);
 	}
 

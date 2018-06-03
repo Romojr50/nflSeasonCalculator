@@ -1,10 +1,14 @@
 package nfl.season.season;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 
+import nfl.season.input.NFLFileWriterFactory;
 import nfl.season.league.Team;
 
 public class NFLSeasonSheet {
@@ -25,6 +29,12 @@ public class NFLSeasonSheet {
 	public static final String COLUMN_CONFERENCE_ROUND = "Conf Rnd";
 	public static final String COLUMN_CONFERENCE_CHAMPS = "Conf Champs";
 	public static final String COLUMN_SUPER_BOWL_CHAMPS = "SB Champs";
+
+	private NFLFileWriterFactory fileWriterFactory;
+	
+	public NFLSeasonSheet(NFLFileWriterFactory fileWriterFactory) {
+		this.fileWriterFactory = fileWriterFactory;
+	}
 
 	public void createHeaderRow(Sheet sheet) {
 		Row headerRow = sheet.createRow(0);
@@ -70,7 +80,7 @@ public class NFLSeasonSheet {
 		for (NFLSeasonTeam seasonTeam : seasonTeams) {
 			createTeamRow(sheet, seasonTeam, numberOfSeasons);
 		}
-		Row teamRow = sheet.createRow(sheet.getLastRowNum() + 1);
+		sheet.createRow(sheet.getLastRowNum() + 1);
 	}
 
 	public void createConferenceRows(Sheet sheet, NFLSeasonConference conference, int numberOfSeasons) {
@@ -85,6 +95,17 @@ public class NFLSeasonSheet {
 		for (NFLSeasonConference seasonConference : seasonConferences) {
 			createConferenceRows(sheet, seasonConference, numberOfSeasons);
 		}
+	}
+
+	public void createSeasonEstimatesWorkbook(String folderPath, NFLSeason season,
+			int numberOfSeasons) throws IOException {
+		FileOutputStream fileWriter = fileWriterFactory.createNFLSeasonEstimatesWriter(folderPath);
+		Workbook workbook = fileWriterFactory.createNFLSeasonEstimatesWorkbook();
+		Sheet sheet = workbook.createSheet();
+		createLeagueRows(sheet, season, numberOfSeasons);
+		workbook.write(fileWriter);
+		workbook.close();
+		fileWriter.close();
 	}
 
 }

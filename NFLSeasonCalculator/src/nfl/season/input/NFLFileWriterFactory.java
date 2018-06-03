@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 public class NFLFileWriterFactory extends NFLFileIO {
 
 	public FileOutputStream createNFLTeamSettingsWriter() throws FileNotFoundException {
@@ -34,6 +37,15 @@ public class NFLFileWriterFactory extends NFLFileIO {
 	public FileOutputStream createNFLSeasonSaveWriter(String folderPath) throws FileNotFoundException {
 		createFolderIfItDoesNotExist(folderPath);
 		return createNFLFileWriter(folderPath + "/" + NFL_SEASON_SAVE_FILE_NAME);
+	}
+	
+	public FileOutputStream createNFLSeasonEstimatesWriter(String folderPath) throws FileNotFoundException {
+		createFolderIfItDoesNotExist(folderPath);
+		return createNFLFileWriter(folderPath + "/" + NFL_SEASON_ESTIMATES_FILE_NAME);
+	}
+	
+	public Workbook createNFLSeasonEstimatesWorkbook() {
+		return new XSSFWorkbook();
 	}
 	
 	private void createFolderIfItDoesNotExist(String folderLocation) {
