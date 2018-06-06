@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 public class NFLFileWriterFactory extends NFLFileIO {
 
 	public FileOutputStream createNFLTeamSettingsWriter() throws FileNotFoundException {
@@ -41,12 +38,16 @@ public class NFLFileWriterFactory extends NFLFileIO {
 	
 	public FileOutputStream createNFLSeasonEstimatesWriter(String folderPath) throws FileNotFoundException {
 		createFolderIfItDoesNotExist(folderPath);
-		String filepath = getSeasonEstimatesFilepath(folderPath);
-		return createNFLFileWriter(filepath);
+		return createNFLFileWriter(folderPath + "/" + NFL_SEASON_ESTIMATES_FILE_NAME);
 	}
 	
-	public Workbook createNFLSeasonEstimatesWorkbook() {
-		return new XSSFWorkbook();
+	public String getSeasonEstimatesFilepath(String folderPath) {
+		String filepath = folderPath + "/" + NFL_SEASON_ESTIMATES_FILE_NAME;
+		return filepath;
+	}
+	
+	public String getSeasonEstimatesFilename() {
+		return NFL_SEASON_ESTIMATES_FILE_NAME;
 	}
 	
 	private void createFolderIfItDoesNotExist(String folderLocation) {
@@ -61,11 +62,6 @@ public class NFLFileWriterFactory extends NFLFileIO {
 		FileOutputStream fileOutputStream = new FileOutputStream(fileLocation);
 		
 		return fileOutputStream;
-	}
-
-	public String getSeasonEstimatesFilepath(String folderPath) {
-		String filepath = folderPath + "/" + NFL_SEASON_ESTIMATES_FILE_NAME;
-		return filepath;
 	}
 
 }
