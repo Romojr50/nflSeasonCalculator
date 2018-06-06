@@ -97,7 +97,7 @@ public class NFLSeasonSheet {
 		}
 	}
 
-	public void createSeasonEstimatesWorkbook(String folderPath, NFLSeason season,
+	public Workbook createSeasonEstimatesWorkbook(String folderPath, NFLSeason season,
 			int numberOfSeasons) throws IOException {
 		FileOutputStream fileWriter = fileWriterFactory.createNFLSeasonEstimatesWriter(folderPath);
 		Workbook workbook = fileWriterFactory.createNFLSeasonEstimatesWorkbook();
@@ -106,6 +106,8 @@ public class NFLSeasonSheet {
 		workbook.write(fileWriter);
 		workbook.close();
 		fileWriter.close();
+		
+		return workbook;
 	}
 
 }
