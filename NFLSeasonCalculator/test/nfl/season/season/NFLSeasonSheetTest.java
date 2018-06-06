@@ -1,10 +1,8 @@
 package nfl.season.season;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.anyInt;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -14,15 +12,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.AdditionalAnswers;
-import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -32,21 +24,6 @@ import nfl.season.league.Team;
 @RunWith(MockitoJUnitRunner.class)
 public class NFLSeasonSheetTest {
 
-	@Mock
-	private Sheet mockSheet;
-	
-	@Mock
-	private Row headerRow;
-	
-	@Mock
-	private Row teamRow;
-	
-	@Mock
-	private Row emptyRow;
-	
-	@Mock
-	private Cell mockCell;
-	
 	@Mock
 	private NFLSeasonTeam mockSeasonTeam;
 	
@@ -74,23 +51,16 @@ public class NFLSeasonSheetTest {
 	@Mock
 	private FileOutputStream mockFileWriter;
 	
-	@Mock
-	private Workbook mockWorkbook;
-	
 	private final int numberOfSeasons = 24;
 	
 	private final int numberOfTeamsPerDivision = 4;
+	
+	private String expectedTeamRow;
 	
 	private NFLSeasonSheet seasonSheet;
 	
 	@Before
 	public void beforeEach() throws FileNotFoundException {
-		when(mockSheet.createRow(0)).thenReturn(headerRow);
-		when(headerRow.createCell(anyInt())).thenReturn(mockCell);
-		when(teamRow.createCell(anyInt())).thenReturn(mockCell);
-		
-		setUpMockTeam();
-		
 		seasonTeamList = new ArrayList<NFLSeasonTeam>();
 		seasonTeamList.add(mockSeasonTeam);
 		seasonTeamList.add(mockSeasonTeam);
@@ -111,108 +81,111 @@ public class NFLSeasonSheetTest {
 		when(mockSeason.getConferences()).thenReturn(seasonConferenceList);
 		
 		when(mockFileWriterFactory.createNFLSeasonEstimatesWriter(anyString())).thenReturn(mockFileWriter);
-		when(mockFileWriterFactory.createNFLSeasonEstimatesWorkbook()).thenReturn(mockWorkbook);
-		when(mockWorkbook.createSheet()).thenReturn(mockSheet);
+		
+		StringBuilder expectedTeamRowBuilder = new StringBuilder();
+		expectedTeamRowBuilder.append("MockTeam,");
+		expectedTeamRowBuilder.append("10,");
+		expectedTeamRowBuilder.append("6,");
+		expectedTeamRowBuilder.append("5,");
+		expectedTeamRowBuilder.append("8,");
+		expectedTeamRowBuilder.append("70,");
+		expectedTeamRowBuilder.append("66,");
+		expectedTeamRowBuilder.append("49,");
+		expectedTeamRowBuilder.append("30,");
+		expectedTeamRowBuilder.append("18,");
+		expectedTeamRowBuilder.append("68,");
+		expectedTeamRowBuilder.append("34,");
+		expectedTeamRowBuilder.append("17,");
+		expectedTeamRowBuilder.append("8\n");
+		expectedTeamRow = expectedTeamRowBuilder.toString();
+		
+		setUpMockTeam();
 		
 		seasonSheet = new NFLSeasonSheet(mockFileWriterFactory);
 	}
 	
 	@Test
 	public void seasonSheetCreatesAHeaderRow() {
-		seasonSheet.createHeaderRow(mockSheet);
+		String headerRow = seasonSheet.createHeaderRow();
 		
-		verify(headerRow, times(NFLSeasonSheet.NUMBER_OF_COLUMNS)).createCell(anyInt());
+		StringBuilder expectedHeader = new StringBuilder();
+		expectedHeader.append(NFLSeasonSheet.COLUMN_TEAM + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_AVERAGE_WINS + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_AVERAGE_LOSSES + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_BOTTOM_5 + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_DIVISION_LAST + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_WINNING_SEASON + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_PLAYOFFS + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_DIVISION_CHAMPS + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_ROUND_1_BYE + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_NUMBER_1_SEED + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_DIVISIONAL_ROUND + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_CONFERENCE_ROUND + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_CONFERENCE_CHAMPS + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_SUPER_BOWL_CHAMPS);
+		expectedHeader.append('\n');
 		
-		InOrder inOrder = inOrder(mockCell);
-		inOrder.verify(mockCell).setCellValue(NFLSeasonSheet.COLUMN_TEAM);
-		inOrder.verify(mockCell).setCellValue(NFLSeasonSheet.COLUMN_AVERAGE_WINS);
-		inOrder.verify(mockCell).setCellValue(NFLSeasonSheet.COLUMN_AVERAGE_LOSSES);
-		inOrder.verify(mockCell).setCellValue(NFLSeasonSheet.COLUMN_BOTTOM_5);
-		inOrder.verify(mockCell).setCellValue(NFLSeasonSheet.COLUMN_DIVISION_LAST);
-		inOrder.verify(mockCell).setCellValue(NFLSeasonSheet.COLUMN_WINNING_SEASON);
-		inOrder.verify(mockCell).setCellValue(NFLSeasonSheet.COLUMN_PLAYOFFS);
-		inOrder.verify(mockCell).setCellValue(NFLSeasonSheet.COLUMN_DIVISION_CHAMPS);
-		inOrder.verify(mockCell).setCellValue(NFLSeasonSheet.COLUMN_ROUND_1_BYE);
-		inOrder.verify(mockCell).setCellValue(NFLSeasonSheet.COLUMN_NUMBER_1_SEED);
-		inOrder.verify(mockCell).setCellValue(NFLSeasonSheet.COLUMN_DIVISIONAL_ROUND);
-		inOrder.verify(mockCell).setCellValue(NFLSeasonSheet.COLUMN_CONFERENCE_ROUND);
-		inOrder.verify(mockCell).setCellValue(NFLSeasonSheet.COLUMN_CONFERENCE_CHAMPS);
-		inOrder.verify(mockCell).setCellValue(NFLSeasonSheet.COLUMN_SUPER_BOWL_CHAMPS);
+		assertEquals(expectedHeader.toString(), headerRow);
 	}
 	
 	@Test
 	public void seasonSheetCreatesATeamRow() {
-		when(mockSheet.getLastRowNum()).thenReturn(0);
-		when(mockSheet.createRow(1)).thenReturn(teamRow);
+		String teamRow = seasonSheet.createTeamRow(mockSeasonTeam, numberOfSeasons);
 		
-		seasonSheet.createTeamRow(mockSheet, mockSeasonTeam, numberOfSeasons);
-		
-		verify(teamRow, times(NFLSeasonSheet.NUMBER_OF_COLUMNS)).createCell(anyInt());
-		
-		InOrder inOrder = inOrder(mockCell);
-		inOrder.verify(mockCell).setCellValue("MockTeam");
-		inOrder.verify(mockCell).setCellValue(10);
-		inOrder.verify(mockCell).setCellValue(6);
-		inOrder.verify(mockCell).setCellValue(5);
-		inOrder.verify(mockCell).setCellValue(8);
-		inOrder.verify(mockCell).setCellValue(70);
-		inOrder.verify(mockCell).setCellValue(66);
-		inOrder.verify(mockCell).setCellValue(49);
-		inOrder.verify(mockCell).setCellValue(30);
-		inOrder.verify(mockCell).setCellValue(18);
-		inOrder.verify(mockCell).setCellValue(68);
-		inOrder.verify(mockCell).setCellValue(34);
-		inOrder.verify(mockCell).setCellValue(17);
-		inOrder.verify(mockCell).setCellValue(8);
+		assertEquals(expectedTeamRow, teamRow);
 	}
 	
 	@Test
 	public void seasonSheetCreatesRowsForTeamsInDivision() {
-		int numberOfDivisions = 1;
 		int numberOfTeams = 4;
 		
-		setUpTestForNumberOfTeamsInDivisions(numberOfDivisions);
-		seasonSheet.createDivisionRows(mockSheet, mockDivision, numberOfSeasons);
-		verifyCreateRowCalledForNumberOfTeamsAndDivisions(numberOfTeams, numberOfDivisions);
+		String expectedDivisionString = "";
+		for (int i = 0; i < numberOfTeams; i++) {
+			expectedDivisionString = expectedDivisionString + expectedTeamRow;
+		}
+		
+		String divisionString = seasonSheet.createDivisionRows(mockDivision, numberOfSeasons);
+		
+		assertEquals(expectedDivisionString, divisionString);
 	}
 	
 	@Test
 	public void seasonSheetCreatesRowsForTeamsInConference() {
 		int numberOfDivisions = 4;
-		int numberOfTeams = 4 * numberOfDivisions;
 		
-		setUpTestForNumberOfTeamsInDivisions(numberOfDivisions);
-		seasonSheet.createConferenceRows(mockSheet, mockConference, numberOfSeasons);
-		verifyCreateRowCalledForNumberOfTeamsAndDivisions(numberOfTeams, numberOfDivisions);
+		String expectedConferenceString = buildExpectedStringFromDivisionsAndTeams(numberOfDivisions);
+		
+		String conferenceString = seasonSheet.createConferenceRows(mockConference, numberOfSeasons);
+		
+		assertEquals(expectedConferenceString, conferenceString);
 	}
-	
+
 	@Test
 	public void seasonSheetCreatesRowsForTeamsInLeague() {
 		int numberOfConferences = 2;
 		int numberOfDivisions = 4 * numberOfConferences;
-		int numberOfTeams = 4 * numberOfDivisions;
 		
-		setUpTestForNumberOfTeamsInDivisions(numberOfDivisions);
-		seasonSheet.createLeagueRows(mockSheet, mockSeason, numberOfSeasons);
-		verifyCreateRowCalledForNumberOfTeamsAndDivisions(numberOfTeams, numberOfDivisions);
+		String expectedLeagueString = buildExpectedStringFromDivisionsAndTeams(numberOfDivisions);
+		
+		String leagueString = seasonSheet.createLeagueRows(mockSeason, numberOfSeasons);
+		
+		assertEquals(expectedLeagueString, leagueString);
 	}
 	
 	@Test
-	public void seasonSheetCreatesAWorkbookWithSeasonEstimates() throws IOException {
+	public void seasonSheetCreatesAFileWithSeasonEstimates() throws IOException {
 		int numberOfConferences = 2;
 		int numberOfDivisions = 4 * numberOfConferences;
-		int numberOfTeams = 4 * numberOfDivisions;
-		
-		setUpTestForNumberOfTeamsInDivisions(numberOfDivisions);
+		String expectedLeagueString = buildExpectedStringFromDivisionsAndTeams(numberOfDivisions);
 		
 		String folderPath = "someFolder";
-		Workbook returnedWorkbook = seasonSheet.createSeasonEstimatesWorkbook(folderPath, mockSeason, numberOfSeasons);
+		boolean success = seasonSheet.createSeasonEstimatesFile(folderPath, mockSeason, numberOfSeasons);
 		
-		assertEquals(mockWorkbook, returnedWorkbook);
-		verify(mockWorkbook).write(mockFileWriter);
-		verify(mockWorkbook).close();
+		verify(mockFileWriterFactory).createNFLSeasonEstimatesWriter(folderPath);
+		verify(mockFileWriter).write(expectedLeagueString.getBytes());
 		verify(mockFileWriter).close();
-		verifyCreateRowCalledForNumberOfTeamsAndDivisions(numberOfTeams, numberOfDivisions);
+		
+		assertTrue(success);
 	}
 
 	private void setUpMockTeam() {
@@ -233,27 +206,15 @@ public class NFLSeasonSheetTest {
 		when(mockSeasonTeam.getChanceToWinSuperBowl()).thenReturn(8 * numberOfSeasons);
 	}
 	
-	private void setUpTestForNumberOfTeamsInDivisions(int numberOfDivisions) {
-		List<Integer> lastRowNumReturns = new ArrayList<Integer>();
-		int currentRow = 0;
+	private String buildExpectedStringFromDivisionsAndTeams(int numberOfDivisions) {
+		String expectedString = "";
 		for (int i = 0; i < numberOfDivisions; i++) {
 			for (int j = 0; j < numberOfTeamsPerDivision; j++) {
-				lastRowNumReturns.add(currentRow);
-				when(mockSheet.createRow(currentRow + 1)).thenReturn(teamRow);
-				currentRow++;
+				expectedString = expectedString + expectedTeamRow;
 			}
-			lastRowNumReturns.add(currentRow);
-			when(mockSheet.createRow(currentRow + 1)).thenReturn(emptyRow);
-			currentRow++;
+			expectedString = expectedString + "\n";
 		}
-		when(mockSheet.getLastRowNum()).thenAnswer(AdditionalAnswers.returnsElementsOf(lastRowNumReturns));
-	}
-	
-	private void verifyCreateRowCalledForNumberOfTeamsAndDivisions(int numberOfTeams, int numberOfDivisions) {
-		int totalRows = numberOfTeams + numberOfDivisions;
-		for (int i = 1; i <= totalRows; i++) {
-			verify(mockSheet).createRow(i);
-		}
+		return expectedString;
 	}
 	
 }

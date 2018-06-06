@@ -4,17 +4,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-
 import nfl.season.input.NFLFileWriterFactory;
 import nfl.season.league.Team;
 
 public class NFLSeasonSheet {
 
-	public static final int NUMBER_OF_COLUMNS = 14;
-	
 	public static final String COLUMN_TEAM = "Team";
 	public static final String COLUMN_AVERAGE_WINS = "Avg Wins";
 	public static final String COLUMN_AVERAGE_LOSSES = "Avg Losses";
@@ -36,78 +30,100 @@ public class NFLSeasonSheet {
 		this.fileWriterFactory = fileWriterFactory;
 	}
 
-	public void createHeaderRow(Sheet sheet) {
-		Row headerRow = sheet.createRow(0);
+	public String createHeaderRow() {
+		StringBuilder header = new StringBuilder();
+		header.append(COLUMN_TEAM + ",");
+		header.append(COLUMN_AVERAGE_WINS + ",");
+		header.append(COLUMN_AVERAGE_LOSSES + ",");
+		header.append(COLUMN_BOTTOM_5 + ",");
+		header.append(COLUMN_DIVISION_LAST + ",");
+		header.append(COLUMN_WINNING_SEASON + ",");
+		header.append(COLUMN_PLAYOFFS + ",");
+		header.append(COLUMN_DIVISION_CHAMPS + ",");
+		header.append(COLUMN_ROUND_1_BYE + ",");
+		header.append(COLUMN_NUMBER_1_SEED + ",");
+		header.append(COLUMN_DIVISIONAL_ROUND + ",");
+		header.append(COLUMN_CONFERENCE_ROUND + ",");
+		header.append(COLUMN_CONFERENCE_CHAMPS + ",");
+		header.append(COLUMN_SUPER_BOWL_CHAMPS);
+		header.append('\n');
 		
-		headerRow.createCell(0).setCellValue(COLUMN_TEAM);
-		headerRow.createCell(1).setCellValue(COLUMN_AVERAGE_WINS);
-		headerRow.createCell(2).setCellValue(COLUMN_AVERAGE_LOSSES);
-		headerRow.createCell(3).setCellValue(COLUMN_BOTTOM_5);
-		headerRow.createCell(4).setCellValue(COLUMN_DIVISION_LAST);
-		headerRow.createCell(5).setCellValue(COLUMN_WINNING_SEASON);
-		headerRow.createCell(6).setCellValue(COLUMN_PLAYOFFS);
-		headerRow.createCell(7).setCellValue(COLUMN_DIVISION_CHAMPS);
-		headerRow.createCell(8).setCellValue(COLUMN_ROUND_1_BYE);
-		headerRow.createCell(9).setCellValue(COLUMN_NUMBER_1_SEED);
-		headerRow.createCell(10).setCellValue(COLUMN_DIVISIONAL_ROUND);
-		headerRow.createCell(11).setCellValue(COLUMN_CONFERENCE_ROUND);
-		headerRow.createCell(12).setCellValue(COLUMN_CONFERENCE_CHAMPS);
-		headerRow.createCell(13).setCellValue(COLUMN_SUPER_BOWL_CHAMPS);
+		return header.toString();
 	}
 
-	public void createTeamRow(Sheet sheet, NFLSeasonTeam seasonTeam, int numberOfSeasons) {
-		Row teamRow = sheet.createRow(sheet.getLastRowNum() + 1);
+	public String createTeamRow(NFLSeasonTeam seasonTeam, int numberOfSeasons) {
+		StringBuilder teamRow = new StringBuilder();
 		
 		Team team = seasonTeam.getTeam();
-		teamRow.createCell(0).setCellValue(team.getName());
-		teamRow.createCell(1).setCellValue(Math.round(seasonTeam.getNumberOfWins() / numberOfSeasons));
-		teamRow.createCell(2).setCellValue(Math.round(seasonTeam.getNumberOfLosses() / numberOfSeasons));
-		teamRow.createCell(3).setCellValue(Math.round(seasonTeam.getWasBottomTeam() / numberOfSeasons));
-		teamRow.createCell(4).setCellValue(Math.round(seasonTeam.getWasInDivisionCellar() / numberOfSeasons));
-		teamRow.createCell(5).setCellValue(Math.round(seasonTeam.getHadWinningSeason() / numberOfSeasons));
-		teamRow.createCell(6).setCellValue(Math.round(seasonTeam.getMadePlayoffs() / numberOfSeasons));
-		teamRow.createCell(7).setCellValue(Math.round(seasonTeam.getWonDivision() / numberOfSeasons));
-		teamRow.createCell(8).setCellValue(Math.round(seasonTeam.getGotRoundOneBye() / numberOfSeasons));
-		teamRow.createCell(9).setCellValue(Math.round(seasonTeam.getGotOneSeed() / numberOfSeasons));
-		teamRow.createCell(10).setCellValue(Math.round(seasonTeam.getChanceToMakeDivisionalRound() / numberOfSeasons));
-		teamRow.createCell(11).setCellValue(Math.round(seasonTeam.getChanceToMakeConferenceRound() / numberOfSeasons));
-		teamRow.createCell(12).setCellValue(Math.round(seasonTeam.getChanceToWinConference() / numberOfSeasons));
-		teamRow.createCell(13).setCellValue(Math.round(seasonTeam.getChanceToWinSuperBowl() / numberOfSeasons));
+		teamRow.append(team.getName() + ",");
+		teamRow.append(Math.round(seasonTeam.getNumberOfWins() / numberOfSeasons) + ",");
+		teamRow.append(Math.round(seasonTeam.getNumberOfLosses() / numberOfSeasons) + ",");
+		teamRow.append(Math.round(seasonTeam.getWasBottomTeam() / numberOfSeasons) + ",");
+		teamRow.append(Math.round(seasonTeam.getWasInDivisionCellar() / numberOfSeasons) + ",");
+		teamRow.append(Math.round(seasonTeam.getHadWinningSeason() / numberOfSeasons) + ",");
+		teamRow.append(Math.round(seasonTeam.getMadePlayoffs() / numberOfSeasons) + ",");
+		teamRow.append(Math.round(seasonTeam.getWonDivision() / numberOfSeasons) + ",");
+		teamRow.append(Math.round(seasonTeam.getGotRoundOneBye() / numberOfSeasons) + ",");
+		teamRow.append(Math.round(seasonTeam.getGotOneSeed() / numberOfSeasons) + ",");
+		teamRow.append(Math.round(seasonTeam.getChanceToMakeDivisionalRound() / numberOfSeasons) + ",");
+		teamRow.append(Math.round(seasonTeam.getChanceToMakeConferenceRound() / numberOfSeasons) + ",");
+		teamRow.append(Math.round(seasonTeam.getChanceToWinConference() / numberOfSeasons) + ",");
+		teamRow.append(Math.round(seasonTeam.getChanceToWinSuperBowl() / numberOfSeasons) + "\n");
+		
+		return teamRow.toString();
 	}
 
-	public void createDivisionRows(Sheet sheet, NFLSeasonDivision division, int numberOfSeasons) {
+	public String createDivisionRows(NFLSeasonDivision division, int numberOfSeasons) {
+		StringBuilder divisionBuilder = new StringBuilder();
+		
 		List<NFLSeasonTeam> seasonTeams = division.getTeams();
 		for (NFLSeasonTeam seasonTeam : seasonTeams) {
-			createTeamRow(sheet, seasonTeam, numberOfSeasons);
+			divisionBuilder.append(createTeamRow(seasonTeam, numberOfSeasons));
 		}
-		sheet.createRow(sheet.getLastRowNum() + 1);
+		
+		return divisionBuilder.toString();
 	}
 
-	public void createConferenceRows(Sheet sheet, NFLSeasonConference conference, int numberOfSeasons) {
+	public String createConferenceRows(NFLSeasonConference conference, int numberOfSeasons) {
+		StringBuilder conferenceBuilder = new StringBuilder();
+		
 		List<NFLSeasonDivision> seasonDivisions = conference.getDivisions();
 		for (NFLSeasonDivision seasonDivision : seasonDivisions) {
-			createDivisionRows(sheet, seasonDivision, numberOfSeasons);
+			conferenceBuilder.append(createDivisionRows(seasonDivision, numberOfSeasons));
+			conferenceBuilder.append("\n");
 		}
+		
+		return conferenceBuilder.toString();
 	}
 
-	public void createLeagueRows(Sheet sheet, NFLSeason season, int numberOfSeasons) {
+	public String createLeagueRows(NFLSeason season, int numberOfSeasons) {
+		StringBuilder leagueBuilder = new StringBuilder();
+		
 		List<NFLSeasonConference> seasonConferences = season.getConferences();
 		for (NFLSeasonConference seasonConference : seasonConferences) {
-			createConferenceRows(sheet, seasonConference, numberOfSeasons);
+			leagueBuilder.append(createConferenceRows(seasonConference, numberOfSeasons));
 		}
+		
+		return leagueBuilder.toString();
 	}
 
-	public Workbook createSeasonEstimatesWorkbook(String folderPath, NFLSeason season,
+	public boolean createSeasonEstimatesFile(String folderPath, NFLSeason season,
 			int numberOfSeasons) throws IOException {
-		FileOutputStream fileWriter = fileWriterFactory.createNFLSeasonEstimatesWriter(folderPath);
-		Workbook workbook = fileWriterFactory.createNFLSeasonEstimatesWorkbook();
-		Sheet sheet = workbook.createSheet();
-		createLeagueRows(sheet, season, numberOfSeasons);
-		workbook.write(fileWriter);
-		workbook.close();
-		fileWriter.close();
+		boolean success = true;
 		
-		return workbook;
+		FileOutputStream fileWriter = null;
+		
+		try {
+			fileWriter = fileWriterFactory.createNFLSeasonEstimatesWriter(folderPath);
+			String leagueString = createLeagueRows(season, numberOfSeasons);
+			fileWriter.write(leagueString.getBytes());
+		} catch (IOException e) {
+			success = false;
+		} finally {
+			fileWriter.close();
+		}
+		
+		return success;
 	}
 
 }
