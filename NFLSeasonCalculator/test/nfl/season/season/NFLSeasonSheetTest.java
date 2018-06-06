@@ -1,5 +1,6 @@
 package nfl.season.season;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.inOrder;
@@ -205,8 +206,9 @@ public class NFLSeasonSheetTest {
 		setUpTestForNumberOfTeamsInDivisions(numberOfDivisions);
 		
 		String folderPath = "someFolder";
-		seasonSheet.createSeasonEstimatesWorkbook(folderPath, mockSeason, numberOfSeasons);
+		Workbook returnedWorkbook = seasonSheet.createSeasonEstimatesWorkbook(folderPath, mockSeason, numberOfSeasons);
 		
+		assertEquals(mockWorkbook, returnedWorkbook);
 		verify(mockWorkbook).write(mockFileWriter);
 		verify(mockWorkbook).close();
 		verify(mockFileWriter).close();
