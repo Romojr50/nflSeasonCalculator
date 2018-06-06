@@ -41,7 +41,8 @@ public class NFLFileWriterFactory extends NFLFileIO {
 	
 	public FileOutputStream createNFLSeasonEstimatesWriter(String folderPath) throws FileNotFoundException {
 		createFolderIfItDoesNotExist(folderPath);
-		return createNFLFileWriter(folderPath + "/" + NFL_SEASON_ESTIMATES_FILE_NAME);
+		String filepath = getSeasonEstimatesFilepath(folderPath);
+		return createNFLFileWriter(filepath);
 	}
 	
 	public Workbook createNFLSeasonEstimatesWorkbook() {
@@ -60,6 +61,11 @@ public class NFLFileWriterFactory extends NFLFileIO {
 		FileOutputStream fileOutputStream = new FileOutputStream(fileLocation);
 		
 		return fileOutputStream;
+	}
+
+	public String getSeasonEstimatesFilepath(String folderPath) {
+		String filepath = folderPath + "/" + NFL_SEASON_ESTIMATES_FILE_NAME;
+		return filepath;
 	}
 
 }

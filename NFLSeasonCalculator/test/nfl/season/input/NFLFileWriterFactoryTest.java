@@ -1,5 +1,6 @@
 package nfl.season.input;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
@@ -42,6 +43,14 @@ public class NFLFileWriterFactoryTest {
 	public void fileWriterFactoryCreatesXSSFWorkbook() {
 		Workbook workbook = fileWriterFactory.createNFLSeasonEstimatesWorkbook();
 		assertNotNull(workbook);
+	}
+	
+	@Test
+	public void fileWriterFactoryReturnsEstimatesFilepath() {
+		String folderPath = "someFolder";
+		String expectedFilepath = folderPath + "/" + NFLFileIO.NFL_SEASON_ESTIMATES_FILE_NAME;
+		String filepath = fileWriterFactory.getSeasonEstimatesFilepath(folderPath);
+		assertEquals(expectedFilepath, filepath);
 	}
 	
 }
