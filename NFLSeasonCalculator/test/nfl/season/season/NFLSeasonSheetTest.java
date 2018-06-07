@@ -51,7 +51,7 @@ public class NFLSeasonSheetTest {
 	@Mock
 	private FileOutputStream mockFileWriter;
 	
-	private final int numberOfSeasons = 24;
+	private final int numberOfSeasons = 700;
 	
 	private final int numberOfTeamsPerDivision = 4;
 	
@@ -107,25 +107,8 @@ public class NFLSeasonSheetTest {
 	@Test
 	public void seasonSheetCreatesAHeaderRow() {
 		String headerRow = seasonSheet.createHeaderRow();
-		
-		StringBuilder expectedHeader = new StringBuilder();
-		expectedHeader.append(NFLSeasonSheet.COLUMN_TEAM + ",");
-		expectedHeader.append(NFLSeasonSheet.COLUMN_AVERAGE_WINS + ",");
-		expectedHeader.append(NFLSeasonSheet.COLUMN_AVERAGE_LOSSES + ",");
-		expectedHeader.append(NFLSeasonSheet.COLUMN_BOTTOM_5 + ",");
-		expectedHeader.append(NFLSeasonSheet.COLUMN_DIVISION_LAST + ",");
-		expectedHeader.append(NFLSeasonSheet.COLUMN_WINNING_SEASON + ",");
-		expectedHeader.append(NFLSeasonSheet.COLUMN_PLAYOFFS + ",");
-		expectedHeader.append(NFLSeasonSheet.COLUMN_DIVISION_CHAMPS + ",");
-		expectedHeader.append(NFLSeasonSheet.COLUMN_ROUND_1_BYE + ",");
-		expectedHeader.append(NFLSeasonSheet.COLUMN_NUMBER_1_SEED + ",");
-		expectedHeader.append(NFLSeasonSheet.COLUMN_DIVISIONAL_ROUND + ",");
-		expectedHeader.append(NFLSeasonSheet.COLUMN_CONFERENCE_ROUND + ",");
-		expectedHeader.append(NFLSeasonSheet.COLUMN_CONFERENCE_CHAMPS + ",");
-		expectedHeader.append(NFLSeasonSheet.COLUMN_SUPER_BOWL_CHAMPS);
-		expectedHeader.append('\n');
-		
-		assertEquals(expectedHeader.toString(), headerRow);
+		String expectedHeader = buildExpectedHeaderRow();
+		assertEquals(expectedHeader, headerRow);
 	}
 	
 	@Test
@@ -176,7 +159,9 @@ public class NFLSeasonSheetTest {
 	public void seasonSheetCreatesAFileWithSeasonEstimates() throws IOException {
 		int numberOfConferences = 2;
 		int numberOfDivisions = 4 * numberOfConferences;
-		String expectedLeagueString = buildExpectedStringFromDivisionsAndTeams(numberOfDivisions);
+		String expectedLeagueString = buildExpectedHeaderRow();
+		expectedLeagueString = expectedLeagueString + 
+				buildExpectedStringFromDivisionsAndTeams(numberOfDivisions);
 		
 		String folderPath = "someFolder";
 		boolean success = seasonSheet.createSeasonEstimatesFile(folderPath, mockSeason, numberOfSeasons);
@@ -191,19 +176,39 @@ public class NFLSeasonSheetTest {
 	private void setUpMockTeam() {
 		when(mockSeasonTeam.getTeam()).thenReturn(mockTeam);
 		when(mockTeam.getName()).thenReturn("MockTeam");
-		when(mockSeasonTeam.getNumberOfWins()).thenReturn(10 * numberOfSeasons);
-		when(mockSeasonTeam.getNumberOfLosses()).thenReturn(6 * numberOfSeasons);
-		when(mockSeasonTeam.getWasBottomTeam()).thenReturn(5 * numberOfSeasons);
-		when(mockSeasonTeam.getWasInDivisionCellar()).thenReturn(8 * numberOfSeasons);
-		when(mockSeasonTeam.getHadWinningSeason()).thenReturn(70 * numberOfSeasons);
-		when(mockSeasonTeam.getMadePlayoffs()).thenReturn(66 * numberOfSeasons);
-		when(mockSeasonTeam.getWonDivision()).thenReturn(49 * numberOfSeasons);
-		when(mockSeasonTeam.getGotRoundOneBye()).thenReturn(30 * numberOfSeasons);
-		when(mockSeasonTeam.getGotOneSeed()).thenReturn(18 * numberOfSeasons);
+		when(mockSeasonTeam.getSimulatedWins()).thenReturn(10 * numberOfSeasons);
+		when(mockSeasonTeam.getSimulatedLosses()).thenReturn(6 * numberOfSeasons);
+		when(mockSeasonTeam.getWasBottomTeam()).thenReturn((int) (0.05 * numberOfSeasons));
+		when(mockSeasonTeam.getWasInDivisionCellar()).thenReturn((int) (0.08 * numberOfSeasons));
+		when(mockSeasonTeam.getHadWinningSeason()).thenReturn((int) (7 * numberOfSeasons / 10));
+		when(mockSeasonTeam.getMadePlayoffs()).thenReturn((int) (0.66 * numberOfSeasons));
+		when(mockSeasonTeam.getWonDivision()).thenReturn((int) (0.49 * numberOfSeasons));
+		when(mockSeasonTeam.getGotRoundOneBye()).thenReturn((int) (0.30 * numberOfSeasons));
+		when(mockSeasonTeam.getGotOneSeed()).thenReturn((int) (0.18 * numberOfSeasons));
 		when(mockSeasonTeam.getChanceToMakeDivisionalRound()).thenReturn(68 * numberOfSeasons);
 		when(mockSeasonTeam.getChanceToMakeConferenceRound()).thenReturn(34 * numberOfSeasons);
 		when(mockSeasonTeam.getChanceToWinConference()).thenReturn(17 * numberOfSeasons);
 		when(mockSeasonTeam.getChanceToWinSuperBowl()).thenReturn(8 * numberOfSeasons);
+	}
+	
+	private String buildExpectedHeaderRow() {
+		StringBuilder expectedHeader = new StringBuilder();
+		expectedHeader.append(NFLSeasonSheet.COLUMN_TEAM + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_AVERAGE_WINS + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_AVERAGE_LOSSES + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_BOTTOM_5 + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_DIVISION_LAST + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_WINNING_SEASON + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_PLAYOFFS + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_DIVISION_CHAMPS + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_ROUND_1_BYE + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_NUMBER_1_SEED + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_DIVISIONAL_ROUND + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_CONFERENCE_ROUND + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_CONFERENCE_CHAMPS + ",");
+		expectedHeader.append(NFLSeasonSheet.COLUMN_SUPER_BOWL_CHAMPS);
+		expectedHeader.append('\n');
+		return expectedHeader.toString();
 	}
 	
 	private String buildExpectedStringFromDivisionsAndTeams(int numberOfDivisions) {
