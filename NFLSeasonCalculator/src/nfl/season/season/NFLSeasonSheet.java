@@ -62,8 +62,8 @@ public class NFLSeasonSheet {
 		if (numberOfHundredSimulations == 0) {
 			numberOfHundredSimulations = 1;
 		}
-		teamRow.append((int) Math.round(seasonTeam.getSimulatedWins() / numberOfSeasons) + ",");
-		teamRow.append((int) Math.round(seasonTeam.getSimulatedLosses() / numberOfSeasons) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getSimulatedWins() / numberOfSeasonsDouble) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getSimulatedLosses() / numberOfSeasonsDouble) + ",");
 		teamRow.append((int) Math.round(seasonTeam.getWasBottomTeam() / numberOfHundredSimulations) + ",");
 		teamRow.append((int) Math.round(seasonTeam.getWasInDivisionCellar() / numberOfHundredSimulations) + ",");
 		teamRow.append((int) Math.round(seasonTeam.getHadWinningSeason() / numberOfHundredSimulations) + ",");
@@ -71,10 +71,10 @@ public class NFLSeasonSheet {
 		teamRow.append((int) Math.round(seasonTeam.getWonDivision() / numberOfHundredSimulations) + ",");
 		teamRow.append((int) Math.round(seasonTeam.getGotRoundOneBye() / numberOfHundredSimulations) + ",");
 		teamRow.append((int) Math.round(seasonTeam.getGotOneSeed() / numberOfHundredSimulations) + ",");
-		teamRow.append((int) Math.round(seasonTeam.getChanceToMakeDivisionalRound() / numberOfSeasons) + ",");
-		teamRow.append((int) Math.round(seasonTeam.getChanceToMakeConferenceRound() / numberOfSeasons) + ",");
-		teamRow.append((int) Math.round(seasonTeam.getChanceToWinConference() / numberOfSeasons) + ",");
-		teamRow.append((int) Math.round(seasonTeam.getChanceToWinSuperBowl() / numberOfSeasons) + "\n");
+		teamRow.append((int) Math.round(seasonTeam.getChanceToMakeDivisionalRound() / numberOfSeasonsDouble) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getChanceToMakeConferenceRound() / numberOfSeasonsDouble) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getChanceToWinConference() / numberOfSeasonsDouble) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getChanceToWinSuperBowl() / numberOfSeasonsDouble) + "\n");
 		
 		return teamRow.toString();
 	}
