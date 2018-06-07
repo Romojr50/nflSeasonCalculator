@@ -56,19 +56,25 @@ public class NFLSeasonSheet {
 		
 		Team team = seasonTeam.getTeam();
 		teamRow.append(team.getName() + ",");
-		teamRow.append(Math.round(seasonTeam.getNumberOfWins() / numberOfSeasons) + ",");
-		teamRow.append(Math.round(seasonTeam.getNumberOfLosses() / numberOfSeasons) + ",");
-		teamRow.append(Math.round(seasonTeam.getWasBottomTeam() / numberOfSeasons) + ",");
-		teamRow.append(Math.round(seasonTeam.getWasInDivisionCellar() / numberOfSeasons) + ",");
-		teamRow.append(Math.round(seasonTeam.getHadWinningSeason() / numberOfSeasons) + ",");
-		teamRow.append(Math.round(seasonTeam.getMadePlayoffs() / numberOfSeasons) + ",");
-		teamRow.append(Math.round(seasonTeam.getWonDivision() / numberOfSeasons) + ",");
-		teamRow.append(Math.round(seasonTeam.getGotRoundOneBye() / numberOfSeasons) + ",");
-		teamRow.append(Math.round(seasonTeam.getGotOneSeed() / numberOfSeasons) + ",");
-		teamRow.append(Math.round(seasonTeam.getChanceToMakeDivisionalRound() / numberOfSeasons) + ",");
-		teamRow.append(Math.round(seasonTeam.getChanceToMakeConferenceRound() / numberOfSeasons) + ",");
-		teamRow.append(Math.round(seasonTeam.getChanceToWinConference() / numberOfSeasons) + ",");
-		teamRow.append(Math.round(seasonTeam.getChanceToWinSuperBowl() / numberOfSeasons) + "\n");
+		
+		double numberOfSeasonsDouble = (double) numberOfSeasons;
+		double numberOfHundredSimulations = Math.round(numberOfSeasonsDouble / 100);
+		if (numberOfHundredSimulations == 0) {
+			numberOfHundredSimulations = 1;
+		}
+		teamRow.append((int) Math.round(seasonTeam.getSimulatedWins() / numberOfSeasons) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getSimulatedLosses() / numberOfSeasons) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getWasBottomTeam() / numberOfHundredSimulations) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getWasInDivisionCellar() / numberOfHundredSimulations) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getHadWinningSeason() / numberOfHundredSimulations) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getMadePlayoffs() / numberOfHundredSimulations) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getWonDivision() / numberOfHundredSimulations) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getGotRoundOneBye() / numberOfHundredSimulations) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getGotOneSeed() / numberOfHundredSimulations) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getChanceToMakeDivisionalRound() / numberOfSeasons) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getChanceToMakeConferenceRound() / numberOfSeasons) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getChanceToWinConference() / numberOfSeasons) + ",");
+		teamRow.append((int) Math.round(seasonTeam.getChanceToWinSuperBowl() / numberOfSeasons) + "\n");
 		
 		return teamRow.toString();
 	}
@@ -115,7 +121,8 @@ public class NFLSeasonSheet {
 		
 		try {
 			fileWriter = fileWriterFactory.createNFLSeasonEstimatesWriter(folderPath);
-			String leagueString = createLeagueRows(season, numberOfSeasons);
+			String leagueString = createHeaderRow();
+			leagueString = leagueString + createLeagueRows(season, numberOfSeasons);
 			fileWriter.write(leagueString.getBytes());
 		} catch (IOException e) {
 			success = false;
