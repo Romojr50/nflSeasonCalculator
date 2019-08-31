@@ -85,7 +85,7 @@ public class LeagueTest {
 		nfl.initializeNFL();
 		
 		List<Team> allTeams = nfl.getTeams();
-		Team teamAtRankingTen = allTeams.get(17);
+		Team teamAtRankingTen = allTeams.get(9);
 		teamAtRankingTen.setPowerRanking(10);
 		
 		Team returnTeam = nfl.getTeamWithPowerRanking(10);
