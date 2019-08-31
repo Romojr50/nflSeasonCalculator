@@ -36,6 +36,20 @@ public class NFLFileWriterFactory extends NFLFileIO {
 		return createNFLFileWriter(folderPath + "/" + NFL_SEASON_SAVE_FILE_NAME);
 	}
 	
+	public FileOutputStream createNFLSeasonEstimatesWriter(String folderPath) throws FileNotFoundException {
+		createFolderIfItDoesNotExist(folderPath);
+		return createNFLFileWriter(folderPath + "/" + NFL_SEASON_ESTIMATES_FILE_NAME);
+	}
+	
+	public String getSeasonEstimatesFilepath(String folderPath) {
+		String filepath = folderPath + "/" + NFL_SEASON_ESTIMATES_FILE_NAME;
+		return filepath;
+	}
+	
+	public String getSeasonEstimatesFilename() {
+		return NFL_SEASON_ESTIMATES_FILE_NAME;
+	}
+	
 	private void createFolderIfItDoesNotExist(String folderLocation) {
 		File directory = new File(folderLocation);
 	    if (!directory.exists()){

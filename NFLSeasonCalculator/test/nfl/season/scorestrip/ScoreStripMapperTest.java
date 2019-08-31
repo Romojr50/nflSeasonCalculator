@@ -192,6 +192,10 @@ public class ScoreStripMapperTest {
 		assertTrue(seasonGame.wonTheGame(team1));
 		assertFalse(seasonGame.wonTheGame(team2));
 		assertFalse(seasonGame.wasATie());
+		assertEquals(24, seasonGame.getHomeScore());
+		assertEquals(21, seasonGame.getAwayScore());
+		assertEquals(24, seasonGame.getWinningScore());
+		assertEquals(21, seasonGame.getLosingScore());
 		
 		
 		when(scoreStripGame1_2.getHs()).thenReturn("21");
@@ -203,6 +207,10 @@ public class ScoreStripMapperTest {
 		assertFalse(seasonGame.wonTheGame(team1));
 		assertTrue(seasonGame.wonTheGame(team2));
 		assertFalse(seasonGame.wasATie());
+		assertEquals(21, seasonGame.getHomeScore());
+		assertEquals(24, seasonGame.getAwayScore());
+		assertEquals(24, seasonGame.getWinningScore());
+		assertEquals(21, seasonGame.getLosingScore());
 		
 		
 		when(scoreStripGame1_2.getHs()).thenReturn("21");
@@ -215,6 +223,10 @@ public class ScoreStripMapperTest {
 		assertFalse(seasonGame.wonTheGame(team1));
 		assertFalse(seasonGame.wonTheGame(team2));
 		assertTrue(seasonGame.wasATie());
+		assertEquals(21, seasonGame.getHomeScore());
+		assertEquals(21, seasonGame.getAwayScore());
+		assertEquals(21, seasonGame.getWinningScore());
+		assertEquals(21, seasonGame.getLosingScore());
 	}
 	
 }

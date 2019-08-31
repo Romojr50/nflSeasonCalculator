@@ -82,7 +82,9 @@ public class ScoreStripMapper {
 		String awayScoreString = scoreStripGame.getVs();
 		
 		int homeScore = getScoreFromString(homeScoreString);
+		seasonGame.setHomeScore(homeScore);
 		int awayScore = getScoreFromString(awayScoreString);
+		seasonGame.setAwayScore(awayScore);
 		if (homeScore > awayScore) {
 			seasonGame.setWinner(homeTeam);
 		} else if (awayScore > homeScore) {

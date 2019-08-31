@@ -85,7 +85,7 @@ public class LeagueTest {
 		nfl.initializeNFL();
 		
 		List<Team> allTeams = nfl.getTeams();
-		Team teamAtRankingTen = allTeams.get(17);
+		Team teamAtRankingTen = allTeams.get(9);
 		teamAtRankingTen.setPowerRanking(10);
 		
 		Team returnTeam = nfl.getTeamWithPowerRanking(10);
@@ -289,10 +289,9 @@ public class LeagueTest {
 		assertEquals(expectedNeutralWinChance, 
 				teamMatchup.getTeamNeutralWinChance(teamName));
 		
-		int expectedHomeWinChance = Math.min(99, Math.round(
-				expectedNeutralWinChance + (team.getHomeFieldAdvantage() / 2)));
-		int expectedAwayWinChance = Math.min(99, Math.round(
-				expectedNeutralWinChance - (opponent.getHomeFieldAdvantage() / 2)));
+		int homeModifier = Math.round((team.getHomeFieldAdvantage() + opponent.getHomeFieldAdvantage()) / 4);
+		int expectedHomeWinChance = Math.min(99, expectedNeutralWinChance + homeModifier);
+		int expectedAwayWinChance = Math.min(99, expectedNeutralWinChance - homeModifier);
 		assertEquals(expectedHomeWinChance, teamMatchup.getTeamHomeWinChance(teamName));
 		assertEquals(expectedAwayWinChance, teamMatchup.getTeamAwayWinChance(teamName));
 	}

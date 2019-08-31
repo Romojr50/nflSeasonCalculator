@@ -27,4 +27,9 @@ public abstract class NFLFileIO {
 	protected static final String NFL_SEASON_SAVE_FILE_LOCATION = 
 			NFL_SEASON_SAVE_FOLDER_LOCATION + "/" + NFL_SEASON_SAVE_FILE_NAME;
 	
+	protected static final String NFL_SEASON_ESTIMATES_FILE_NAME = "nflSeasonEstimates.csv";
+	
+	protected static final String NFL_SEASON_ESTIMATES_FILE_LOCATION = 
+			NFL_SEASON_SAVE_FOLDER_LOCATION + "/" + NFL_SEASON_ESTIMATES_FILE_NAME;
+	
 }

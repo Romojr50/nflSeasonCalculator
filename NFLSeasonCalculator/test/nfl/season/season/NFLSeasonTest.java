@@ -610,7 +610,7 @@ public class NFLSeasonTest {
 		NFLSeasonTeam seasonTeam1_1_1 = season.getTeam(team1_1_1Name);
 		
 		for (int i = 1; i <= NFLSeason.NUMBER_OF_WEEKS_IN_SEASON; i++) {
-			verify(scoreStripReader).generateScoreStripURL("2017", i);
+			verify(scoreStripReader).generateScoreStripURL("2019", i);
 			assertEquals(seasonGame1, seasonTeam1_1_1.getSeasonGame(i));
 			
 		}

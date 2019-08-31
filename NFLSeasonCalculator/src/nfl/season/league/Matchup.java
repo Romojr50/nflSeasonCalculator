@@ -450,15 +450,15 @@ public class Matchup implements Serializable {
 
 	private int calculateHomeTeamWinChance(int homeFieldAdvantage, int neutralWinChance,
 			int opponentHomeField, int opponentNeutralWinChance) {
-		int effectiveHomeField = homeFieldAdvantage;
+		int effectiveHomeField = Math.round((homeFieldAdvantage + opponentHomeField) / 4);
 		int opponentHomeTeamWinChance = opponentNeutralWinChance + 
-				Math.round(opponentHomeField / 2);
+				Math.round((opponentHomeField + homeFieldAdvantage) / 4);
 		if (opponentHomeTeamWinChance > 99) {
 			int difference = 99 - opponentNeutralWinChance;
-			effectiveHomeField = Math.min(homeFieldAdvantage, difference * 2);
+			effectiveHomeField = Math.min(effectiveHomeField, difference);
 		}
 		
-		int homeTeamWinChance = neutralWinChance + Math.round(effectiveHomeField / 2);
+		int homeTeamWinChance = neutralWinChance + effectiveHomeField;
 		homeTeamWinChance = Math.min(99, homeTeamWinChance);
 		
 		return homeTeamWinChance;
